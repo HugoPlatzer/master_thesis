@@ -1,0 +1,18 @@
+minimal: only token embds, only attn blocks, single head, qkv matrix, attn scaling, softmax, lmhead, residual
+optimizer is adam
+
+minimal: 196/1000
+heads: 247/1000
+pos: 626/1000
+pos,drop: 0/1000
+pos,mask: 550/1000
+pos,heads:674/1000
+pos,proj:778/1000
+pos,proj,drop:786/1000
+pos,ln:645/1000
+pos,proj,ln:586/1000
+pos,proj,ln,heads:585/1000
+pos,proj,ln,mask,drop,heads:
+
+778
+full: 845/1000

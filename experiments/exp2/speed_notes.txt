@@ -1,0 +1,12 @@
+model price power_draw time_fen_10k time_uci_10k
+
+gtx1660s      200€ 120w 300min 52min
+p100(no_bf16) 300€ 300w 130min 23min
+a4000         500€ 140w 54min 13min
+a5000        1200€ 220w 36min 8min
+a6000        5000€ 270w 32min 7min
+2080ti        400€ 230w 100min 21min
+rtx3090       800€ 350w 38min 7.5min
+rtx4090      2000€ 220w 27min 6min
+v100_32gb    3200€ 220w 80min 14min
+a100_40gb    5000€ 260w 20min 4.5min
