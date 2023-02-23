@@ -15,10 +15,13 @@ def layer_norm(state, w, b):
     return state_out
 
 
-def gpt2_block_attention(state, c_attn_w, c_attn_b, c_proj_w, c_proj_b):
+def gpt2_block_attention(state, block_nr, c_attn_w, c_attn_b, c_proj_w, c_proj_b):
     qkv = np.matmul(state, c_attn_w) + c_attn_b
     qkv = qkv.reshape((n_positions, 3, hidden_size))
     query, key, value = qkv[:, 0, :], qkv[:, 1, :], qkv[:, 2, :]
+    
+    # ~ if block_nr == 0:
+        # ~ pickle.dump(value, open("state.pickle", "wb"))
 
     query = query.reshape((n_positions, n_heads, head_size))
     query = np.swapaxes(query, 0, 1)
@@ -40,6 +43,7 @@ def gpt2_block_attention(state, c_attn_w, c_attn_b, c_proj_w, c_proj_b):
 
     attn = np.matmul(attn_weights, value)
     attn_merged = np.swapaxes(attn, 0, 1).reshape((n_positions, hidden_size))
+    
     attn_proj = np.matmul(attn_merged, c_proj_w) + c_proj_b
     
     return attn_proj
@@ -49,20 +53,21 @@ def gelu_activation(state):
     return  0.5 * state * (1 + np.tanh(np.sqrt(2 / np.pi) * (state + 0.044715 * (state**3))))
 
 
-def gpt2_block_mlp(state, mlp_fc_w, mlp_fc_b, mlp_proj_w, mlp_proj_b):
+def gpt2_block_mlp(state, block_nr, mlp_fc_w, mlp_fc_b, mlp_proj_w, mlp_proj_b):
     state = np.matmul(state, mlp_fc_w) + mlp_fc_b
     state = gelu_activation(state)
     state = np.matmul(state, mlp_proj_w) + mlp_proj_b
     return state
 
 
-def gpt2_block(state, block_params):
+def gpt2_block(state, block_nr, block_params):
     state_ln1 = layer_norm(state, block_params["ln1_w"], block_params["ln1_b"])
-    state_ln1_attn = gpt2_block_attention(state_ln1, block_params["c_attn_w"], block_params["c_attn_b"], block_params["c_proj_w"], block_params["c_proj_b"])
+      
+    state_ln1_attn = gpt2_block_attention(state_ln1, block_nr, block_params["c_attn_w"], block_params["c_attn_b"], block_params["c_proj_w"], block_params["c_proj_b"])
     state = state + state_ln1_attn
 
     state_ln2 = layer_norm(state, block_params["ln2_w"], block_params["ln2_b"])
-    state_ln2_mlp = gpt2_block_mlp(state_ln2, block_params["mlp_fc_w"], block_params["mlp_fc_b"], block_params["mlp_proj_w"], block_params["mlp_proj_b"])
+    state_ln2_mlp = gpt2_block_mlp(state_ln2, block_nr, block_params["mlp_fc_w"], block_params["mlp_fc_b"], block_params["mlp_proj_w"], block_params["mlp_proj_b"])
     
     state = state + state_ln2_mlp
     return state
@@ -74,11 +79,13 @@ def gpt2_model(input_tokenids, params):
     pos_vectors = params["wpe"].take(pos_range, axis=0)
     state = token_vectors + pos_vectors
     
-    for i in range(n_blocks):
-        state = gpt2_block(state, params["block"][i])
+    for block_nr in range(n_blocks):
+        state = gpt2_block(state, block_nr, params["block"][block_nr])
 
     state = layer_norm(state, params["lnf_w"], params["lnf_b"])
     state = np.matmul(state, params["lm_head_w"].transpose())
+        
+    # ~ pickle.dump(state[-1], open("state.pickle", "wb"))
     return state
 
 
