@@ -47,5 +47,5 @@ class SamplerStringReverse(Sampler):
     def get_max_prompt_len(self):
         return self.params["max_len"] + 1  # maximum string length plus : character
 
-    def get_max_prompt_len(self):
+    def get_max_response_len(self):
         return self.params["max_len"] # maximum string length

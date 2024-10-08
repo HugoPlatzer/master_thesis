@@ -52,7 +52,7 @@ class GPT2Model:
             x = x + ([self.pad_token_id] * n_pad)
         else:
             raise ValueError("invalid pad direction")
-        x = torch.tensor(x)
+        x = torch.tensor(x, dtype=torch.int64)
         return x
     
     def encode_prompt(self, prompt_str):
@@ -61,7 +61,7 @@ class GPT2Model:
     def encode_training_sample(self, prompt_str, response_str):
         prompt = self.encode_and_pad(prompt_str, self.max_prompt_len, "left")
         response = self.encode_and_pad(response_str, self.max_response_len, "right")
-        end_token = torch.tensor([self.pad_token_id])
+        end_token = torch.tensor([self.pad_token_id], dtype=torch.int64)
         sample = torch.cat((prompt, response, end_token))
         return sample
     
