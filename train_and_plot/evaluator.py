@@ -13,7 +13,7 @@ class Evaluator:
         f"num_samples={self.num_samples})"
         )
     
-    def evaluate_model(self):
+    def evaluate_model(self, debug=False):
         prompts_responses = [self.sampler.get_prompt_and_response()
             for i in range(self.num_samples)]
         prompts = [a[0] for a in prompts_responses]
@@ -25,9 +25,10 @@ class Evaluator:
         good_answers = 0
         for prompt, correct_response, model_response in zip(
             prompts, correct_responses, model_responses):
-            print(f"prompt={repr(prompt)}, "
-                f"correct_response={repr(correct_response)}, "
-                f"model_response={repr(model_response)}")
+            if debug:
+                print(f"prompt={repr(prompt)}, "
+                    f"correct_response={repr(correct_response)}, "
+                    f"model_response={repr(model_response)}")
             if model_response == correct_response:
                 good_answers += 1
         accuracy = good_answers / total_answers

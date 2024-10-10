@@ -13,5 +13,5 @@ model = model.GPT2Model(
 
 e = evaluator.Evaluator(sampler, model, num_samples=10)
 print(e)
-accuracy = e.evaluate_model()
+accuracy = e.evaluate_model(debug=True)
 print(accuracy)
