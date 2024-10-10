@@ -14,10 +14,11 @@ t = trainer.Trainer(
     training_steps=10,
     batch_size=2,
     eval_rate=1,
+    accuracy_samples=100
 )
 
 
-t.init_optimizer_scheduler()
+t.prepare_for_training()
 print(t.optimizer)
 t.lr_scheduler.step()
 print(t.optimizer)

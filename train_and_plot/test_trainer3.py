@@ -11,13 +11,11 @@ model = model.GPT2Model(
 t = trainer.Trainer(
     sampler,
     model,
-    training_steps=1000,
-    batch_size=2,
-    eval_rate=1,
+    training_steps=10000,
+    batch_size=8,
+    eval_rate=100,
+    accuracy_samples=100
 )
 
-
-sample = model.encode_training_sample("abc:", "cba")
-print("loss before training:", model.forward(sample).loss.item())
 t.run_training()
-print("loss after training:", model.forward(sample).loss.item())
+model.save_to_file("model_stringreverse.bin")

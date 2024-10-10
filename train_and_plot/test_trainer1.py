@@ -14,6 +14,7 @@ t = trainer.Trainer(
     training_steps=10,
     batch_size=2,
     eval_rate=1,
+    accuracy_samples=100
 )
 
 print(t)
