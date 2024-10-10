@@ -1,4 +1,5 @@
 import torch
+import transformers
 
 class Trainer:
     def __init__(self, sampler, model, training_steps, batch_size, eval_rate):
@@ -30,3 +31,22 @@ class Trainer:
                 prompt, response = self.sampler.get_prompt_and_response()
                 sample = self.model.encode_training_sample(prompt, response)
                 self.training_dataset[i][j] = sample
+    
+    def init_optimizer_scheduler(self):
+        # AdamW with default learning rate as in 'transformers' Trainer class
+        self.optimizer = torch.optim.AdamW(
+            self.model.model.parameters(), lr=1e-5)
+        # learning rate scheduler
+        self.lr_scheduler = transformers.get_scheduler(
+            name="linear",
+            optimizer=self.optimizer,
+            num_warmup_steps=0,
+            num_training_steps=self.training_steps
+            )
+    
+    def run_training(self):
+        self.build_training_dataset()
+        self.init_optimizer_scheduler()
+        print(self.optimizer)
+        self.lr_scheduler.step()
+        print(self.optimizer)
