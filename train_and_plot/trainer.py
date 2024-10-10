@@ -47,6 +47,13 @@ class Trainer:
     def run_training(self):
         self.build_training_dataset()
         self.init_optimizer_scheduler()
-        print(self.optimizer)
-        self.lr_scheduler.step()
-        print(self.optimizer)
+        
+        for step in range(1, self.training_steps + 1):
+            inputs = self.training_dataset[step-1]
+            outputs = self.model.forward(inputs)
+            loss = outputs.loss
+            loss.backward()
+            self.optimizer.step()
+            self.lr_scheduler.step()
+            self.optimizer.zero_grad()
+            

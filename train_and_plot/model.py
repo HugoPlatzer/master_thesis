@@ -87,3 +87,11 @@ class GPT2Model:
         responses = responses[:, self.max_prompt_len:]
         response_strings = [self.decode_response(x) for x in responses]
         return response_strings
+    
+    # forward sequences through model for training purposes
+    def forward(self, inputs):
+        self.model.train()
+        # use labels as inputs
+        # left shifting of labels relative to inputs happens inside
+        # transformers GPT2 model
+        return self.model(inputs, labels=inputs)
