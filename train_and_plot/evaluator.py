@@ -6,12 +6,18 @@ class Evaluator:
         self.model = model
         self.num_samples = num_samples
     
+    def get_params(self):
+        return {
+            "num_samples" : self.num_samples
+        }
+    
     def __str__(self):
-        return (f"{self.__class__.__name__}("
-        f"sampler={self.sampler}, "
-        f"model={self.model}, "
-        f"num_samples={self.num_samples})"
-        )
+        params = self.get_params()
+        params["sampler"] = str(self.sampler)
+        params["model"] = str(self.model)
+        params_str = ", ".join(
+            f"{name}={value}" for name, value in params.items())
+        return f"{self.__class__.__name__}({params_str}"")"
     
     def evaluate_model(self, debug=False):
         prompts_responses = [self.sampler.get_prompt_and_response()
@@ -33,4 +39,3 @@ class Evaluator:
                 good_answers += 1
         accuracy = good_answers / total_answers
         return accuracy
-        

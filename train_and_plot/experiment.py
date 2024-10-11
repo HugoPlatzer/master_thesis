@@ -8,12 +8,17 @@ class Experiment:
     def __init__(self, json_file):
         self.load_from_json(json_file)
     
+    def get_params(self):
+        return {}
+    
     def __str__(self):
-        return (f"{self.__class__.__name__}("
-        f"sampler={self.sampler}, "
-        f"model={self.model}, "
-        f"trainer={self.trainer})"
-        )
+        params = self.get_params()
+        params["sampler"] = str(self.sampler)
+        params["model"] = str(self.model)
+        params["trainer"] = str(self.trainer)
+        params_str = ", ".join(
+            f"{name}={value}" for name, value in params.items())
+        return f"{self.__class__.__name__}({params_str}"")"
     
     def load_from_json(self, json_file):
         json_data = json.loads(open(json_file).read())

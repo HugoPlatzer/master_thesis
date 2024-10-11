@@ -5,16 +5,15 @@ import string
 
 class Sampler:
     def __init__(self, **kwargs):
-        self.params = {name:value for name, value in kwargs.items()}
+        self.params = {name: value for name, value in kwargs.items()}
+    
+    def get_params(self):
+        return dict(self.params)
     
     def __str__(self):
-        s = f"{self.__class__.__name__}("
-        for name, value in self.params.items():
-            s += f"{name}={value}, "
-        if s.endswith(", "):
-            s = s[:-2]
-        s += ")"
-        return s
+        params_str = ", ".join(
+            f"{name}={value}" for name, value in self.get_params().items())
+        return f"{self.__class__.__name__}({params_str}"")"
     
     def get_prompt_and_response(self):
         pass

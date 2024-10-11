@@ -24,22 +24,20 @@ class GPT2Model:
     def save_to_file(self, filename):
         torch.save(self, filename)
     
-    def get_config_values(self):
+    def get_params(self):
         return {
             "max_prompt_len" : self.max_prompt_len,
             "max_response_len" : self.max_response_len,
             "n_positions" : self.config.n_positions,
             "n_embd" : self.config.n_embd,
             "n_layer" : self.config.n_layer,
-            "n_head" : self.config.n_head,
+            "n_head" : self.config.n_head
         }
     
     def __str__(self):
-        s = f"{self.__class__.__name__}("
-        s += ", ".join(f"{param}={value}" for param, value in
-            self.get_config_values().items())
-        s += ")"
-        return s
+        params_str = ", ".join(
+            f"{name}={value}" for name, value in self.get_params().items())
+        return f"{self.__class__.__name__}({params_str}"")"
     
     def encode_and_pad(self, s, max_len, pad_direction):
         if len(s) > max_len:

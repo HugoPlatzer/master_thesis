@@ -16,17 +16,23 @@ class Trainer:
         self.eval_rate = eval_rate
         self.accuracy_samples = accuracy_samples
     
+    def get_params(self):
+        return {
+            "training_steps": self.training_steps,
+            "batch_size": self.batch_size,
+            "lr_scheduler_type": self.lr_scheduler_type,
+            "initial_lr": self.initial_lr,
+            "eval_rate": self.eval_rate,
+            "accuracy_samples": self.accuracy_samples
+        }
+    
     def __str__(self):
-        return (f"{self.__class__.__name__}("
-        f"sampler={self.sampler}, "
-        f"model={self.model}], "
-        f"training_steps={self.training_steps}, "
-        f"batch_size={self.batch_size}, "
-        f"lr_scheduler_type={self.lr_scheduler_type}, "
-        f"initial_lr={self.initial_lr}, "
-        f"eval_rate={self.eval_rate}, "
-        f"accuracy_samples={self.accuracy_samples})"
-        )
+        params = self.get_params()
+        params["sampler"] = str(self.sampler)
+        params["model"] = str(self.model)
+        params_str = ", ".join(
+            f"{name}={value}" for name, value in params.items())
+        return f"{self.__class__.__name__}({params_str}"")"
     
     def get_sample_len(self):
         return self.model.config.n_positions
