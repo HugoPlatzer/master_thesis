@@ -9,7 +9,7 @@ class Evaluator:
     def __str__(self):
         return (f"{self.__class__.__name__}("
         f"sampler={self.sampler}, "
-        f"model={self.model}], "
+        f"model={self.model}, "
         f"num_samples={self.num_samples})"
         )
     

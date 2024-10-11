@@ -16,6 +16,8 @@ def run_test():
         model_,
         training_steps=10,
         batch_size=2,
+        lr_scheduler_type="linear",
+        initial_lr=1e-5,
         eval_rate=1,
         accuracy_samples=100
     )
