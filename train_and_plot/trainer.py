@@ -5,12 +5,14 @@ import transformers
 import tqdm
 
 class Trainer:
-    def __init__(self, sampler, model, training_steps,
-        batch_size, eval_rate, accuracy_samples):
+    def __init__(self, sampler, model, training_steps, batch_size,
+        lr_scheduler_type, initial_lr, eval_rate, accuracy_samples):
         self.sampler = sampler
         self.model = model
         self.training_steps = training_steps
         self.batch_size = batch_size
+        self.lr_scheduler_type = lr_scheduler_type
+        self.initial_lr = initial_lr
         self.eval_rate = eval_rate
         self.accuracy_samples = accuracy_samples
     
@@ -20,6 +22,8 @@ class Trainer:
         f"model={self.model}], "
         f"training_steps={self.training_steps}, "
         f"batch_size={self.batch_size}, "
+        f"lr_scheduler_type={self.lr_scheduler_type}, "
+        f"initial_lr={self.initial_lr}, "
         f"eval_rate={self.eval_rate}, "
         f"accuracy_samples={self.accuracy_samples})"
         )

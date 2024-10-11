@@ -1,0 +1,28 @@
+{
+    "sampler": {
+        "type": "SamplerStringReverse",
+        "params": {
+            "max_len": 5,
+            "mixed_len": true
+        }
+    },
+    "model": {
+        "type": "GPT2Model",
+        "params": {
+            "n_embd": 128,
+            "n_head": 2,
+            "n_layer": 2
+        }
+    },
+    "trainer": {
+        "type": "Trainer",
+        "params": {
+            "training_steps": 10000,
+            "batch_size": 8,
+            "eval_rate": 100,
+            "accuracy_samples": 100,
+            "initial_lr": 1e-5,
+            "lr_scheduler_type": "linear"
+        }
+    }
+}
