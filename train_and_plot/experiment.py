@@ -48,5 +48,24 @@ class Experiment:
             **trainer_params
         )
     
+    def save_to_json(self, json_file):
+        json_data = {
+            "sampler": {
+                "type": self.sampler.__class__.__name__,
+                "params": self.sampler.get_params()
+            },
+            "model": {
+                "type": self.model.__class__.__name__,
+                "params": self.model.get_params()
+            },
+            "trainer": {
+                "type": self.trainer.__class__.__name__,
+                "params": self.trainer.get_params()
+            },
+        }
+        with open(json_file, "w") as f:
+            json.dump(json_data, f, indent=4)
+            f.write("\n")
+    
     def run_training(self):
         self.trainer.run_training()
