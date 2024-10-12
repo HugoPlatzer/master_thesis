@@ -1,4 +1,4 @@
 import experiment
 
-e = experiment.Experiment("tests/test_experiment1.json")
+e = experiment.Experiment("tests/test_experiment.json")
 print(e)
