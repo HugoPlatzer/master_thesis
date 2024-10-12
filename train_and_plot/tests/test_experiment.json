@@ -2,7 +2,7 @@
     "sampler": {
         "type": "SamplerStringReverse",
         "params": {
-            "max_len": 5,
+            "max_len": 2,
             "mixed_len": true
         }
     },
@@ -17,7 +17,7 @@
     "trainer": {
         "type": "Trainer",
         "params": {
-            "training_steps": 10000,
+            "training_steps": 1000,
             "batch_size": 8,
             "eval_rate": 100,
             "accuracy_samples": 100,
