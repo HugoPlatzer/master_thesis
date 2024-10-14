@@ -7,7 +7,8 @@ import plot_generator
 
 if len(sys.argv) != 2:
     print(f"usage: {sys.argv[0]} EXPERIMENT_PATH")
-    print(f"usage: {sys.argv[0]} experiments/example_stringreverse")
+    print(f"example: {sys.argv[0]} experiments/example_stringreverse")
+    exit(1)
 
 
 experiment_path = sys.argv[1]
