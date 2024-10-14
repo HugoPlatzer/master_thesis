@@ -7,3 +7,4 @@
 **/*.pickle
 **/*.hdf5
 **/*.bin
+**/results.json
