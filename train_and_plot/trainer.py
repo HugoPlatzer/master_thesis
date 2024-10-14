@@ -1,4 +1,5 @@
 import evaluator
+import training_state
 
 import torch
 import transformers
@@ -49,7 +50,7 @@ class Trainer:
                 self.training_dataset[i][j] = sample
     
     # initialize training data batches, optimizer, learning rate scheduler,
-    # model evaluator
+    # model evaluator, training states
     def prepare_for_training(self):
         self.build_training_dataset()
         # AdamW with default learning rate as in 'transformers' Trainer class
@@ -64,6 +65,7 @@ class Trainer:
             )
         self.evaluator = evaluator.Evaluator(self.sampler, self.model,
             num_samples=self.accuracy_samples)
+        self.training_states = []
     
     def run_training(self):
         self.prepare_for_training()
@@ -82,3 +84,9 @@ class Trainer:
                 accuracy_value = self.evaluator.evaluate_model()
                 print(f"step={step} loss={loss_value} "
                       f"accuracy={accuracy_value}")
+                state = training_state.TrainingState(
+                    training_step=step,
+                    loss=loss_value,
+                    accuracy=accuracy_value
+                )
+                self.training_states.append(state)
