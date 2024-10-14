@@ -48,7 +48,12 @@ class Experiment:
             **trainer_params
         )
     
-    def save_to_json(self, json_file):
+    def save_results(self, json_file):
+        if self.trainer.training_states is not None:
+            training_states_data = [ts.get_params()
+                for ts in self.trainer.training_states]
+        else:
+            training_states_data = None
         json_data = {
             "sampler": {
                 "type": self.sampler.__class__.__name__,
@@ -62,6 +67,7 @@ class Experiment:
                 "type": self.trainer.__class__.__name__,
                 "params": self.trainer.get_params()
             },
+            "training_states": training_states_data
         }
         with open(json_file, "w") as f:
             json.dump(json_data, f, indent=4)

@@ -16,6 +16,12 @@ class Trainer:
         self.initial_lr = initial_lr
         self.eval_rate = eval_rate
         self.accuracy_samples = accuracy_samples
+        
+        self.training_dataset = None
+        self.optimizer = None
+        self.lr_scheduler = None
+        self.evaluator = None
+        self.training_states = None
     
     def get_params(self):
         return {
