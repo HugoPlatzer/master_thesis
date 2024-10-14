@@ -8,3 +8,4 @@
 **/*.hdf5
 **/*.bin
 **/results.json
+**/plot.pdf

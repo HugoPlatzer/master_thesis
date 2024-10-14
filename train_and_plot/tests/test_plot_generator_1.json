@@ -1,0 +1,83 @@
+{
+    "sampler": {
+        "type": "SamplerStringReverse",
+        "params": {
+            "max_len": 5,
+            "mixed_len": true
+        }
+    },
+    "model": {
+        "type": "GPT2Model",
+        "params": {
+            "max_prompt_len": 6,
+            "max_response_len": 5,
+            "n_positions": 12,
+            "n_embd": 128,
+            "n_layer": 2,
+            "n_head": 2
+        }
+    },
+    "trainer": {
+        "type": "Trainer",
+        "params": {
+            "training_steps": 1000,
+            "batch_size": 8,
+            "lr_scheduler_type": "linear",
+            "initial_lr": 1e-05,
+            "eval_rate": 100,
+            "accuracy_samples": 100
+        }
+    },
+    "training_states": [
+        {
+            "training_step": 100,
+            "loss": 5.0,
+            "accuracy": 0.0
+        },
+        {
+            "training_step": 200,
+            "loss": 4.8,
+            "accuracy": 0.1
+        },
+        {
+            "training_step": 300,
+            "loss": 4.6,
+            "accuracy": 0.25
+        },
+        {
+            "training_step": 400,
+            "loss": 4.4,
+            "accuracy": 0.4
+        },
+        {
+            "training_step": 500,
+            "loss": 4.2,
+            "accuracy": 0.6
+        },
+        {
+            "training_step": 600,
+            "loss": 4.0,
+            "accuracy": 0.8
+        },
+        {
+            "training_step": 700,
+            "loss": 3.9,
+            "accuracy": 0.9
+        },
+        {
+            "training_step": 800,
+            "loss": 3.8,
+            "accuracy": 0.95
+        },
+        {
+            "training_step": 900,
+            "loss": 3.7,
+            "accuracy": 0.975
+        },
+        {
+            "training_step": 1000,
+            "loss": 3.6,
+            "accuracy": 1.0
+        }
+    ]
+}
