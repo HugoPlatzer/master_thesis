@@ -1,6 +1,6 @@
-import sampler
+import samplers
 
-s = sampler.SamplerStringReverse(max_len=5, mixed_len=True)
+s = samplers.SamplerStringReverse(max_len=5, mixed_len=True)
 print(s)
     
 for i in range(5):

@@ -1,6 +1,6 @@
 import json
 
-import sampler
+import samplers
 import model
 import trainer
 
@@ -25,7 +25,7 @@ class Experiment:
         
         sampler_class_name = json_data["sampler"]["type"]
         sampler_params = json_data["sampler"]["params"]
-        sampler_class = getattr(sampler, sampler_class_name)
+        sampler_class = getattr(samplers, sampler_class_name)
         self.sampler = sampler_class(**sampler_params)
         
         model_class_name = json_data["model"]["type"]

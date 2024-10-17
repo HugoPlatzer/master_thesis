@@ -1,17 +1,17 @@
-import sampler
+import samplers
 import model
 import trainer
 
-sampler_ = sampler.SamplerStringReverse(max_len=1, mixed_len=False)
+sampler = samplers.SamplerStringReverse(max_len=1, mixed_len=False)
 model_ = model.GPT2Model(
-    max_prompt_len=sampler_.get_max_prompt_len(),
-    max_response_len=sampler_.get_max_response_len(),
+    max_prompt_len=sampler.get_max_prompt_len(),
+    max_response_len=sampler.get_max_response_len(),
     n_embd=128,
     n_layer=2,
     n_head=2,
 )
 t = trainer.Trainer(
-    sampler_,
+    sampler,
     model_,
     training_steps=1000,
     batch_size=2,

@@ -1,4 +1,4 @@
-from sampler import SamplerStringReverse
+from samplers import SamplerStringReverse
 from model import GPT2Model
 from evaluator import Evaluator
 
