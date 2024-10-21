@@ -3,8 +3,9 @@ import random
 from .sampler import Sampler
 
 class SamplerMul(Sampler):
-    def __init__(self, max_len, mixed_len):
-        super().__init__(max_len=max_len, mixed_len=mixed_len)
+    def __init__(self, max_len, mixed_len, reverse_result):
+        super().__init__(max_len=max_len, mixed_len=mixed_len,
+            reverse_result=reverse_result)
     
     def random_int(self, n_digits):
         lower_limit = 10**(n_digits - 1)
@@ -24,7 +25,10 @@ class SamplerMul(Sampler):
         x = self.random_int(digits_x)
         y = self.random_int(digits_y)
         prompt_str = f"{x}*{y}="
-        response_str = f"{x*y}"
+        if self.params["reverse_result"]:
+            response_str = str(x * y)[::-1]
+        else:
+            response_str = str(x * y)
         return prompt_str, response_str
     
     def get_max_prompt_len(self):

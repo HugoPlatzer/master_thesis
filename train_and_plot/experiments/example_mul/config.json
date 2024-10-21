@@ -3,7 +3,8 @@
         "type": "SamplerMul",
         "params": {
             "max_len": 2,
-            "mixed_len": false
+            "mixed_len": false,
+            "reverse_result": true
         }
     },
     "model": {
