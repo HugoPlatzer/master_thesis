@@ -1,11 +1,12 @@
 import random
 
 from .sampler import Sampler
+from . import scratchpad
 
 class SamplerAdd(Sampler):
-    def __init__(self, max_len, mixed_len, reverse_result):
+    def __init__(self, max_len, mixed_len, reverse_result, scratchpad_type):
         super().__init__(max_len=max_len, mixed_len=mixed_len,
-            reverse_result=reverse_result)
+            reverse_result=reverse_result, scratchpad_type=scratchpad_type)
     
     def random_int(self, n_digits):
         lower_limit = 10**(n_digits - 1)
@@ -19,16 +20,27 @@ class SamplerAdd(Sampler):
         else:
             return self.params["max_len"]
     
+    def build_response(self, x, y):
+        if self.params["reverse_result"]:
+            sum_str = str(x + y)[::-1]
+        else:
+            sum_str = str(x + y)
+        
+        if self.params["scratchpad_type"] == "none":
+            return sum_str
+        elif self.params["scratchpad_type"] == "basic":
+            pad = scratchpad.generate_addition_scratchpad([x, y])
+            return f"[{pad}]{sum_str}"
+        else:
+            raise ValueError("invalid scratchpad type")
+    
     def get_prompt_and_response(self):
         digits_x = self.get_number_of_operand_digits()
         digits_y = self.get_number_of_operand_digits()
         x = self.random_int(digits_x)
         y = self.random_int(digits_y)
         prompt_str = f"{x}+{y}="
-        if self.params["reverse_result"]:
-            response_str = str(x + y)[::-1]
-        else:
-            response_str = str(x + y)
+        response_str = self.build_response(x, y)
         return prompt_str, response_str
     
     def get_max_prompt_len(self):
@@ -36,5 +48,9 @@ class SamplerAdd(Sampler):
         return 2 * self.params["max_len"] + 2
     
     def get_max_response_len(self):
-        # max length of sum
-        return self.params["max_len"] + 1
+        # the longest possible response string is generated
+        # when adding (10**max_digits - 1) + (10**max_digits - 1)
+        x_for_longest_response = 10**self.params["max_len"] - 1
+        response = self.build_response(x_for_longest_response,
+            x_for_longest_response)
+        return len(response)
