@@ -1,6 +1,8 @@
 from transformers import GPT2LMHeadModel, GPT2Config
 import torch
 
+import util
+
 class GPT2Model:
     def __init__(self, max_prompt_len, max_response_len, n_embd, n_layer, n_head):
         self.max_prompt_len = max_prompt_len
@@ -16,6 +18,7 @@ class GPT2Model:
             n_head=n_head,
         )
         self.model = GPT2LMHeadModel(self.config)
+        self.model = util.move_tensor_to_device(self.model)
     
     @classmethod
     def load_from_file(cls, filename):
@@ -38,7 +41,7 @@ class GPT2Model:
         params_str = ", ".join(
             f"{name}={value}" for name, value in self.get_params().items())
         return f"{self.__class__.__name__}({params_str}"")"
-    
+
     def encode_and_pad(self, s, max_len, pad_direction):
         if len(s) > max_len:
             raise ValueError("string too long")
@@ -74,13 +77,18 @@ class GPT2Model:
         # deterministic generation
         self.model.eval()
         prompts = torch.stack([self.encode_prompt(s) for s in prompt_strings])
+        prompts = util.move_tensor_to_device(prompts)
+        # create dummy attention mask (attention on all positions is enabled)
+        # to fix an issue on some devices
+        dummy_attention_mask = torch.ones_like(prompts)
         # generate response tokens using greedy decoding
         # up to max response length of model (plus eos token)
         responses = self.model.generate(prompts,
             max_new_tokens=self.max_response_len + 1,
             do_sample=False,
             pad_token_id=self.pad_token_id,
-            eos_token_id=self.pad_token_id)
+            eos_token_id=self.pad_token_id,
+            attention_mask=dummy_attention_mask)
         # strip prompt part to leave only response
         responses = responses[:, self.max_prompt_len:]
         response_strings = [self.decode_response(x) for x in responses]

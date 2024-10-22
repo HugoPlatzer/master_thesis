@@ -20,9 +20,9 @@
     "model": {
         "type": "GPT2Model",
         "params": {
-            "n_embd": 128,
-            "n_head": 2,
-            "n_layer": 2
+            "n_embd": 384,
+            "n_head": 6,
+            "n_layer": 6
         }
     },
     "evaluator": {
@@ -35,8 +35,8 @@
     "trainer": {
         "type": "Trainer",
         "params": {
-            "training_steps": 100000,
-            "batch_size": 8,
+            "training_steps": 10000,
+            "batch_size": 16,
             "eval_rate": 100,
             "initial_lr": 1e-5,
             "lr_scheduler_type": "linear"

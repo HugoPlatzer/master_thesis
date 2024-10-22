@@ -1,9 +1,10 @@
-import evaluator
-import training_state
-
 import torch
 import transformers
 import tqdm
+
+import util
+import evaluator
+import training_state
 
 class Trainer:
     def __init__(self, sampler, model, evaluator, training_steps, batch_size,
@@ -55,6 +56,9 @@ class Trainer:
                 prompt, response = self.sampler.get_prompt_and_response()
                 sample = self.model.encode_training_sample(prompt, response)
                 self.training_dataset[i][j] = sample
+        
+        self.training_dataset = util.move_tensor_to_device(
+            self.training_dataset)
     
     # initialize training dataset, optimizer, learning rate scheduler,
     # training states
