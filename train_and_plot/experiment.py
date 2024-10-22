@@ -14,7 +14,8 @@ class Experiment:
     
     def __str__(self):
         params = {
-            "sampler": self.sampler,
+            "sampler_train": self.sampler_train,
+            "sampler_eval": self.sampler_eval,
             "model": self.model,
             "evaluator": self.evaluator,
             "trainer": self.trainer
@@ -27,16 +28,21 @@ class Experiment:
     def load_from_json(self, json_file):
         json_data = json.loads(open(json_file).read())
         
-        sampler_class_name = json_data["sampler"]["type"]
-        sampler_params = json_data["sampler"]["params"]
-        sampler_class = getattr(samplers, sampler_class_name)
-        self.sampler = sampler_class(**sampler_params)
+        sampler_train_class_name = json_data["sampler_train"]["type"]
+        sampler_train_params = json_data["sampler_train"]["params"]
+        sampler_train_class = getattr(samplers, sampler_train_class_name)
+        self.sampler_train = sampler_train_class(**sampler_train_params)
+        
+        sampler_eval_class_name = json_data["sampler_eval"]["type"]
+        sampler_eval_params = json_data["sampler_eval"]["params"]
+        sampler_eval_class = getattr(samplers, sampler_eval_class_name)
+        self.sampler_eval = sampler_eval_class(**sampler_eval_params)
         
         model_class_name = json_data["model"]["type"]
         model_params = json_data["model"]["params"]
         model_class = getattr(model, model_class_name)
-        max_prompt_len = self.sampler.get_max_prompt_len()
-        max_response_len = self.sampler.get_max_response_len()
+        max_prompt_len = self.sampler_train.get_max_prompt_len()
+        max_response_len = self.sampler_train.get_max_response_len()
         self.model = model_class(
             max_prompt_len=max_prompt_len,
             max_response_len=max_response_len,
@@ -46,14 +52,17 @@ class Experiment:
         evaluator_class_name = json_data["evaluator"]["type"]
         evaluator_params = json_data["evaluator"]["params"]
         evaluator_class = getattr(evaluator, evaluator_class_name)
-        self.evaluator = evaluator_class(self.sampler, self.model,
-            **evaluator_params)
+        self.evaluator = evaluator_class(
+            sampler=self.sampler_eval,
+            model=self.model,
+            **evaluator_params
+        )
         
         trainer_class_name = json_data["trainer"]["type"]
         trainer_params = json_data["trainer"]["params"]
         trainer_class = getattr(trainer, trainer_class_name)
         self.trainer = trainer_class(
-            sampler=self.sampler,
+            sampler=self.sampler_train,
             model=self.model,
             evaluator=self.evaluator,
             **trainer_params
@@ -66,9 +75,13 @@ class Experiment:
         else:
             training_states_data = None
         json_data = {
-            "sampler": {
-                "type": self.sampler.__class__.__name__,
-                "params": self.sampler.get_params()
+            "sampler_train": {
+                "type": self.sampler_train.__class__.__name__,
+                "params": self.sampler_train.get_params()
+            },
+            "sampler_eval": {
+                "type": self.sampler_eval.__class__.__name__,
+                "params": self.sampler_eval.get_params()
             },
             "model": {
                 "type": self.model.__class__.__name__,

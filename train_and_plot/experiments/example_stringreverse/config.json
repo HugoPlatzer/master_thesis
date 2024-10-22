@@ -1,9 +1,16 @@
 {
-    "sampler": {
+    "sampler_train": {
         "type": "SamplerStringReverse",
         "params": {
             "max_len": 5,
             "mixed_len": true
+        }
+    },
+    "sampler_eval": {
+        "type": "SamplerStringReverse",
+        "params": {
+            "max_len": 5,
+            "mixed_len": false
         }
     },
     "model": {

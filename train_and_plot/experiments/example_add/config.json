@@ -1,11 +1,20 @@
 {
-    "sampler": {
+    "sampler_train": {
+        "type": "SamplerAdd",
+        "params": {
+            "max_len": 2,
+            "mixed_len": true,
+            "reverse_result": false,
+            "scratchpad_type": "basic"
+        }
+    },
+    "sampler_eval": {
         "type": "SamplerAdd",
         "params": {
             "max_len": 2,
             "mixed_len": false,
             "reverse_result": false,
-            "scratchpad_type": "basic"
+            "scratchpad_type": "none"
         }
     },
     "model": {
