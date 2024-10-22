@@ -32,10 +32,12 @@ class Trainer:
         }
     
     def __str__(self):
-        params = self.get_params()
-        params["sampler"] = str(self.sampler)
-        params["model"] = str(self.model)
-        params["evaluator"] = str(self.evaluator)
+        params = {
+            "sampler": self.sampler,
+            "model": self.model,
+            "evaluator": self.evaluator
+        }
+        params.update(self.get_params())
         params_str = ", ".join(
             f"{name}={value}" for name, value in params.items())
         return f"{self.__class__.__name__}({params_str}"")"
