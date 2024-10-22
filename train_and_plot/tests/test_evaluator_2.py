@@ -7,7 +7,7 @@ def test():
     strlen = 5
     
     sampler = SamplerStringReverse(max_len=strlen, mixed_len=False)
-    evaluator = Evaluator(sampler, model, num_samples=10)
+    evaluator = Evaluator(sampler, model, num_samples=10, strip_scratchpad=False)
     
     print(evaluator)
     accuracy = evaluator.evaluate_model(debug=True)

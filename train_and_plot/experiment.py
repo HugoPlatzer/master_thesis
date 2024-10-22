@@ -2,6 +2,7 @@ import json
 
 import samplers
 import model
+import evaluator
 import trainer
 
 class Experiment:
@@ -15,6 +16,7 @@ class Experiment:
         params = self.get_params()
         params["sampler"] = str(self.sampler)
         params["model"] = str(self.model)
+        params["evaluator"] = str(self.evaluator)
         params["trainer"] = str(self.trainer)
         params_str = ", ".join(
             f"{name}={value}" for name, value in params.items())
@@ -39,12 +41,19 @@ class Experiment:
             **model_params
         )
         
+        evaluator_class_name = json_data["evaluator"]["type"]
+        evaluator_params = json_data["evaluator"]["params"]
+        evaluator_class = getattr(evaluator, evaluator_class_name)
+        self.evaluator = evaluator_class(self.sampler, self.model,
+            **evaluator_params)
+        
         trainer_class_name = json_data["trainer"]["type"]
         trainer_params = json_data["trainer"]["params"]
         trainer_class = getattr(trainer, trainer_class_name)
         self.trainer = trainer_class(
             sampler=self.sampler,
             model=self.model,
+            evaluator=self.evaluator,
             **trainer_params
         )
     
@@ -62,6 +71,10 @@ class Experiment:
             "model": {
                 "type": self.model.__class__.__name__,
                 "params": self.model.get_params()
+            },
+            "evaluator": {
+                "type": self.evaluator.__class__.__name__,
+                "params": self.evaluator.get_params()
             },
             "trainer": {
                 "type": self.trainer.__class__.__name__,

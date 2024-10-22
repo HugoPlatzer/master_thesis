@@ -12,7 +12,7 @@ def test():
         n_head=2,
     )
     
-    eval_ = evaluator.Evaluator(sampler, model_, num_samples=10)
+    eval_ = evaluator.Evaluator(sampler, model_, num_samples=10, strip_scratchpad=False)
     print(eval_)
     accuracy = eval_.evaluate_model(debug=True)
     print(accuracy)

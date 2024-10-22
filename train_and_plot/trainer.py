@@ -6,37 +6,36 @@ import transformers
 import tqdm
 
 class Trainer:
-    def __init__(self, sampler, model, training_steps, batch_size,
-        lr_scheduler_type, initial_lr, eval_rate, accuracy_samples):
+    def __init__(self, sampler, model, evaluator, training_steps, batch_size,
+        eval_rate, initial_lr, lr_scheduler_type):
         self.sampler = sampler
         self.model = model
+        self.evaluator = evaluator
         self.training_steps = training_steps
         self.batch_size = batch_size
-        self.lr_scheduler_type = lr_scheduler_type
-        self.initial_lr = initial_lr
         self.eval_rate = eval_rate
-        self.accuracy_samples = accuracy_samples
+        self.initial_lr = initial_lr
+        self.lr_scheduler_type = lr_scheduler_type
         
         self.training_dataset = None
         self.optimizer = None
         self.lr_scheduler = None
-        self.evaluator = None
         self.training_states = None
     
     def get_params(self):
         return {
             "training_steps": self.training_steps,
             "batch_size": self.batch_size,
-            "lr_scheduler_type": self.lr_scheduler_type,
-            "initial_lr": self.initial_lr,
             "eval_rate": self.eval_rate,
-            "accuracy_samples": self.accuracy_samples
+            "initial_lr": self.initial_lr,
+            "lr_scheduler_type": self.lr_scheduler_type
         }
     
     def __str__(self):
         params = self.get_params()
         params["sampler"] = str(self.sampler)
         params["model"] = str(self.model)
+        params["evaluator"] = str(self.evaluator)
         params_str = ", ".join(
             f"{name}={value}" for name, value in params.items())
         return f"{self.__class__.__name__}({params_str}"")"
@@ -55,8 +54,8 @@ class Trainer:
                 sample = self.model.encode_training_sample(prompt, response)
                 self.training_dataset[i][j] = sample
     
-    # initialize training data batches, optimizer, learning rate scheduler,
-    # model evaluator, training states
+    # initialize training dataset, optimizer, learning rate scheduler,
+    # training states
     def prepare_for_training(self):
         self.build_training_dataset()
         # AdamW with default learning rate as in 'transformers' Trainer class
@@ -69,8 +68,6 @@ class Trainer:
             num_warmup_steps=0,
             num_training_steps=self.training_steps
             )
-        self.evaluator = evaluator.Evaluator(self.sampler, self.model,
-            num_samples=self.accuracy_samples)
         self.training_states = []
     
     def run_training(self):

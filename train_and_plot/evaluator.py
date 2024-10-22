@@ -1,20 +1,24 @@
 import torch
 
 class Evaluator:
-    def __init__(self, sampler, model, num_samples):
+    def __init__(self, sampler, model, num_samples, strip_scratchpad):
         self.sampler = sampler
         self.model = model
         self.num_samples = num_samples
+        self.strip_scratchpad = strip_scratchpad
     
     def get_params(self):
         return {
-            "num_samples" : self.num_samples
+            "num_samples" : self.num_samples,
+            "strip_scratchpad": self.strip_scratchpad
         }
     
     def __str__(self):
-        params = self.get_params()
-        params["sampler"] = str(self.sampler)
-        params["model"] = str(self.model)
+        params = {
+            "sampler": self.sampler,
+            "model": self.model
+        }
+        params.update(self.get_params())
         params_str = ", ".join(
             f"{name}={value}" for name, value in params.items())
         return f"{self.__class__.__name__}({params_str}"")"

@@ -14,13 +14,19 @@
             "n_layer": 2
         }
     },
+    "evaluator": {
+        "type": "Evaluator",
+        "params": {
+            "num_samples": 100,
+            "strip_scratchpad": true
+        }
+    },
     "trainer": {
         "type": "Trainer",
         "params": {
             "training_steps": 1000,
             "batch_size": 8,
             "eval_rate": 100,
-            "accuracy_samples": 100,
             "initial_lr": 1e-5,
             "lr_scheduler_type": "linear"
         }

@@ -1,5 +1,6 @@
 import samplers
 import model
+import evaluator
 import trainer
 
 def test():
@@ -11,15 +12,16 @@ def test():
         n_layer=2,
         n_head=2,
     )
+    evaluator_ = evaluator.Evaluator(sampler, model_, num_samples=100, strip_scratchpad=False)
     t = trainer.Trainer(
         sampler,
         model_,
+        evaluator_,
         training_steps=1000,
         batch_size=2,
         lr_scheduler_type="linear",
         initial_lr=1e-5,
         eval_rate=100,
-        accuracy_samples=100
     )
     
     t.run_training()
