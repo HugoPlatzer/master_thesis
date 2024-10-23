@@ -47,11 +47,12 @@ class Trainer:
         return self.model.config.n_positions
     
     def build_training_dataset(self):
+        print("building training dataset...")
         dataset_size = (self.training_steps,
             self.batch_size,
             self.get_sample_len())
         self.training_dataset = torch.zeros(dataset_size, dtype=torch.int64)
-        for i in range(self.training_steps):
+        for i in tqdm.tqdm(range(self.training_steps)):
             for j in range(self.batch_size):
                 prompt, response = self.sampler.get_prompt_and_response()
                 sample = self.model.encode_training_sample(prompt, response)
@@ -79,6 +80,7 @@ class Trainer:
     def run_training(self):
         self.prepare_for_training()
         
+        print("running training...")
         for step in tqdm.tqdm(range(1, self.training_steps + 1)):
             inputs = self.training_dataset[step-1]
             outputs = self.model.forward(inputs)
@@ -99,3 +101,5 @@ class Trainer:
                     accuracy=accuracy_value
                 )
                 self.training_states.append(state)
+        
+        print("training complete.")
