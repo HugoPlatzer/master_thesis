@@ -29,7 +29,7 @@ class SamplerAdd(Sampler):
         if self.params["scratchpad_type"] == "none":
             return sum_str
         elif self.params["scratchpad_type"] == "basic":
-            pad = scratchpad.generate_addition_scratchpad([x, y])
+            pad = scratchpad.build_scratchpad_add([x, y])
             return f"[{pad}]{sum_str}"
         else:
             raise ValueError("invalid scratchpad type")

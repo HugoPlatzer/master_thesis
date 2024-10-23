@@ -52,15 +52,21 @@ def test_sampler_add_scratchpad():
         validate_addition(prompt, response)
 
 def test_sampler_mul():
-    s = samplers.SamplerMul(max_len=3, mixed_len=False, reverse_result=True)
+    s = samplers.SamplerMul(max_len=3, mixed_len=False, reverse_result=True, scratchpad_type="none")
     print(s)
         
     for i in range(5):
         print(s.get_prompt_and_response())
 
 def test_sampler_mul_mixed():
-    s = samplers.SamplerMul(max_len=3, mixed_len=True, reverse_result=False)
+    s = samplers.SamplerMul(max_len=3, mixed_len=True, reverse_result=False, scratchpad_type="none")
     print(s)
         
     for i in range(5):
         print(s.get_prompt_and_response())
+
+def test_sampler_mul_scratchpad():
+    s = samplers.SamplerMul(max_len=5, mixed_len=True, reverse_result=False, scratchpad_type="basic")
+    for i in range(100):
+        prompt, response = s.get_prompt_and_response()
+        print(prompt, response)
