@@ -63,10 +63,9 @@ class PlotGenerator:
         ax1.xaxis.set_minor_locator(AutoMinorLocator(minorticks_x))
         ax1.yaxis.set_major_locator(MultipleLocator(tick_interval_y_acc))
         ax1.yaxis.set_minor_locator(AutoMinorLocator(minorticks_y_acc))
-        ax1.tick_params(bottom=False, labelbottom=False,
-            left=False, labelleft=False)
+        ax1.tick_params(which="both", left=False, bottom=False,
+            labelleft=False, labelbottom=False)
 
-        
         ax2 = fig.add_subplot(gs[0, 0], zorder=2, frame_on=False)
         ax2.plot(x_values, y_values_loss, label="Loss", color=loss_color)
         ax2.set_xlim(*x_limits)
@@ -80,7 +79,6 @@ class PlotGenerator:
         ax2.xaxis.set_major_formatter(StrMethodFormatter("{x:.0f}"))
         ax2.yaxis.set_major_formatter(StrMethodFormatter("{x:.1f}"))
         
-        
         ax3 = ax2.twinx()
         ax3.plot(x_values, y_values_acc, color="red", label="Accuracy")
         ax3.set_xlim(*x_limits)
@@ -90,6 +88,6 @@ class PlotGenerator:
         ax3.yaxis.set_major_formatter(StrMethodFormatter("{x:.1f}"))
         ax3.yaxis.set_major_locator(MultipleLocator(tick_interval_y_acc))
         ax3.yaxis.set_minor_locator(AutoMinorLocator(minorticks_y_acc))
-        
+
         plt.tight_layout()
         plt.savefig(output_file)
