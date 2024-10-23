@@ -90,7 +90,7 @@ class Trainer:
             self.lr_scheduler.step()
             self.optimizer.zero_grad()
             
-            if step % self.eval_rate == 0:
+            if step == 1 or step % self.eval_rate == 0:
                 loss_value = loss.item()
                 accuracy_value = self.evaluator.evaluate_model()
                 print(f"step={step} loss={loss_value} "
