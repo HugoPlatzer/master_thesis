@@ -3,9 +3,9 @@
         "type": "SamplerAdd",
         "params": {
             "max_len": 2,
-            "mixed_len": true,
+            "mixed_len": false,
             "reverse_result": false,
-            "scratchpad_type": "basic"
+            "scratchpad_type": "none"
         }
     },
     "sampler_eval": {
