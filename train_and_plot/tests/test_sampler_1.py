@@ -70,3 +70,16 @@ def test_sampler_mul_scratchpad():
     for i in range(100):
         prompt, response = s.get_prompt_and_response()
         print(prompt, response)
+
+
+def test_sampler_file():
+    s = samplers.SamplerFile(file_name="tests/test_sampler_file.txt")
+    possible_samples = [("1+1=", "2"), ("1+2=", "3"), ("12+34=", "46")]
+    print(s)
+    assert s.get_max_prompt_len() == 6
+    assert s.get_max_response_len() == 2
+    for i in range(10):
+        prompt, response = s.get_prompt_and_response()
+        print(prompt, response)
+        assert (prompt, response) in possible_samples
+    
