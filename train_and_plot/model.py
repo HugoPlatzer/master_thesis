@@ -97,6 +97,7 @@ class GPT2Model:
     # forward sequences through model for training purposes
     def forward(self, inputs):
         self.model.train()
+        inputs = utils.move_tensor_to_device(inputs)
         # use labels as inputs
         # left shifting of labels relative to inputs happens inside
         # transformers GPT2 model

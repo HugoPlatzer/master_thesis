@@ -57,9 +57,6 @@ class Trainer:
                 prompt, response = self.sampler.get_prompt_and_response()
                 sample = self.model.encode_training_sample(prompt, response)
                 self.training_dataset[i][j] = sample
-        
-        self.training_dataset = util.move_tensor_to_device(
-            self.training_dataset)
     
     # initialize training dataset, optimizer, learning rate scheduler,
     # training states
