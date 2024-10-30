@@ -60,9 +60,6 @@ class Trainer:
                     for k in range(self.model.num_sequences)]
                 sample = self.model.encode_training_sample(prompts_responses)
                 self.training_dataset[i][j] = sample
-        
-        self.training_dataset = util.move_tensor_to_device(
-            self.training_dataset)
     
     # initialize training dataset, optimizer, learning rate scheduler,
     # training states
