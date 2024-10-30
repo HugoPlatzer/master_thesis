@@ -4,12 +4,17 @@ import torch
 import util
 
 class GPT2Model:
-    def __init__(self, max_prompt_len, max_response_len, n_embd, n_layer, n_head):
+    def __init__(self, max_prompt_len, max_response_len, num_sequences,
+        n_embd, n_layer, n_head):
         self.max_prompt_len = max_prompt_len
         self.max_response_len = max_response_len
         self.pad_token_id = 0
+        # support training with multiple sequential examples in one
+        # training sample, even though prompting only uses a single example
+        self.num_sequences = num_sequences
         # model should be able to handle max prompt plus response len plus eos token
         n_positions = max_prompt_len + max_response_len + 1
+        n_positions *= num_sequences
         self.config = GPT2Config(
             vocab_size=256,
             n_positions=n_positions,
@@ -31,6 +36,7 @@ class GPT2Model:
         return {
             "max_prompt_len" : self.max_prompt_len,
             "max_response_len" : self.max_response_len,
+            "num_sequences" : self.num_sequences,
             "n_positions" : self.config.n_positions,
             "n_embd" : self.config.n_embd,
             "n_layer" : self.config.n_layer,
@@ -59,11 +65,20 @@ class GPT2Model:
     def encode_prompt(self, prompt_str):
         return self.encode_and_pad(prompt_str, self.max_prompt_len, "left")
     
-    def encode_training_sample(self, prompt_str, response_str):
-        prompt = self.encode_and_pad(prompt_str, self.max_prompt_len, "left")
-        response = self.encode_and_pad(response_str, self.max_response_len, "right")
-        end_token = torch.tensor([self.pad_token_id], dtype=torch.int64)
-        sample = torch.cat((prompt, response, end_token))
+    def encode_training_sample(self, prompts_responses):
+        sample_seqs = []
+        if len(prompts_responses) != self.num_sequences:
+            raise ValueError(f"need {self.num_sequences} prompts and responses")
+        for prompt_str, response_str in prompts_responses:
+            prompt = self.encode_and_pad(
+                prompt_str, self.max_prompt_len, "left")
+            response = self.encode_and_pad(
+                response_str, self.max_response_len, "right")
+            end_token = torch.tensor([self.pad_token_id], dtype=torch.int64)
+            sample_seq = torch.cat((prompt, response, end_token))
+            sample_seqs.append(sample_seq)
+        sample = torch.cat(sample_seqs)
+        assert sample.shape == (self.config.n_positions,)
         return sample
     
     def decode_response(self, response):
