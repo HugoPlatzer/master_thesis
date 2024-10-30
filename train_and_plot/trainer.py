@@ -54,8 +54,11 @@ class Trainer:
         self.training_dataset = torch.zeros(dataset_size, dtype=torch.int64)
         for i in tqdm.tqdm(range(self.training_steps)):
             for j in range(self.batch_size):
-                prompt, response = self.sampler.get_prompt_and_response()
-                sample = self.model.encode_training_sample(prompt, response)
+                # fetch multiple prompts and responses to support
+                # multi-sequence training of model
+                prompts_responses = [self.sampler.get_prompt_and_response()
+                    for k in range(self.model.num_sequences)]
+                sample = self.model.encode_training_sample(prompts_responses)
                 self.training_dataset[i][j] = sample
         
         self.training_dataset = util.move_tensor_to_device(

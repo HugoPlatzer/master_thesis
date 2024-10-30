@@ -2,7 +2,7 @@
     "sampler_train": {
         "type": "SamplerAdd",
         "params": {
-            "max_len": 2,
+            "max_len": 3,
             "mixed_len": false,
             "reverse_result": false,
             "scratchpad_type": "none"
@@ -11,7 +11,7 @@
     "sampler_eval": {
         "type": "SamplerAdd",
         "params": {
-            "max_len": 2,
+            "max_len": 3,
             "mixed_len": false,
             "reverse_result": false,
             "scratchpad_type": "none"
@@ -20,6 +20,7 @@
     "model": {
         "type": "GPT2Model",
         "params": {
+            "num_sequences": 2,
             "n_embd": 384,
             "n_head": 6,
             "n_layer": 6
@@ -28,15 +29,15 @@
     "evaluator": {
         "type": "Evaluator",
         "params": {
-            "num_samples": 100,
-            "strip_scratchpad": true
+            "num_samples": 1000,
+            "strip_scratchpad": false
         }
     },
     "trainer": {
         "type": "Trainer",
         "params": {
-            "training_steps": 10000,
-            "batch_size": 16,
+            "training_steps": 1000,
+            "batch_size": 256,
             "eval_rate": 100,
             "initial_lr": 1e-5,
             "lr_scheduler_type": "linear"
