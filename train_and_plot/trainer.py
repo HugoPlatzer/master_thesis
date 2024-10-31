@@ -8,14 +8,15 @@ import training_state
 
 class Trainer:
     def __init__(self, sampler, model, evaluator, training_steps, batch_size,
-        eval_rate, initial_lr, lr_scheduler_type):
+        eval_rate, lr_initial_value, lr_warmup_steps, lr_scheduler_type):
         self.sampler = sampler
         self.model = model
         self.evaluator = evaluator
         self.training_steps = training_steps
         self.batch_size = batch_size
         self.eval_rate = eval_rate
-        self.initial_lr = initial_lr
+        self.lr_initial_value = lr_initial_value
+        self.lr_warmup_steps = lr_warmup_steps
         self.lr_scheduler_type = lr_scheduler_type
         
         self.training_dataset = None
@@ -28,7 +29,8 @@ class Trainer:
             "training_steps": self.training_steps,
             "batch_size": self.batch_size,
             "eval_rate": self.eval_rate,
-            "initial_lr": self.initial_lr,
+            "lr_initial_value": self.lr_initial_value,
+            "lr_warmup_steps": self.lr_warmup_steps,
             "lr_scheduler_type": self.lr_scheduler_type
         }
     
@@ -62,14 +64,12 @@ class Trainer:
     # training states
     def prepare_for_training(self):
         self.build_training_dataset()
-        # AdamW with default learning rate as in 'transformers' Trainer class
         self.optimizer = torch.optim.AdamW(
-            self.model.model.parameters(), lr=self.initial_lr)
-        # learning rate scheduler
+            self.model.model.parameters(), lr=self.lr_initial_value)
         self.lr_scheduler = transformers.get_scheduler(
-            name="linear",
+            name=self.lr_scheduler_type,
             optimizer=self.optimizer,
-            num_warmup_steps=0,
+            num_warmup_steps=self.lr_warmup_steps,
             num_training_steps=self.training_steps
             )
         self.training_states = []
@@ -88,10 +88,11 @@ class Trainer:
             self.optimizer.zero_grad()
             
             if step == 1 or step % self.eval_rate == 0:
+                current_lr = self.lr_scheduler.get_last_lr()[0]
                 loss_value = loss.item()
                 accuracy_value = self.evaluator.evaluate_model()
-                print(f"step={step} loss={loss_value} "
-                      f"accuracy={accuracy_value}")
+                print(f"step={step} lr={current_lr:.8f}"
+                    f" loss={loss_value:.6f} accuracy={accuracy_value:.3f}")
                 state = training_state.TrainingState(
                     training_step=step,
                     loss=loss_value,
