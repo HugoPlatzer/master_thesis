@@ -19,9 +19,10 @@ def test():
         evaluator_,
         training_steps=10,
         batch_size=2,
-        lr_scheduler_type="linear",
-        initial_lr=1e-5,
         eval_rate=1,
+        lr_initial_value=1e-5,
+        lr_warmup_steps=0,
+        lr_scheduler_type="linear",
     )
     
     t.run_training()

@@ -31,10 +31,11 @@
     "trainer": {
         "type": "Trainer",
         "params": {
-            "training_steps": 1000,
+            "training_steps": 100,
             "batch_size": 8,
-            "eval_rate": 100,
-            "initial_lr": 1e-5,
+            "eval_rate": 5,
+            "lr_initial_value": 1e-3,
+            "lr_warmup_steps": 10,
             "lr_scheduler_type": "linear"
         }
     }

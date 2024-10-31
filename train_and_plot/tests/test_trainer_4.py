@@ -17,11 +17,12 @@ def test():
         sampler,
         model_,
         evaluator_,
-        training_steps=1000,
+        training_steps=100,
         batch_size=2,
+        eval_rate=10,
+        lr_initial_value=1e-5,
+        lr_warmup_steps=0,
         lr_scheduler_type="linear",
-        initial_lr=1e-5,
-        eval_rate=100,
     )
     
     t.run_training()
