@@ -64,7 +64,7 @@ class Trainer:
         self.build_training_dataset()
         # AdamW with default learning rate as in 'transformers' Trainer class
         self.optimizer = torch.optim.AdamW(
-            self.model.model.parameters(), lr=1e-5)
+            self.model.model.parameters(), lr=self.initial_lr)
         # learning rate scheduler
         self.lr_scheduler = transformers.get_scheduler(
             name="linear",
