@@ -1,0 +1,46 @@
+{
+    "sampler_train": {
+        "type": "SamplerAdd",
+        "params": {
+            "max_len": 5,
+            "mixed_len": false,
+            "reverse_result": false,
+            "scratchpad_type": "basic"
+        }
+    },
+    "sampler_eval": {
+        "type": "SamplerAdd",
+        "params": {
+            "max_len": 5,
+            "mixed_len": false,
+            "reverse_result": false,
+            "scratchpad_type": "basic"
+        }
+    },
+    "model": {
+        "type": "GPT2Model",
+        "params": {
+            "n_embd": 384,
+            "n_head": 6,
+            "n_layer": 6
+        }
+    },
+    "evaluator": {
+        "type": "Evaluator",
+        "params": {
+            "num_samples": 1000,
+            "strip_scratchpad": true
+        }
+    },
+    "trainer": {
+        "type": "Trainer",
+        "params": {
+            "training_steps": 10000,
+            "batch_size": 256,
+            "eval_rate": 100,
+            "lr_initial_value": 1e-3,
+            "lr_warmup_steps": 300,
+            "lr_scheduler_type": "linear"
+        }
+    }
+}
