@@ -7,5 +7,7 @@
 **/*.pickle
 **/*.hdf5
 **/*.bin
+**/logfile.txt
 **/results.json
 **/plot.pdf
+**/checkpoint-*/
