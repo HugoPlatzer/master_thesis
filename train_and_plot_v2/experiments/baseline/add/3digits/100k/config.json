@@ -21,7 +21,7 @@
         "batch_size": 256,
         "max_epochs": 200,
         "logging_steps": 40,
-        "logging_compute_accuracy": false,
+        "logging_compute_accuracy": true,
         "early_stopping_patience": 5,
         "early_stopping_threshold": 1e-4
     }
