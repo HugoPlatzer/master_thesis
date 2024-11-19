@@ -7,7 +7,7 @@
         }
     },
     "model_params": {
-        "n_positions": 16,
+        "n_positions": 40,
         "n_embd": 384,
         "n_layer": 6,
         "n_head": 6
