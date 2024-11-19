@@ -1,0 +1,28 @@
+{
+    "random_seed": 42,
+    "sampler": {
+        "name": "SamplerAdd",
+        "params": {
+            "digits": 3
+        }
+    },
+    "model_params": {
+        "n_positions": 16,
+        "n_embd": 384,
+        "n_layer": 6,
+        "n_head": 6
+    },
+    "dataset_params": {
+        "train_dataset_size": 100000,
+        "val_dataset_size": 1000,
+        "test_dataset_size": 1000
+    },
+    "training_params": {
+        "batch_size": 256,
+        "max_epochs": 200,
+        "logging_steps": 40,
+        "logging_compute_accuracy": false,
+        "early_stopping_patience": 5,
+        "early_stopping_threshold": 1e-4
+    }
+}
