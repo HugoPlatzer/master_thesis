@@ -18,6 +18,7 @@ def create_plot(config_file):
     fig, ax1 = plt.subplots()
     ax1.plot(batch_loss_x, batch_loss_y, color="b",
         label="Batch loss")
+    ax1.plot(batch_loss_x[-1], batch_loss_y[-1], marker="s", color="b")
     ax1.set_ylim(0.0, max(batch_loss_y) * 1.05)
     
     val_accuracy_data = [(state["step"], state["val_accuracy"])
@@ -29,10 +30,14 @@ def create_plot(config_file):
     ax2 = ax1.twinx()
     ax2.plot(val_accuracy_x, val_accuracy_y, color="r",
         label="Validation accuracy")
+    ax2.plot(val_accuracy_x[-1], val_accuracy_y[-1], marker="s", color="r")
     ax2.set_ylim(-0.05, 1.05)
     
     ax1.xaxis.grid(True)
     ax2.yaxis.grid(True)
+    
+    if "x_limits" in config:
+        plt.xlim(config["x_limits"][0], config["x_limits"][1])
     
     ax1.set_xlabel("Training step")
     ax1.set_ylabel("Loss")
