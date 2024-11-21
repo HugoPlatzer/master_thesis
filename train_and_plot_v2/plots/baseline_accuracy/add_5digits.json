@@ -1,0 +1,22 @@
+{
+    "plot_type": "accuracy",
+    "curves": [
+        {
+            "name": "1k",
+            "results_file": "experiments/baseline/add/5digits/1k/results.json"
+        },
+        {
+            "name": "10k",
+            "results_file": "experiments/baseline/add/5digits/10k/results.json"
+        },
+        {
+            "name": "100k",
+            "results_file": "experiments/baseline/add/5digits/100k/results.json"
+        },
+        {
+            "name": "1000k",
+            "results_file": "experiments/baseline/add/5digits/1000k/results.json"
+        }
+    ],
+    "x_limits": [0, 10000]
+}
