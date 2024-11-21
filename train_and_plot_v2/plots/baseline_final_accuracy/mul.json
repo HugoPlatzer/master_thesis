@@ -1,0 +1,35 @@
+{
+    "plot_type": "final_accuracy",
+    "x_axis_points": ["1k", "10k", "100k", "1000k"],
+    "x_axis_label": "Dataset size",
+    "curves": [
+        {
+            "name": "3 digits",
+            "results_files": [
+                "experiments/baseline/mul/3digits/1k/results.json",
+                "experiments/baseline/mul/3digits/10k/results.json",
+                "experiments/baseline/mul/3digits/100k/results.json",
+                "experiments/baseline/mul/3digits/1000k/results.json"
+            ]
+        },
+        {
+            "name": "5 digits",
+            "results_files": [
+                "experiments/baseline/mul/5digits/1k/results.json",
+                "experiments/baseline/mul/5digits/10k/results.json",
+                "experiments/baseline/mul/5digits/100k/results.json",
+                "experiments/baseline/mul/5digits/1000k/results.json"
+            ]
+        },
+        {
+            "name": "10 digits",
+            "results_files": [
+                "experiments/baseline/mul/10digits/1k/results.json",
+                "experiments/baseline/mul/10digits/10k/results.json",
+                "experiments/baseline/mul/10digits/100k/results.json",
+                "experiments/baseline/mul/10digits/1000k/results.json"
+            ]
+        }
+
+    ]
+}
