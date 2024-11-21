@@ -19,11 +19,7 @@ def create_plot(config_file):
         }
         curves.append(curve)
     
-    colormap = plt.get_cmap("Reds")
-    if len(curves) == 1:
-        colors = colormap([0.5])
-    else:
-        colors = colormap(np.linspace(0.25, 0.75, len(curves)))
+    colors = plt.colormaps["tab10"].colors
     
     for i, curve in enumerate(curves):
         x_values = [d[0] for d in curve["data"]]
