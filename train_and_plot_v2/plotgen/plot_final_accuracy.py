@@ -3,6 +3,22 @@ import os
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FixedLocator, MultipleLocator, FixedFormatter
 import numpy as np
+import csv
+
+def create_csv(config_file, col_labels, curves):
+    csv_file = config_file.rsplit(".", 1)[0] + ".csv"
+    csv_rows = []
+    csv_rows.append(["name"] + col_labels)
+    
+    for curve in curves:
+        y_values_formatted = [f"{y:.3f}" for y in curve["y_values"]]
+        row = [curve["name"]] + y_values_formatted
+        csv_rows.append(row)
+    
+    with open(csv_file, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerows(csv_rows)
+
 
 def create_plot(config_file):
     config = json.loads(open(config_file).read())
@@ -45,3 +61,5 @@ def create_plot(config_file):
     plt.tight_layout()
     output_file = config_file.rsplit(".", 1)[0] + ".pdf"
     plt.savefig(output_file)
+    
+    create_csv(config_file, x_tick_labels, curves)
