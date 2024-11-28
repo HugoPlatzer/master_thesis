@@ -3,7 +3,10 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
+from .settings import apply_plot_settings
+
 def create_plot(config_file):
+    apply_plot_settings()
     config = json.loads(open(config_file).read())
     
     curves = []

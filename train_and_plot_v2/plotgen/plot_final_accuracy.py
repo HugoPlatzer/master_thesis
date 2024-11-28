@@ -5,6 +5,8 @@ from matplotlib.ticker import FixedLocator, MultipleLocator, FixedFormatter
 import numpy as np
 import csv
 
+from .settings import apply_plot_settings
+
 def create_csv(config_file, col_labels, curves):
     csv_file = config_file.rsplit(".", 1)[0] + ".csv"
     csv_rows = []
@@ -21,6 +23,12 @@ def create_csv(config_file, col_labels, curves):
 
 
 def create_plot(config_file):
+    apply_plot_settings()
+    
+    plt.rcParams.update({
+        "text.usetex": True
+    })
+    
     config = json.loads(open(config_file).read())
     
     x_tick_labels = config["x_axis_points"]
@@ -59,7 +67,8 @@ def create_plot(config_file):
     plt.grid(True)
     plt.legend(loc="lower right", bbox_to_anchor=(1,1))
     plt.tight_layout()
+    
     output_file = config_file.rsplit(".", 1)[0] + ".pdf"
-    plt.savefig(output_file)
+    plt.savefig(output_file, bbox_inches="tight", pad_inches=0)
     
     create_csv(config_file, x_tick_labels, curves)

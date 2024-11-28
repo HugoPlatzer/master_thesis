@@ -2,7 +2,11 @@ import json
 import os
 import matplotlib.pyplot as plt
 
+from .settings import apply_plot_settings
+
 def create_plot(config_file):
+    apply_plot_settings()
+    
     config = json.loads(open(config_file).read())
     results_file = config["results_file"]
     results = json.loads(open(results_file).read())
