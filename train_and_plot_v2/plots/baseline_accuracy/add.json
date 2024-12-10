@@ -1,7 +1,6 @@
 {
     "plot_type": "accuracy",
     "legend_columns": 3,
-    "colormap": "viridis",
     "curves": [
         {
             "name": "3 digits, 1k",
