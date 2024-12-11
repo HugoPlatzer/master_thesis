@@ -1,0 +1,48 @@
+{
+    "plot_type": "accuracy",
+    "legend_columns": 3,
+    "curves": [
+        {
+            "name": "baseline",
+            "results_file": "experiments/baseline/add/10digits/100k/results.json",
+            "colormap": "Greys",
+            "colormap_position": 1.0
+        },
+        {
+            "name": "n_embd=192",
+            "results_file": "experiments/model_size/add_10digits_100k/n_embd_192/results.json",
+            "colormap": "Reds",
+            "colormap_position": 0.25
+        },
+        {
+            "name": "n_embd=768",
+            "results_file": "experiments/model_size/add_10digits_100k/n_embd_768/results.json",
+            "colormap": "Reds",
+            "colormap_position": 0.75
+        },
+        {
+            "name": "n_head=3",
+            "results_file": "experiments/model_size/add_10digits_100k/n_head_3/results.json",
+            "colormap": "Greens",
+            "colormap_position": 0.25
+        },
+        {
+            "name": "n_head=12",
+            "results_file": "experiments/model_size/add_10digits_100k/n_head_12/results.json",
+            "colormap": "Greens",
+            "colormap_position": 0.75
+        },
+        {
+            "name": "n_layer=3",
+            "results_file": "experiments/model_size/add_10digits_100k/n_layer_3/results.json",
+            "colormap": "Blues",
+            "colormap_position": 0.25
+        },
+        {
+            "name": "n_layer=12",
+            "results_file": "experiments/model_size/add_10digits_100k/n_layer_12/results.json",
+            "colormap": "Blues",
+            "colormap_position": 0.75
+        }
+    ]
+}
