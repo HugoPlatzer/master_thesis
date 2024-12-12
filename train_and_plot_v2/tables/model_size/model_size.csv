@@ -1,0 +1,8 @@
+name,"add: 10 digits, 100k","mul: 5 digits, 100k"
+baseline,0.987,0.0
+n_embd=192,0.974,0.0
+n_embd=768,1.0,0.0
+n_head=3,0.991,0.0
+n_head=12,0.989,0.0
+n_layer=3,0.974,0.001
+n_layer=12,0.989,0.0

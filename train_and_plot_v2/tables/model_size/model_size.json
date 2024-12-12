@@ -1,0 +1,96 @@
+{
+    "metric": "val_accuracy",
+    "rows": [
+        {
+            "row_name": "baseline",
+            "cols": [
+                {
+                    "col_name": "add: 10 digits, 100k",
+                    "results_file": "experiments/baseline/add/10digits/100k/results.json"
+                },
+                {
+                    "col_name": "mul: 5 digits, 100k",
+                    "results_file": "experiments/baseline/mul/5digits/100k/results.json"
+                }
+            ]
+        },
+        {
+            "row_name": "n_embd=192",
+            "cols": [
+                {
+                    "col_name": "add: 10 digits, 100k",
+                    "results_file": "experiments/model_size/add_10digits_100k/n_embd_192/results.json"
+                },
+                {
+                    "col_name": "mul: 5 digits, 100k",
+                    "results_file": "experiments/model_size/mul_5digits_100k/n_embd_192/results.json"
+                }
+            ]
+        },
+        {
+            "row_name": "n_embd=768",
+            "cols": [
+                {
+                    "col_name": "add: 10 digits, 100k",
+                    "results_file": "experiments/model_size/add_10digits_100k/n_embd_768/results.json"
+                },
+                {
+                    "col_name": "mul: 5 digits, 100k",
+                    "results_file": "experiments/model_size/mul_5digits_100k/n_embd_768/results.json"
+                }
+            ]
+        },
+        {
+            "row_name": "n_head=3",
+            "cols": [
+                {
+                    "col_name": "add: 10 digits, 100k",
+                    "results_file": "experiments/model_size/add_10digits_100k/n_head_3/results.json"
+                },
+                {
+                    "col_name": "mul: 5 digits, 100k",
+                    "results_file": "experiments/model_size/mul_5digits_100k/n_head_3/results.json"
+                }
+            ]
+        },
+        {
+            "row_name": "n_head=12",
+            "cols": [
+                {
+                    "col_name": "add: 10 digits, 100k",
+                    "results_file": "experiments/model_size/add_10digits_100k/n_head_12/results.json"
+                },
+                {
+                    "col_name": "mul: 5 digits, 100k",
+                    "results_file": "experiments/model_size/mul_5digits_100k/n_head_12/results.json"
+                }
+            ]
+        },
+        {
+            "row_name": "n_layer=3",
+            "cols": [
+                {
+                    "col_name": "add: 10 digits, 100k",
+                    "results_file": "experiments/model_size/add_10digits_100k/n_layer_3/results.json"
+                },
+                {
+                    "col_name": "mul: 5 digits, 100k",
+                    "results_file": "experiments/model_size/mul_5digits_100k/n_layer_3/results.json"
+                }
+            ]
+        },
+        {
+            "row_name": "n_layer=12",
+            "cols": [
+                {
+                    "col_name": "add: 10 digits, 100k",
+                    "results_file": "experiments/model_size/add_10digits_100k/n_layer_12/results.json"
+                },
+                {
+                    "col_name": "mul: 5 digits, 100k",
+                    "results_file": "experiments/model_size/mul_5digits_100k/n_layer_12/results.json"
+                }
+            ]
+        }
+    ]
+}
