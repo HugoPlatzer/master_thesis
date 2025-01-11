@@ -24,7 +24,8 @@ for row in table_config["rows"]:
             results_file = col["results_file"]
             results = json.loads(open(results_file).read())
             value = results["best_model"][metric]
-            table_row[col_name] = value
+            value_str = f"{value:.3f}"
+            table_row[col_name] = value_str
 
 if not (min(len(row_values) for row_values in table.values())
     == max(len(row_values) for row_values in table.values())):
