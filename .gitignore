@@ -9,6 +9,5 @@
 **/*.bin
 **/*.swp
 **/logfile.txt
-**/results.json
 **/plot.pdf
 **/checkpoint-*/
