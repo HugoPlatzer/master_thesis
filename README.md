@@ -5,7 +5,7 @@ Contains:
     * Code:
         * Reconstructing gpt2 from scratch (basic numpy/pytorch)
             to help me understand its structure
-        * Dataset generation / training code for main experiments
+        * Dataset generation / training code for experiments
         * Plotting code
     * Experiment results (plots/tables)
     * Backup of relevant papers/literature
