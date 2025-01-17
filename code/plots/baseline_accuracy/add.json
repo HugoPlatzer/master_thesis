@@ -6,75 +6,57 @@
             "name": "3 digits, 1k",
             "results_file": "experiments/baseline/add/3digits/1k/results.json",
             "colormap": "Reds",
-            "colormap_position": 0.5
+            "colormap_position": 0.3
         },
         {
             "name": "3 digits, 10k",
             "results_file": "experiments/baseline/add/3digits/10k/results.json",
             "colormap": "Reds",
-            "colormap_position": 0.7
+            "colormap_position": 0.5
         },
         {
             "name": "3 digits, 100k",
             "results_file": "experiments/baseline/add/3digits/100k/results.json",
             "colormap": "Reds",
-            "colormap_position": 0.85
-        },
-        {
-            "name": "3 digits, 1000k",
-            "results_file": "experiments/baseline/add/3digits/1000k/results.json",
-            "colormap": "Reds",
-            "colormap_position": 1.0
+            "colormap_position": 0.7
         },
 
         {
             "name": "5 digits, 1k",
             "results_file": "experiments/baseline/add/5digits/1k/results.json",
             "colormap": "Greens",
-            "colormap_position": 0.5
+            "colormap_position": 0.3
         },
         {
             "name": "5 digits, 10k",
             "results_file": "experiments/baseline/add/5digits/10k/results.json",
             "colormap": "Greens",
-            "colormap_position": 0.7
+            "colormap_position": 0.5
         },
         {
             "name": "5 digits, 100k",
             "results_file": "experiments/baseline/add/5digits/100k/results.json",
             "colormap": "Greens",
-            "colormap_position": 0.85
-        },
-        {
-            "name": "5 digits, 1000k",
-            "results_file": "experiments/baseline/add/5digits/1000k/results.json",
-            "colormap": "Greens",
-            "colormap_position": 1.0
+            "colormap_position": 0.7
         },
 
         {
             "name": "10 digits, 1k",
             "results_file": "experiments/baseline/add/10digits/1k/results.json",
             "colormap": "Blues",
-            "colormap_position": 0.5
+            "colormap_position": 0.3
         },
         {
             "name": "10 digits, 10k",
             "results_file": "experiments/baseline/add/10digits/10k/results.json",
             "colormap": "Blues",
-            "colormap_position": 0.7
+            "colormap_position": 0.5
         },
         {
             "name": "10 digits, 100k",
             "results_file": "experiments/baseline/add/10digits/100k/results.json",
             "colormap": "Blues",
-            "colormap_position": 0.85
-        },
-        {
-            "name": "10 digits, 1000k",
-            "results_file": "experiments/baseline/add/10digits/1000k/results.json",
-            "colormap": "Blues",
-            "colormap_position": 1.0
+            "colormap_position": 0.7
         }
     ]
 }

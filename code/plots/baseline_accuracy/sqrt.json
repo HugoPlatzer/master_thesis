@@ -1,0 +1,62 @@
+{
+    "plot_type": "accuracy",
+    "legend_columns": 3,
+    "curves": [
+        {
+            "name": "6 digits, 1k",
+            "results_file": "experiments/baseline/sqrt/6digits/1k/results.json",
+            "colormap": "Reds",
+            "colormap_position": 0.3
+        },
+        {
+            "name": "6 digits, 10k",
+            "results_file": "experiments/baseline/sqrt/6digits/10k/results.json",
+            "colormap": "Reds",
+            "colormap_position": 0.5
+        },
+        {
+            "name": "6 digits, 100k",
+            "results_file": "experiments/baseline/sqrt/6digits/100k/results.json",
+            "colormap": "Reds",
+            "colormap_position": 0.7
+        },
+
+        {
+            "name": "10 digits, 1k",
+            "results_file": "experiments/baseline/sqrt/10digits/1k/results.json",
+            "colormap": "Greens",
+            "colormap_position": 0.3
+        },
+        {
+            "name": "10 digits, 10k",
+            "results_file": "experiments/baseline/sqrt/10digits/10k/results.json",
+            "colormap": "Greens",
+            "colormap_position": 0.5
+        },
+        {
+            "name": "10 digits, 100k",
+            "results_file": "experiments/baseline/sqrt/10digits/100k/results.json",
+            "colormap": "Greens",
+            "colormap_position": 0.7
+        },
+
+        {
+            "name": "20 digits, 1k",
+            "results_file": "experiments/baseline/sqrt/20digits/1k/results.json",
+            "colormap": "Blues",
+            "colormap_position": 0.3
+        },
+        {
+            "name": "20 digits, 10k",
+            "results_file": "experiments/baseline/sqrt/20digits/10k/results.json",
+            "colormap": "Blues",
+            "colormap_position": 0.5
+        },
+        {
+            "name": "20 digits, 100k",
+            "results_file": "experiments/baseline/sqrt/20digits/100k/results.json",
+            "colormap": "Blues",
+            "colormap_position": 0.7
+        }
+    ]
+}
