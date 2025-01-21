@@ -76,4 +76,39 @@ def evaluate_accuracy(model, tokenizer, dataset, batch_size):
         total_accuracy += batch_accuracy * len(batch_prompts) / len(dataset)
         num_batches += 1
     return total_accuracy
+
+
+def generate_responses_batch(model, tokenizer, prompts):
+    prompt_ids = [tokenizer.encode(prompt, add_special_tokens=False)
+        for prompt in prompts]
+    prompt_ids = torch.tensor(prompt_ids, device=model.device)
+    prompt_length = prompt_ids.shape[1]
+    model_max_length = model.config.n_positions
+    dummy_attention_mask = torch.ones_like(prompt_ids)
+    model.eval()
     
+    response_ids = model.generate(
+        prompt_ids,
+        max_length=model_max_length,
+        do_sample=False,
+        pad_token_id=model.config.eos_token_id,
+        attention_mask=dummy_attention_mask
+    )
+    
+    response_ids = response_ids[:, prompt_length:]
+    response_strs = [
+        tokenizer.decode(response, skip_special_tokens=True)
+        for response in response_ids]
+
+    return response_strs
+
+
+def generate_responses(model, tokenizer, prompts, batch_size):
+    responses = []
+    for batch_start in range(0, len(prompts), batch_size):
+        batch_end = batch_start + batch_size
+        batch_prompts = prompts[batch_start:batch_end]
+        batch_responses = generate_responses_batch(
+            model, tokenizer, batch_prompts)
+        responses.extend(batch_responses)
+    return responses
