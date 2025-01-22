@@ -1,0 +1,82 @@
+\tikzstyle{block data node}=[
+data node,
+text width=1cm,
+]
+
+\tikzstyle{tall block data node}=[
+data node,
+text width=1cm,
+]
+
+\tikzstyle{my block node}=[
+block node,
+text width=3cm,
+minimum height=6mm,
+]
+
+\tikzstyle{my caption node}=[
+caption node,
+align=right
+]
+
+\node[tall block data node] (i1) {4 \\ where};
+\node[tall block data node, right=of i1] (i2) {19 \\ is};
+\node[tall block data node, right=of i2] (i3) {7 \\ my};
+\node[fit node,fit=(i1)(i2)(i3)] (if) {};
+\node[my caption node, left=of if]{Input (token) \\ sequence:};
+
+
+\node[my block node, color 1, above=of if] (pp) {Preprocessing};
+\draw[arrow style] (if) to (pp);
+
+\node[block data node, above=of pp] (v2) {$v_2$};
+\node[block data node, left=of v2] (v1) {$v_1$};
+\node[block data node, right=of v2] (v3) {$v_3$};
+\node[fit node,fit=(v1)(v2)(v3)] (vf) {};
+\node[my caption node, left=of vf]{Vector \\ sequence:};
+\draw[arrow style] (pp) to (vf);
+
+
+\node[my block node, color 2, above=of vf] (b1) {GPT2 block};
+\draw[arrow style] (vf) to (b1);
+
+
+\node[data node, above=of b1] (cdots) {$\cdots$};
+\node[data node, right=1mm of cdots, minimum width=0mm] (cdotse) {(12 blocks)};
+\draw[arrow style] (b1) to (cdots);
+
+
+\node[my block node, color 2, above=of cdots] (b2) {GPT2 block};
+\draw[arrow style] (cdots) to (b2);
+
+\node[my block node, color 3, above=of b2] (pop) {Postprocessing};
+\draw[arrow style] (b2) to (pop);
+
+
+\node[block data node, above=of pop] (p2) {$p_2$};
+\node[block data node, left=of p2] (p1) {$p_1$};
+\node[block data node, right=of p2] (p3) {$p_3$};
+\node[fit node,fit=(p1)(p2)(p3)] (pf) {};
+\draw[arrow style] (pop) to (pf);
+\node[my caption node, left=of pf]{Probability \\ distributions:};
+
+\begin{scope}[on background layer]
+\node[highlight node] at (p3) (p3h) {};
+\node[highlight node] at (v3) (v3h) {};
+\end{scope}
+
+\node[insight node, below right=1cm and 1cm of p3h] (p3i) {
+\begin{tabular}{c|c|c|c|c}
+0.001 & $\cdots$ & 0.08 & 0.3 & $\cdots$ \\
+the & $\cdots$ & house & dog & $\cdots$ \\
+\end{tabular}
+};
+\draw[line style] (p3h) -- (p3i);
+
+\node[insight node, below right=1cm and 1cm of v3h] (v3i) {
+\begin{tabular}{c|c|c}
+0.5 & $\cdots$ & -1.7 \\
+\end{tabular}
+};
+\draw[line style] (v3h) -- (v3i);
+\node[data node, below=1mm of v3i] {$\in \mathbb{R}^{768}$};

@@ -1,0 +1,120 @@
+\tikzstyle{circle math node}=[
+%data node,
+minimum size=5mm,
+inner sep=0mm,
+circle,
+draw,
+]
+
+\tikzstyle{my caption node}=[
+inner sep=0mm,
+text width=5.5cm,
+node distance=2mm,
+align=right,
+anchor=east,
+font=\bfseries,
+%draw,
+]
+
+\tikzstyle{large gap}=[
+node distance=15mm and 0mm,
+]
+
+\colorlet{arrowcolor}{red!90!black}
+
+
+
+\node[data node] (x) {$x_i$};
+\node[block node, color 1, large gap, above=of x] (ln) {Final Layer Norm};
+\draw[arrow style] (x) to (ln);
+
+\matrix[matrix of math nodes, left delimiter={[}, right delimiter={]}, above=of ln] (xx) {
+1.0 & -1.3 & \cdots & 0.2 \\
+};
+
+\draw[arrow style] (ln) to (xx);
+);
+
+\matrix[matrix of math nodes, node distance=6mm, left delimiter={[}, right delimiter={]}, right=of xx] (vtoken) {
+-1.2 & 3.4 & \cdots & -0.1 \\
+\cdots & \cdots & \cdots & \cdots \\
+0.4 & -2.7 & \cdots & -1.0 \\
+};
+
+\begin{scope}[on background layer]
+\node[fit node, fit=(vtoken-1-1)(vtoken-3-1), fill=red!20] (vt1) {};
+\node[fit node, fit=(vtoken-1-2)(vtoken-3-2), fill=green!20] (vt2) {};
+\node[fit node, fit=(vtoken-1-4)(vtoken-3-4), fill=blue!20] (vt3) {};
+
+\node[fit node, fit=(xx-1-1), fill=red!20] (xx1) {};
+\node[fit node, fit=(xx-1-2), fill=green!20] (xx2) {};
+\node[fit node, fit=(xx-1-3)] (xxd) {};
+\node[fit node, fit=(xx-1-4), fill=blue!20] (xx3) {};
+\end{scope}
+
+\node[circle math node, large gap, above=of xx1] (mul1) {$\cdot$};
+\node[circle math node, large gap, above=of xx2] (mul2) {$\cdot$};
+\node[circle math node, large gap, above=of xxd, draw=none] (muld) {$\cdots$};
+\node[circle math node, large gap, above=of xx3] (mul3) {$\cdot$};
+
+\draw[arrow style] (xx1) to (mul1);
+\draw[arrow style] (xx2) to (mul2);
+\draw[arrow style] (xx3) to (mul3);
+\draw[arrow style, arrowcolor] (vt1.north) to (mul1.south);
+\draw[arrow style, arrowcolor] (vt2.north) to (mul2.south);
+\draw[arrow style, arrowcolor] (vt3.north) to (mul3.south);
+
+\node[fit node, fit=(mul1)(mul3)] (mulf) {};
+\node[circle math node, above=of mulf] (add) {$+$};
+
+\draw[arrow style] (mul1) to (add);
+\draw[arrow style] (mul2) to (add);
+\draw[arrow style] (mul3) to (add);
+
+\path let \p1=(ln.west), \p2=(ln.east), \n1={\x2-\x1} in 
+node[block node, color 3, above=of add, minimum width=\n1] (sm) {Softmax};
+
+\draw [arrow style] (add) to (sm);
+
+\node[data node, large gap, above=of sm] (y) {$y_i$};
+
+\draw [arrow style] (sm) to (y);
+
+%\draw[arrow style] (xx1) to (vt1);
+%\draw[arrow style] (xx2) to (vt2);
+%\draw[arrow style] (xx3) to (vt3);
+
+\matrix[matrix of math nodes, left delimiter={[}, right delimiter={]}, anchor=west] (ymat)
+at (vtoken.west|-y)
+{
+0.03 & \textrm{"the"} \\
+0.2 & \textrm{"is"} \\
+\cdots & \\
+0.01 & \textrm{"house"} \\
+};
+
+
+
+\coordinate (cap) at ($(x-|ln.west) + (-4mm, 0mm)$);
+
+\node[my caption node] at (cap) {Output vector of final GPT2 block \\
+$
+\begin{aligned}
+x_i \in \mathbb{R}^{n_{hidden}}
+\end{aligned}
+$};
+\node[my caption node] at (cap|-ln) {One last layer normalization stage (same structure as in GPT2 blocks) };
+\node[my caption node] at (cap|-sm) { Apply softmax to get a valid probability distribution };
+\node[my caption node] at (cap|-mul1) { Blend columns of $v_{token}$ according to normalized $x_i$ (matrix-vector product) };
+\node[my caption node, below=of vtoken, align=left, text width=4cm] { Token embedding matrix $v_{token}$ taken from the preprocessing stage. Each row represents the embedding vector for a token from the vocabulary. \\
+$
+\begin{aligned}
+v_{token} \in \mathbb{R}^{n_{vocab} \times d_{hidden}}
+\end{aligned}
+$};
+\node[my caption node] at (cap|-y) {Model-estimated probabilites for token at position $i+1$ \\
+$
+\begin{aligned}
+y_i \in \mathbb{R}^{n_{vocab}}
+\end{aligned}
+$};

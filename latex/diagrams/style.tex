@@ -1,0 +1,106 @@
+\tikzstyle{line style}=[
+line width=0.3mm,
+]
+
+\tikzstyle{arrow style}=[
+->,
+line width=0.3mm,
+shorten <= 1.5mm,
+shorten >= 1.5mm,
+]
+
+\tikzstyle{short arrow style}=[
+->,
+line width=0.3mm,
+shorten <= 4mm,
+shorten >= 4mm,
+]
+
+\tikzstyle{connect arrow style}=[
+->,
+line width=0.3mm,
+]
+
+\tikzstyle{behind arrow style}=[
+->,
+%dashed,
+rounded corners,
+line width=0.3mm,
+shorten <= 1mm,
+shorten >= 1mm,
+]
+
+
+\tikzstyle{block node}=[
+rounded corners,
+font=\bfseries,
+node distance=6mm and 0mm,
+text width=3cm,
+align=center,
+]
+
+\tikzstyle{data node}=[
+inner sep=0mm,
+node distance=6mm and 0mm,
+align=center,
+%draw,
+%text height=3mm,
+%text depth=2mm,
+]
+
+\tikzstyle{sum node}=[
+circle,
+draw,
+minimum size=7mm,
+node distance=6mm and 0mm,
+append after command={
+node at (\tikzlastnode) {$\textbf{+}$}
+},
+]
+
+
+\tikzstyle{caption node}=[
+font=\bfseries,
+node distance=0mm and 3mm,
+%text width=5cm,
+%text height=6mm,
+%align=right,
+%draw,
+]
+
+\tikzstyle{small caption node}=[
+font=\footnotesize,
+]
+
+\tikzstyle{highlight node}=[
+ellipse,
+minimum height=8mm,
+minimum width=12mm,
+fill=gray!30,
+draw,
+line style,
+]
+
+\tikzstyle{insight node}=[
+fill=gray!30,
+draw,
+line style,
+]
+
+\tikzstyle{fit node}=[
+inner sep=0mm,
+%draw,
+%draw=red,
+]
+
+\tikzstyle{matrix style}=[
+node distance=7mm and 7mm,
+%draw=red,
+]
+
+
+\tikzstyle{color 1}=[fill=blue!30]
+\tikzstyle{color 1a}=[fill=blue!30]
+\tikzstyle{color 1b}=[fill={rgb:blue,1;green,1;white,3}]
+\tikzstyle{color 2}=[fill=red!30]
+\tikzstyle{color 3}=[fill=orange!30]

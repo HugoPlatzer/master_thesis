@@ -1,0 +1,10 @@
+\section{Introduction}
+
+In 2017, the influential paper "Attention Is All You Need" \cite{allyouneed} was published. It showed that a new language model architecture, which they called the "Transformer", outperformed all previous models on English-French and English-German translation tasks, while also having lower training cost \citepage{8}{allyouneed}. Soon thereafter, variations of the transformer architecture described in this paper became the state of the art in most natural language processing tasks. They were also found to be competitive with established neural network architectures in other domains such as image classification \citepage{6}{tf-image}.
+
+OpenAI's release of the ChatGPT web service in late 2022 \cite{openai_chatgpt_2022} made Transformer networks a topic of relevance for the general public: This AI chat assistant gave natural, helpful and human-sounding answers in a quality not seen before, showing strong skills in a wide array of domains such as computer science, history and creative writing \cite{Savelka_2023} \citepage{5}{openai2023gpt4}.
+
+While the details of the architecture of ChatGPT have not been released \cite{openai_chatgpt_2022} \cite{openai2023gpt4}, it is assumed that it is based on a transformer decoder architecture very similar to that of GPT2, which was released by OpenAI in 2019, with the main differences being a bigger model with more learnable parameters as well as a larger training dataset \cite{OpenGenus2023GPTComparison}.
+
+Even though transformer models are very strong at understanding the patterns of human language, they do have limitations in other areas such as performing arithmetics:
+For example, ChatGPT is unable to correctly multiply numbers with 4 or more decimal digits. It does however seem capable of adding numbers of arbitrary size \cite{openai2023gpt4} \citepage{9}{yang2023gpt}.  This work seeks to explore the limits on what transformer-style models are able to learn.

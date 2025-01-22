@@ -1,0 +1,149 @@
+\documentclass{article}
+
+%%% packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{svg}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[labelfont=bf]{caption}
+\usepackage{ifthen}
+\usepackage[a4paper]{geometry}
+\usepackage{booktabs}
+\usepackage{pgfplotstable}
+\usepackage{colortbl}
+\usepackage{float}
+\usepackage{makecell}
+\usepackage{hyperref}
+\usepackage{xparse}
+\usepackage{cleveref}
+\usepackage{tikz}
+
+%%% package configuration
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue
+}
+
+\usetikzlibrary{positioning}
+\usetikzlibrary{fit}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{shapes}
+\usetikzlibrary{matrix}
+\usetikzlibrary{calc}
+\usetikzlibrary{math}
+\usetikzlibrary{arrows.meta}
+\input{diagrams/style}
+
+\pgfplotsset{compat=1.18}
+
+\definecolor{mutedred}{rgb}{1.0, 0.3, 0.3}
+\definecolor{mutedgreen}{rgb}{0.3, 1.0, 0.3}
+
+%%% custom commands
+\newcommand{\citepage}[2]{\cite[p.~#1]{#2}}
+
+\newcommand{\includediagram}[2]{
+    \begin{figure}[htbp]
+    \centering
+    
+    \begin{tikzpicture}[framed]
+    \input{#1}
+    \end{tikzpicture}
+    
+    \caption{#2}
+    \label{#1}
+    \end{figure}
+}
+
+\newcommand{\mapvaluetocolor}[1]{%
+    \pgfmathsetmacro{\colorvalue}{(1-(#1))*100}%
+    \edef\temp{\noexpand\cellcolor{mutedred!\colorvalue!mutedgreen}}%
+    \temp
+}
+
+% arguments: table content, label, caption, additional styling options
+\newcommand{\includeTable}[4]{
+    \begin{table}
+        \centering
+        \pgfplotstabletypeset[
+            string type,
+            row sep=crcr,
+            col sep=semicolon,
+            assign column name/.style={/pgfplots/table/column name={\textbf{##1}}},
+            every head row/.style={
+                before row=\toprule,
+                after row=\midrule,
+            },
+            every last row/.style={
+                after row=\bottomrule
+            },
+            every column/.style={
+                column type={r}
+            },
+            #4
+        ]{#1}
+        \caption{#3}
+        \label{#2}
+    \end{table}
+}
+
+% arguments: csv file, label, caption, additional styling options
+\newcommand{\includeAccuracyTable}[4]{
+    \begin{table}
+        \centering
+        \pgfplotstabletypeset[
+            string type,
+            col sep=comma,
+            assign column name/.style={/pgfplots/table/column name={\textbf{##1}}},
+            every head row/.style={
+                before row=\toprule,
+                after row=\midrule,
+            },
+            every last row/.style={
+                after row=\bottomrule
+            },
+            every column/.style={
+                column type={r},
+                postproc cell content/.code={%
+                    \pgfkeyssetvalue{/pgfplots/table/@cell content}{\mapvaluetocolor{####1} ####1}%
+                },
+            },
+            columns/name/.style={
+                column name={},
+                postproc cell content/.code={}
+            },
+            #4
+        ]{#1}
+        \caption{#3}
+        \label{#2}
+    \end{table}
+}
+
+% arguments: pdf file, label, caption
+\newcommand{\includePDFPlot}[3]{
+    \begin{figure}
+        \centering
+        \includegraphics{#1}
+        \caption{#3}
+        \label{#2}
+    \end{figure}
+}
+
+%%% document content
+\begin{document}
+
+
+
+\include{chapters/introduction}
+
+\include{chapters/basics_transformers}
+
+\include{chapters/experiments}
+
+\bibliography{biblio}
+\bibliographystyle{plain}
+
+\end{document}

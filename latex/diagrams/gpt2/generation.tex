@@ -1,0 +1,138 @@
+\tikzstyle{my data node}=[
+data node,
+node distance=0mm and 5mm,
+text width=2cm,
+%draw,
+]
+
+\tikzstyle{matrix style}=[
+matrix of math nodes,
+ampersand replacement=\&,
+left delimiter={[},
+right delimiter={]},
+node distance=0mm and 8mm,
+anchor=west,
+nodes={text height=2mm, text depth=1mm, text width=6mm, align=center,},
+column 2/.style={nodes={text width=12mm, align=right}},
+]
+
+\colorlet{hlcolor}{green!30}
+\def\hgap{65mm}
+\def\vgap{55mm}
+
+
+
+\newcommand{\dotsmatrix}[2]{
+\matrix[#2] (#1) {
+\cdots \\
+\cdots \\
+\cdots \\
+\cdots \\
+\cdots \\
+};
+}
+
+\newcommand{\wordsmatrix}[3]{
+\matrix[#2] (#1) {
+#3
+};
+}
+
+
+\newcounter{numWords}
+% block command: #1 - block number, #2 - words in bottom row, #3 - content of right matrix
+\newcommand{\block}[3]{
+% count number of columns
+\setcounter{numWords}{0}
+\foreach \x [count=\xi] in {#2} {\stepcounter{numWords}}
+\tikzmath{
+integer \numWords;
+\numWords = \the\value{numWords};
+integer \numWordsM;
+\numWordsM = \the\value{numWords} - 1;
+}
+
+% single column: just add concrete matrix
+\ifthenelse{\numWords=1} {
+\wordsmatrix{#1-m-\numWords}{matrix style}{#3}
+}
+{
+% more than one column: add dots matrices for all but last column
+\dotsmatrix{#1-m-1}{matrix style}
+% ensure foreach is only run when it has at least one iteration
+\ifthenelse{\numWords>2} {
+\foreach \x in {2,...,\numWordsM} {
+\tikzmath {integer \xm; \xm=\x-1;}
+\dotsmatrix{#1-m-\x}{matrix style, right=of #1-m-\xm}
+}
+}{}
+
+% add rightmost matrix which contains concrete words
+\wordsmatrix{#1-m-\numWords}{matrix style, right=of #1-m-\numWordsM}{#3}
+}
+
+% add matrix highlight node
+\begin{scope}[on background layer]
+\node[fit node, fit=(#1-m-\numWords-3-1)(#1-m-\numWords-3-2), fill=hlcolor] (#1-hl) {};
+\end{scope}
+
+% add model block
+\node[fit node, fit=(#1-m-1)(#1-m-\numWords)] (#1-f) {};
+\path let \p1=(#1-f.west), \p2=(#1-f.east), \n1={\x2-\x1} in
+node[block node, color 1, text width=\n1, below=of #1-f] (#1-b) {GPT2 model}
+;
+
+% add input words
+\foreach \w [count=\wi] in {#2} {
+\node[data node, below=of #1-m-\wi|-#1-b.south] (#1-w-\wi) {"\w"};
+}
+
+% add arrows
+\foreach \x in {1,...,\numWords} {
+\draw[arrow style] (#1-w-\x) to (#1-w-\x|-#1-b.south);
+\draw[arrow style] (#1-m-\x|-#1-b.north) to (#1-m-\x);
+}
+
+% add step number
+\node[data node, minimum size=1cm,  node distance=0mm and 2mm, left=of #1-f.north west,] (#1-s) {\textbf{\Large #1.}};
+}
+
+
+
+% now draw the blocks :)
+\block
+{1}
+{where, is}
+{
+\cdots \& \\
+0.18 \& \textrm{"our"} \\
+0.2 \& \textrm{"my"} \\
+0.02 \& \textrm{"there"} \\
+\cdots \& \\
+}
+
+\begin{scope}[shift=({\hgap, 0})]
+\block
+{2}
+{where, is, my}
+{
+\cdots \& \\
+0.01 \& \textrm{"from"} \\
+0.22 \& \textrm{"dog"} \\
+0.13 \& \textrm{"house"} \\
+\cdots \& \\
+}
+\end{scope}
+
+\begin{scope}[shift=({0, -\vgap})]
+\block
+{3}
+{where, is, my, dog}
+{
+\cdots \& \\
+0.1 \& \textrm{"now"} \\
+0.3 \& \textrm{"?"} \\
+0.001 \& \textrm{"for"} \\
+\cdots \& \\
+}
+\end{scope}

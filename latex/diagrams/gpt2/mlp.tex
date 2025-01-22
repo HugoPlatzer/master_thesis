@@ -1,0 +1,16 @@
+\tikzstyle{my block node}=[
+block node,
+text width=3cm,
+minimum height=6mm,
+]
+
+\node[data node] (x_i) {$x_i$};
+\node[my block node, color 1a, above=of x_i] (l1) {Linear I \\ ($W_c / b_c$)};
+\node[my block node, color 3, above=of l1] (ge) {GELU};
+\node[my block node, color 1b, above=of ge] (l2) {Linear II \\ ($W_p / b_p$)};
+\node[data node, above=of l2] (y_i) {$y_i$};
+
+\draw[arrow style] (x_i) to (l1);
+\draw[arrow style] (l1) to (ge);
+\draw[arrow style] (ge) to (l2);
+\draw[arrow style] (l2) to (y_i);

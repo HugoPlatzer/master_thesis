@@ -1,0 +1,29 @@
+\tikzstyle{my data node}=[
+data node,
+node distance=10mm and 0mm,
+minimum height=10mm,
+minimum width=14mm,
+%draw,
+]
+
+\tikzstyle{my block node}=[
+block node,
+minimum width=3cm,
+minimum height=6mm,
+]
+
+\node[data node] (in) {"Where is my dog?"};
+\node[my block node, color 1, above=of in] (to) {Tokenizer};
+\draw[arrow style] (in) to (to);
+
+\node[my data node, above=of to] (t3) {616 \\ "my"};
+
+\node[my data node, left=of t3] (t2) {318 \\ "is"};
+\node[my data node, left=of t2] (t1) {8496 \\ "Where"};
+
+\node[my data node, right=of t3] (t4) {3290 \\ "dog"};
+\node[my data node, right=of t4] (t5) {30 \\ "?"};
+
+\foreach \i in {1,...,5} {
+    \draw[connect arrow style] (to) -- (t\i.south);
+}

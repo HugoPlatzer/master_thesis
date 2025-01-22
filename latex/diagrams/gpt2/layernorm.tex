@@ -1,0 +1,58 @@
+\tikzstyle{circle math node}=[
+%data node,
+minimum size=10mm,
+inner sep=0mm,
+circle,
+draw,
+]
+
+\matrix[
+matrix of math nodes,
+row sep=6mm,
+column sep=1mm,
+] (m) {
+y_{1_{(1)}} & y_{1_{(2)}} & \cdots & y_{1_{(d)}} \\
+|[circle math node]| +b_1 & |[circle math node]| +b_2 & \cdots & |[circle math node]| +b_d \\
+|[circle math node]| \cdot a_1 & |[circle math node]| \cdot a_2 & \cdots & |[circle math node]| \cdot a_d \\
+|[circle math node]| \cdot \frac{1}{\sigma(x_i)} & |[circle math node]| \cdot \frac{1}{\sigma(x_i)} & \cdots & |[circle math node]| \cdot \frac{1}{\sigma(x_i)} \\
+|[circle math node]| -\mu(x_i) & |[circle math node]| -\mu(x_i) & \cdots & |[circle math node]| -\mu(x_i) \\
+x_{1_{(1)}} & x_{1_{(2)}} & \cdots & x_{1_{(d)}} \\
+};
+
+
+\node[fit=(m-1-1)(m-1-4), left delimiter={[}, right delimiter={]}] (d1) {};
+\node[fit=(m-6-1)(m-6-4), left delimiter={[}, right delimiter={]}] (d2) {};
+\node[data node, left=3mm of d1] (dy) {$y_i=$};
+\node[data node, left=3mm of d2] (dx) {$x_i=$};
+
+\coordinate (dd) at ($(dx) + (-2mm, 0)$);
+
+\node[caption node, align=right, left=of dd] (ddx) {
+$
+\begin{aligned} 
+x_i &\in \mathbb{R}^{d_{hidden}} \\
+x_{i_{(d)}} &\in \mathbb{R} \\
+\end{aligned}
+$
+};
+\node[caption node, align=right, left=of m-1-1 -| dd] (ddy) {
+$
+\begin{aligned} 
+y_i &\in \mathbb{R}^{d_{hidden}} \\
+y_{i_{(d)}} &\in \mathbb{R} \\
+\end{aligned}
+$
+};
+
+
+\node[caption node, left=of m-2-1 -| dd] {Add per-position bias $b_j$};
+\node[caption node, left=of m-3-1 -| dd] {Apply per-position gain $a_j$};
+\node[caption node, left=of m-4-1 -| dd] {Divide by standard deviation};
+\node[caption node, left=of m-5-1 -| dd] {Subtract average};
+
+
+\foreach \col in {1,2,4}
+\foreach \startrow in {6,...,2} {
+  \pgfmathtruncatemacro{\endrow}{\startrow-1}
+  \draw[arrow style] (m-\startrow-\col) -- (m-\endrow-\col);
+}

@@ -1,0 +1,178 @@
+\section{Experimental setup}
+
+To test the ability of transformer networks to learn arithmetic operations, we first run some baseline experiments. These are set up as follows:
+
+\subsection{Libraries / Frameworks}
+
+We use the HuggingFace transformers library with PyTorch backend which takes care of implementing transformer networks and the training process. Based on this, we wrote some Python code that implements generating training samples, running model training, evaluating model performance, logging results and generating plots. The generation of plots from the result logs utilized the matplotlib Python library.
+
+\subsection{Hardware}
+
+The experiments were run on a single rented remote Linux machine with an NVIDIA RTX 3090 GPU.
+
+\subsection{Model}
+
+We use the GPT2LMHeadModel class of the HuggingFace transformers library which implements a GPT2-style decoder-only transformer model.
+We adjust the model configuration so it matches nanoGPT, a basic lightweight GPT2 implementation which was also used for the experiments in REF. 
+The model uses a vector size of 384, 6 attention heads and 6 transformer blocks.
+
+\subsubsection{Tokenization}
+
+We use a simple tokenization scheme where each character in the string is converted to one token ID based on its ASCII value, meaning our model supports token IDs from 0 to 127. Token ID 0 is reserved to denote the end of the token sequence, it is appended to the ASCII token sequence.
+
+\begin{verbatim}
+"1+2=3" -> "[49, 43, 50, 61, 51, 0]"
+\end{verbatim}
+
+\subsection{Arithmetic operations}
+
+We study the performance of models on two different arithmetic tasks:
+
+\subsubsection{Addition}
+
+Let $a, b$ be positive integers and let $c=a+b$. The model is then trained on strings of the form $a+b=c$.
+
+\subsubsection{Multiplication}
+
+Let $a, b$ be positive integers and let $c=a \cdot b$. The model is then trained on sequences of the form $a \cdot b=c$.
+
+\subsubsection{Square root}
+
+Integer square root.
+
+\subsection{Data sampling}
+
+For the addition and multiplication tasks with $n$ digits, the operands $a$ and $b$ are independently sampled uniformly from the range $[{10}^{n-1}, 10^n - 1]$, which ensures both operands have exactly $n$ decimal digits.
+
+\subsection{Data format}
+
+The operands $a$ and $b$ are encoded into the string based on their decimal digit representation, the same applies to the sum / product $c$. 
+To avoid uneven string length, $c$ is encoded with leading zeroes up to the maximum possible sum / product length based on the operand size. For example, for the addition task with 3 digits, the sum is padded to 4 digits:
+
+\begin{verbatim}
+"123+456=0579"
+\end{verbatim}
+
+\subsection{Datasets}
+
+Based on the sampling and formatting methods described above, we create 3 separated datasets for the given arithmetic operation, operand size and dataset size:
+
+\begin{itemize}
+	\item \textbf{Training dataset:} This dataset is used to optimize the model weights during training. Its size varies from 1k to 1000k samples as part of the experiment.
+	\item \textbf{Validation dataset:} A separate dataset with 1k samples. Loss on this dataset is used to decide when to stop training (\cref{early_stopping}). Accuracy on this dataset is also tracked.
+	\item \textbf{Test dataset:} Another separate dataset with 1k samples. This dataset is used to compute the reported final accuracy numbers.
+\end{itemize} 
+
+\subsection{Training}
+
+Training is done using the HuggingFace Trainer class with some customization:
+
+\subsubsection{Weight initialization}
+
+The model weights are initialized using the default distributions as defined in the GPT2LMHeadModel class of the HuggingFace transformers framework.
+
+\subsubsection{Optimizer}
+
+Training uses the AdamW optimizer with default parameters as defined by the HuggingFace transformers Trainer / TrainingArguments class.
+
+\subsubsection{Batch size}
+
+For the baseline experiments, we used a fixed batch size of 256. We picked this batch size as it was also used in REF and it fits the memory of our training GPU.
+
+\subsubsection{Learning rate scheduling}
+
+The learning rate is adjusted using a linear schedule with warmup steps, with default parameters as defined by the HuggingFace transformers framework.
+For computing the learning rate, we assume a maximum of 200 epochs for training.
+
+\subsubsection{Early stopping}
+\label{early_stopping}
+
+We use an early stopping strategy where training is aborted if for 5 epochs there is no new minimum in loss on the validation dataset (minimum improvement $\epsilon=10^{-4}$).
+
+\subsection{Generation}
+
+To generate answers to a prompt string like "1+2=", we use auto-regressive generation as is standard practice with transformer decoder models (REF). We use greedy decoding, always selecting the token with the highest probability. Generation stops when token ID 0 (stop token) is generated or the model max sequence length is reached.
+\label{model_generation}
+
+\subsection{Evaluation}
+
+During the training process, multiple metrics are tracked:
+
+\subsubsection{Average batch loss}
+For each sample in tre training, batch, the model outputs a token probability distribution at each position of the sample. This is compared with the correct next token at this position to compute a cross-entropy loss number. This loss is averaged among all positions of a sample and all samples in the current batch. To reduce statistical noise, the HuggingFace trainer class also averages these batch loss numbers among multiple consecutive training steps.
+
+\subsubsection{Validation loss}
+At the end of each epoch, the average loss over all samples in the validation dataset is computed. This number is used to track training progress and stop training if no more progress is made.
+
+\subsubsection{Validation accuracy}
+For each sample in the validation dataset, the string is split at the "=" character, yielding a prompt and answer string (e.g. prompt "1+2=" and corresponding answer "3"). For the prompt string, the model's answer is generated as described in \cref{model_generation}. This answer is then compared to the correct answer. The ratio of samples where the model's answer matches the correct answer gives the accuracy.
+
+\subsubsection{Test accuracy}
+It is evaluated just like validation dataset accuracy, but on the test dataset. This gives the final accuracy numbers reported in the tables below.
+
+
+
+
+
+
+
+\section{Experimental results}
+
+\subsection{Baseline experiments}
+
+Based on the experimental setup described above, we created models and evaluated their training progress for the addition and multiplication tasks, varying numbers of operand digits and training dataset sizes.
+
+\subsubsection{Addition}
+
+Final accuracy numbers obtained when training the model on the addition task are reported in \cref{tbl:baseline_add}. The development of accuracy during training is illustrated in \cref{fig:baseline_add}.
+
+\includeAccuracyTable{experiment_results/baseline_final_accuracy/add.txt}{tbl:baseline_add}{Final model accuracy on the test dataset for the addition operation for the given training dataset sizes and operand digits.}{}
+
+\includePDFPlot{experiment_results/baseline_accuracy/add.pdf}{fig:baseline_add}{Development of accuracy on the validation dataset when training for the addition task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
+
+\subsubsection{Multiplication}
+
+Final accuracy numbers obtained when training the model on the multiplication task are reported in \cref{tbl:baseline_mul}. The development of accuracy during training is illustrated in \cref{fig:baseline_mul}.
+
+\includeAccuracyTable{experiment_results/baseline_final_accuracy/mul.txt}{tbl:baseline_mul}{Final model accuracy on the test dataset for the multiplication operation for the given training dataset sizes and operand digits.}{}
+
+\includePDFPlot{experiment_results/baseline_accuracy/mul.pdf}{fig:baseline_mul}{Development of accuracy on the validation dataset when training for the multiplication task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
+
+\subsubsection{Square root}
+
+Final accuracy numbers obtained when training the model on the square root task are reported in \cref{tbl:baseline_sqrt}. The development of accuracy during training is illustrated in \cref{fig:baseline_sqrt}.
+
+\includeAccuracyTable{experiment_results/baseline_final_accuracy/sqrt.txt}{tbl:baseline_sqrt}{Final model accuracy on the test dataset for the square root operation for the given training dataset sizes and operand digits.}{}
+
+\includePDFPlot{experiment_results/baseline_accuracy/sqrt.pdf}{fig:baseline_sqrt}{Development of accuracy on the validation dataset when training for the square root task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
+
+\subsection{Model size experiments}
+
+Some model size experiments.
+
+\includeAccuracyTable
+{experiment_results/model_size_final_accuracy/results.txt}
+{tbl:model_size}
+{Final model accuracy on the test dataset for the given operation and change in model configuration.}
+{%
+    columns/name/.append style={
+        column name={},
+        string replace={baseline}{baseline},
+        string replace={n_embd=192}{$n_{embd}=192$},
+        string replace={n_embd=768}{$n_{embd}=768$},
+        string replace={n_head=3}{$n_{head}=3$},
+        string replace={n_head=12}{$n_{head}=12$},
+        string replace={n_layer=3}{$n_{layer}=3$},
+        string replace={n_layer=12}{$n_{layer}=12$},
+    },
+    columns/add_10digits_100k/.style={column name={\makecell[r]{add\\(10 digits, 100k)}}},
+    columns/mul_5digits_100k/.style={column name={\makecell[r]{mul\\(5 digits, 100k)}}},
+}
+
+\includePDFPlot{experiment_results/model_size_accuracy/add.pdf}{fig:model_size_add}{Development of accuracy on the validation dataset when training for the addition task (10 digits, 100k dataset) for different changes in model configuration.}
+
+\includePDFPlot{experiment_results/model_size_accuracy/mul.pdf}{fig:model_size_mul}{Development of accuracy on the validation dataset when training for the multiplication task (5 digits, 100k dataset) for different changes in model configuration.}
+
+\subsubsection{Addition}
+
+\subsubsection{Multiplication}

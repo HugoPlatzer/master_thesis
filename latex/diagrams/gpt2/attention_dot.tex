@@ -1,0 +1,133 @@
+\tikzstyle{container node}=[
+minimum width=2cm,
+node distance=0mm,
+%draw=red,
+]
+
+\tikzstyle{my caption node}=[
+inner sep=0mm,
+node distance=3mm and 0mm,
+text width=6cm,
+align=right
+]
+
+\tikzstyle{my data node}=[
+inner sep=0mm,
+node distance=1mm and 0mm,
+]
+
+\tikzstyle{my block node}=[
+block node,
+minimum height=6mm,
+text width=1.5cm,
+]
+
+\tikzstyle{circle math node}=[
+data node,
+minimum size=6mm,
+circle,
+draw,
+]
+
+\tikzstyle{large gap}=[
+node distance=10mm and 0mm,
+]
+
+\node[container node] (k1c) {};
+\node[container node, right=of k1c] (k2c) {};
+\node[container node, right=of k2c] (k3c) {};
+
+\node[my data node] (k1) at (k1c) {$k_1$};
+\node[my data node] (k2) at (k2c) {$k_2$};
+\node[my data node] (k3) at (k3c) {$k_3$};
+
+\node[my caption node, below=of k1.south west, anchor=north west, align=left] (dk) {\textbf{Key vectors at positions up to} $p$};
+\node[my data node, below=of dk.south west, anchor=north west] {$k_i \in \mathbb{R}^{d_{hidden}}$};
+
+\node[my data node, left=5mm of k1c] (q3) {$q_3$};
+\node[my caption node, below=of q3.south east, anchor=north east] (dq) {\textbf{Query vector at position} $p$};
+\node[my data node, below=of dq.south east, anchor=north east] {$q_i \in \mathbb{R}^{d_{hidden}}$};
+
+\node[my block node, large gap, color 1, above=of k1] (k1dot) {Dot \\ product};
+\node[my block node,  large gap, color 1, above=of k2] (k2dot) {Dot \\ product};
+\node[my block node, large gap, color 1, above=of k3] (k3dot) {Dot \\ product};
+
+\draw[arrow style, red] (q3) to (k1dot.south);
+\draw[arrow style, red] (q3) to (k2dot.south);
+\draw[arrow style, red] (q3) to (k3dot.south);
+
+\draw[arrow style] (k1) to (k1dot);
+\draw[arrow style] (k2) to (k2dot);
+\draw[arrow style] (k3) to (k3dot);
+
+
+\node[data node, above=of k1dot] (w13) {$w_{13}$};
+\node[data node, above=of k2dot] (w23) {$w_{23}$};
+\node[data node, above=of k3dot] (w33) {$w_{33}$};
+
+\draw[arrow style] (k1dot) to (w13);
+\draw[arrow style] (k2dot) to (w23);
+\draw[arrow style] (k3dot) to (w33);
+
+\node[my caption node, anchor=east] at (q3.east |- w13) (dw) {\textbf{Attention weights}};
+\node[my data node, below=of dw.south east, anchor=north east] {$w_{ij} \in \mathbb{R}$};
+
+\node[circle math node, above=of w13] (s1) {$\cdot \frac{1}{\vphantom{x^{y^z}} \sqrt{d_{head}}}$};
+\node[circle math node, above=of w23] (s2) {$\cdot \frac{1}{\vphantom{x^{y^z}} \sqrt{d_{head}}}$};
+\node[circle math node, above=of w33] (s3) {$\cdot \frac{1}{\vphantom{x^{y^z}} \sqrt{d_{head}}}$};
+
+\draw[arrow style] (w13) to (s1);
+\draw[arrow style] (w23) to (s2);
+\draw[arrow style] (w33) to (s3);
+
+\node[my caption node, anchor=east] at (q3.east |- s1) {\textbf{Apply scaling factor}};
+
+
+
+\path let \p1=(k1dot.west), \p2=(k3dot.east), \n1={\x2-\x1} in 
+node[my block node, minimum width=\n1, color 3, above=of s2] (soft) {Softmax};
+
+\draw[arrow style] (s1) to (s1 |- soft.south);
+\draw[arrow style] (s2) to (s2 |- soft.south);
+\draw[arrow style] (s3) to (s3 |- soft.south);
+
+\node[circle math node, large gap, above=of $(s1 |- soft.north)$] (mul1) {$\cdot$};
+\node[circle math node, large gap, above=of $(s2 |- soft.north)$] (mul2) {$\cdot$};
+\node[circle math node, large gap, above=of $(s3 |- soft.north)$] (mul3) {$\cdot$};
+
+
+\coordinate (softmid) at ($(soft)!0.5!(mul2)$);
+
+\node[my data node] (v3) at (q3 |- softmid) {$v_3$};
+\node[container node] (cv3) at (v3) {};
+\node[container node, left=of cv3] (cv2) {};
+\node[container node, left=of cv2] (cv1) {};
+\node[my data node] (v2) at (cv2) {$v_2$};
+\node[my data node] (v1) at (cv1) {$v_1$};
+
+\node[my caption node, below=of v3.south east, anchor=north east] (capv) {\textbf{Value vectors at positions up to} $p$};
+\node[my data node, below=of capv.south east, anchor=north east] {$v_i \in \mathbb{R}^{d_{hidden}}$};
+
+\draw[arrow style, red] (v1) to (mul1.south);
+\draw[arrow style, red] (v2) to (mul2.south);
+\draw[arrow style, red] (v3) to (mul3.south);
+
+\draw[arrow style] (mul1 |- soft.north) to (mul1);
+\draw[arrow style] (mul2 |- soft.north) to (mul2);
+\draw[arrow style] (mul3 |- soft.north) to (mul3);
+
+\node[circle math node, above=of mul2] (sum) {$+$};
+
+\draw[arrow style] (mul1) to[out=90, in=180] (sum);
+\draw[arrow style] (mul2) to (sum);
+\draw[arrow style] (mul3) to[out=90, in=0] (sum);
+
+\coordinate (mulmid) at ($(mul2)!0.5!(sum)$);
+\node[my caption node, anchor=east, align=right] at (q3.east |- mulmid) (capmul) {\textbf{Blend value vectors using attention weights}};
+
+\node[data node, above=of sum] (a3) {$a_3$};
+
+\draw[arrow style] (sum) to (a3);
+
+\node[my caption node, anchor=east] at (q3.east |- a3) (capa) {\textbf{Attention output at position} $p$};
+\node[my data node, below=of capa.south east, anchor=north east] {$a_i \in \mathbb{R}^{d_{hidden}}$};

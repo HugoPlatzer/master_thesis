@@ -1,0 +1,94 @@
+\tikzstyle{container node}=[
+minimum width=3.5cm,
+node distance=0mm,
+%draw=red,
+]
+
+\tikzstyle{my data node}=[
+data node,
+%draw,
+]
+
+\tikzstyle{my block node}=[
+block node,
+minimum width=3cm,
+minimum height=6mm,
+]
+
+\tikzstyle{full block node}=[
+block node,
+minimum height=8mm,
+]
+
+\node[container node] (x1c) {};
+\node[container node, right=of x1c] (x2c) {};
+\node[container node, right=of x2c] (x3c) {};
+
+
+\node[my data node] (x1) at (x1c) {$x_1$};
+\node[my data node] (x2) at (x2c) {$x_2$};
+\node[my data node] (x3) at (x3c) {$x_3$};
+
+
+\node[my block node, color 1a, above=of x1c] (ln1_1) {Layer norm I};
+\node[my block node, color 1a, above=of x2c] (ln1_2) {Layer norm I};
+\node[my block node, color 1a, above=of x3c] (ln1_3) {Layer norm I};
+
+\draw[arrow style] (x1c) to (ln1_1);
+\draw[arrow style] (x2c) to (ln1_2);
+\draw[arrow style] (x3c) to (ln1_3);
+
+\path let \p1=(ln1_1.west), \p2=(ln1_3.east), \n1={\x2-\x1} in 
+node[full block node, minimum width=\n1, color 2, above=of ln1_2] (attn) {Multi-head attention};
+
+\draw[arrow style] (ln1_1) to (ln1_1 |- attn.south);
+\draw[arrow style] (ln1_2) to (ln1_2 |- attn.south);
+\draw[arrow style] (ln1_3) to (ln1_3 |- attn.south);
+
+\node[sum node, above=of $(ln1_1|-attn.north)$] (r1_1) {};
+\node[sum node, above=of $(ln1_2|-attn.north)$] (r1_2) {};
+\node[sum node, above=of $(ln1_3|-attn.north)$] (r1_3) {};
+\draw[arrow style] (attn.north -| r1_1) to (r1_1);
+\draw[arrow style] (attn.north -| r1_2) to (r1_2);
+\draw[arrow style] (attn.north -| r1_3) to (r1_3);
+
+\begin{scope}[on background layer]
+\draw[behind arrow style] (x1) to (x1c.west) to (x1c.west|-r1_1.south west) to (r1_1.south west);
+\draw[behind arrow style] (x2) to (x2c.west) to (x2c.west|-r1_2.south west) to (r1_2.south west);
+\draw[behind arrow style] (x3) to (x3c.west) to (x3c.west|-r1_3.south west) to (r1_3.south west);
+\end{scope}
+
+\node[my block node, color 1b, above=of r1_1] (ln2_1) {Layer norm II};
+\node[my block node, color 1b, above=of r1_2] (ln2_2) {Layer norm II};
+\node[my block node, color 1b, above=of r1_3] (ln2_3) {Layer norm II};
+\draw[arrow style] (r1_1) to (ln2_1);
+\draw[arrow style] (r1_2) to (ln2_2);
+\draw[arrow style] (r1_3) to (ln2_3);
+
+\node[my block node, color 3, above=of ln2_1] (mlp_1) {MLP};
+\node[my block node, color 3, above=of ln2_2] (mlp_2) {MLP};
+\node[my block node, color 3, above=of ln2_3] (mlp_3) {MLP};
+\draw[arrow style] (ln2_1) to (mlp_1);
+\draw[arrow style] (ln2_2) to (mlp_2);
+\draw[arrow style] (ln2_3) to (mlp_3);
+
+\node[sum node, above=of mlp_1] (r2_1) {};
+\node[sum node, above=of mlp_2] (r2_2) {};
+\node[sum node, above=of mlp_3] (r2_3) {};
+\draw[arrow style] (mlp_1) to (r2_1);
+\draw[arrow style] (mlp_2) to (r2_2);
+\draw[arrow style] (mlp_3) to (r2_3);
+
+\begin{scope}[on background layer]
+\draw[behind arrow style] (r1_1.west) to (x1c.west|-r1_1.west) to (x1c.west|-r2_1) to (r2_1);
+\draw[behind arrow style] (r1_2.west) to (x2c.west|-r1_2.west) to (x2c.west|-r2_2) to (r2_2);
+\draw[behind arrow style] (r1_3.west) to (x3c.west|-r1_3.west) to (x3c.west|-r2_3) to (r2_3);
+\end{scope}
+
+\node[my data node, above=of r2_1] (y1) {$y_1$};
+\node[my data node, above=of r2_2] (y2) {$y_2$};
+\node[my data node, above=of r2_3] (y3) {$y_3$};
+
+\draw[arrow style] (r2_1) to (y1);
+\draw[arrow style] (r2_2) to (y2);
+\draw[arrow style] (r2_3) to (y3);

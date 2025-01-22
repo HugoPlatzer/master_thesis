@@ -1,0 +1,95 @@
+\tikzstyle{my caption node}=[
+caption node,
+text width=3cm,
+%draw,
+%text width=5cm,
+%text height=6mm,
+%align=right,
+%draw,
+]
+
+\tikzstyle{my data node}=[
+data node,
+text width=1.8cm,
+minimum height=8mm,
+%text width=5cm,
+%text height=6mm,
+%align=right,
+%draw,
+]
+
+\tikzstyle{caption matrix left}=[
+matrix of nodes,
+matrix style,
+node distance=1mm,
+column 1/.style={anchor=base east},
+]
+
+\tikzstyle{caption matrix right}=[
+matrix of nodes,
+matrix style,
+node distance=1mm,
+column 1/.style={anchor=base east},
+]
+
+
+\matrix [matrix of nodes, matrix style, every node/.style={my data node, anchor=base east, align=center}, column 1/.style={nodes={my caption node, align=right}}, ] (mseq) {
+Position: & 1 & 2 & $\cdots$ \\
+Token ID: & 1212 & 318 & $\cdots$ \\
+Token string: & "This" & " is" & $\cdots$ \\
+};
+
+\matrix [matrix of math nodes, matrix style, left delimiter={[},right delimiter={]}, above=2cm of mseq] (m1)
+{
+0.5 & -3.0 & \cdots & -1.2 \\
+\cdots & \cdots & \cdots & \cdots \\
+\cdots & \cdots & \cdots & \cdots \\
+\cdots & \cdots & \cdots & \cdots \\
+};
+
+\matrix [matrix of math nodes, matrix style, left delimiter={[},right delimiter={]}, right=of m1] (m2)
+{
+\cdots & \cdots & \cdots & \cdots \\
+-1.3 & 0.1 & \cdots & 0.7 \\
+\cdots & \cdots & \cdots & \cdots \\
+\cdots & \cdots & \cdots & \cdots \\
+};
+
+\matrix [caption matrix left, left=of m1] (m1c)
+{
+|[my caption node, align=right]| {Positional \\ embedding \\ matrix} \\ $v_{pos} \in \mathbb{R}^{1024 \times 768}$ \\
+};
+
+\matrix [caption matrix right, right=of m2] (m2c)
+{
+|[my caption node, align=left]| {Token \\ embedding \\ matrix} \\
+$v_{token} \in \mathbb{R}^{50257 \times 768}$ \\
+};
+
+\node[sum node, above=5mm of $(m1.north east)!0.5!(m2.north west)$] (sum) {};
+
+\matrix [matrix of math nodes, matrix style, left delimiter={[},right delimiter={]}, above=of sum] (v)
+{
+-0.8 & -2.9 & \cdots & -2.4 \\
+};
+
+\matrix [caption matrix left, left=of v] (vc)
+{
+|[my caption node, align=right]| {Initial vector at position 1} \\
+$x_{1} \in \mathbb{R}^{768}$ \\
+};
+
+\begin{scope}[on background layer]
+\node[highlight node] (pos1h) at (mseq-1-2) {};
+\node[highlight node] (tok1h) at (mseq-2-2) {};
+
+\node[insight node, inner sep=0mm, draw=none, fit=(m1-1-1)(m1-1-4)] (m1f) {};
+\node[insight node, inner sep=0mm, draw=none, fit=(m2-2-1)(m2-2-4)] (m2f) {};
+\end{scope}
+
+\draw[connect arrow style] (pos1h) to node[pos=0.3,left,small caption node] {row 1} (m1f);
+%\draw[connect arrow style] (tok1h) to[out=25,in=-135] ++(1.2,1) to [out=45,in=-90] (m2f);
+\draw[connect arrow style] (tok1h.north east) to node[pos=0.5,right,small caption node] {row 1212} (m2f);
+\draw[connect arrow style] (m1f) to[out=90,in=180] (sum);
+\draw[connect arrow style] (m2f) to[out=90,in=0] (sum);
+\draw[connect arrow style] (sum) -> (v);
