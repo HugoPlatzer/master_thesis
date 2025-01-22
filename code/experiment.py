@@ -11,6 +11,13 @@ from dataset import create_dataset
 from model import create_model
 from trainer import create_trainer
 
+
+def set_random_seed(seed):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+
+
 class Experiment:
     def __init__(self, path):
         self.path = path
@@ -23,19 +30,15 @@ class Experiment:
         self.experiment_results = ExperimentResults(
                 self.config, log_file, results_file)
         
-        random.seed(self.config["random_seed"])
-        np.random.seed(self.config["random_seed"])
-        torch.manual_seed(self.config["random_seed"])
-        
+        random_seed = self.config["random_seed"]
+        set_random_seed(random_seed)
+
         self.tokenizer = ASCIITokenizer()
         
         sampler_class = getattr(samplers, self.config["sampler"]["name"])
         sampler_params = self.config["sampler"]["params"]
         
-        self.sampler = sampler_class(
-            random_seed=self.config["random_seed"],
-            **sampler_params
-        )
+        self.sampler = sampler_class(**sampler_params)
         
         self.train_dataset = create_dataset(
             self.sampler,

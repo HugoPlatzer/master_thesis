@@ -1,9 +1,9 @@
 {
-    "model": "experiments/baseline/add/5digits/100k/checkpoint-11730/",
+    "model": "experiments/baseline/add/10digits/100k/checkpoint-19550/",
     "sampler": {
         "name": "SamplerAdd",
         "params": {
-            "digits": 5
+            "digits": 10
         }
     },
     "random_seed": 1234,

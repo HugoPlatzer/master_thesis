@@ -7,6 +7,7 @@ import samplers
 from tokenizer import ASCIITokenizer
 from dataset import create_dataset
 from model import load_model_from_path, generate_responses
+from experiment import set_random_seed
 
 
 if len(sys.argv) != 2:
@@ -25,6 +26,9 @@ model_path = config["model"]
 model = load_model_from_path(model_path)
 
 tokenizer = ASCIITokenizer()
+
+seed = config["random_seed"]
+set_random_seed(seed)
 
 dataset_size = config["dataset_size"]
 dataset = create_dataset(sampler, tokenizer, dataset_size)
