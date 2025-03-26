@@ -35,27 +35,39 @@ class Experiment:
 
         self.tokenizer = ASCIITokenizer()
         
-        sampler_class = getattr(samplers, self.config["sampler"]["name"])
-        sampler_params = self.config["sampler"]["params"]
-        
-        self.sampler = sampler_class(**sampler_params)
+        val_test_sampler_class = getattr(samplers,
+                self.config["sampler"]["name"])
+        val_test_sampler_params = self.config["sampler"]["params"]
+        val_test_sampler = val_test_sampler_class(
+                **val_test_sampler_params)
+        self.val_sampler = val_test_sampler
+        self.test_sampler = val_test_sampler
+
+        if "sampler_train" in self.config:
+            train_sampler_class = getattr(samplers,
+                    self.config["sampler_train"]["name"])
+            train_sampler_params = self.config["sampler_train"]["params"]
+            self.train_sampler = train_sampler_class(
+                    **train_sampler_params)
+        else:
+            self.train_sampler = val_test_sampler            
         
         self.train_dataset = create_dataset(
-            self.sampler,
+            self.train_sampler,
             self.tokenizer,
             self.config["dataset_params"]["train_dataset_size"]
         )
         self.val_dataset = create_dataset(
-            self.sampler,
+            self.val_sampler,
             self.tokenizer,
             self.config["dataset_params"]["val_dataset_size"]
         )
         self.test_dataset = create_dataset(
-            self.sampler,
+            self.test_sampler,
             self.tokenizer,
             self.config["dataset_params"]["test_dataset_size"]
         )
-        
+
         self.model = create_model(
             self.tokenizer,
             self.config["model_params"]["n_positions"],
