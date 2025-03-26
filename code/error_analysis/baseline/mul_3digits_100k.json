@@ -1,0 +1,12 @@
+{
+    "model": "experiments/baseline/mul/3digits/100k/checkpoint-30107/",
+    "sampler": {
+        "name": "SamplerMul",
+        "params": {
+            "digits": 3
+        }
+    },
+    "random_seed": 1234,
+    "dataset_size": 10000,
+    "batch_size": 256
+}
