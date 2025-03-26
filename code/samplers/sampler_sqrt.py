@@ -1,14 +1,17 @@
-import random
 import math
+from .sampling import get_sample_int
 
 class SamplerSqrt:
     def __init__(self, **kwargs):
         self.digits = kwargs["digits"]
+        if "sampling_strategy" in kwargs:
+            self.sampling_strategy = kwargs["sampling_strategy"]
+        else:
+            self.sampling_strategy = "basic"
 
     def get_sample(self):
-        lower_limit = 10**(self.digits-1)
-        upper_limit = 10**self.digits - 1
-        a = random.randint(lower_limit, upper_limit)
+        a = get_sample_int(self.digits, self.sampling_strategy)
+        a = max(1, a)
         k = math.isqrt(a)
         prompt = f"{a}:"
         response = str(k)

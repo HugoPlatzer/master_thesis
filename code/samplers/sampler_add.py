@@ -1,16 +1,17 @@
-import random
-import time
-import string
+from .sampling import get_sample_int
 
 class SamplerAdd:
     def __init__(self, **kwargs):
         self.digits = kwargs["digits"]
-    
+        if "sampling_strategy" in kwargs:
+            self.sampling_strategy = kwargs["sampling_strategy"]
+        else:
+            self.sampling_strategy = "basic"
+
+
     def get_sample(self):
-        lower_limit = 10**(self.digits-1)
-        upper_limit = 10**self.digits - 1
-        a = random.randint(lower_limit, upper_limit)
-        b = random.randint(lower_limit, upper_limit)
+        a = get_sample_int(self.digits, self.sampling_strategy)
+        b = get_sample_int(self.digits, self.sampling_strategy)
         c = a + b
         prompt = f"{a}+{b}="
         response = str(c)
