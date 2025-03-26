@@ -13,8 +13,9 @@ class SamplerSqrt:
         a = get_sample_int(self.digits, self.sampling_strategy)
         a = max(1, a)
         k = math.isqrt(a)
-        prompt = f"{a}:"
-        response = str(k)
+        a_str = str(a).zfill(self.digits)
         max_response_len = math.ceil(self.digits / 2)
-        response = response.zfill(max_response_len)
+        k_str = str(k).zfill(max_response_len)
+        prompt = f"{a_str}:"
+        response = k_str
         return {"prompt": prompt, "response": response}

@@ -12,8 +12,9 @@ class SamplerMul:
         a = get_sample_int(self.digits, self.sampling_strategy)
         b = get_sample_int(self.digits, self.sampling_strategy)
         c = a * b
-        prompt = f"{a}*{b}="
-        response = str(c)
-        max_response_len = 2 * self.digits
-        response = response.zfill(max_response_len)
+        a_str = str(a).zfill(self.digits)
+        b_str = str(b).zfill(self.digits)
+        c_str = str(c).zfill(2 * self.digits)
+        prompt = f"{a_str}*{b_str}="
+        response = c_str
         return {"prompt": prompt, "response": response}
