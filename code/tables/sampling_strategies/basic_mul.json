@@ -1,0 +1,56 @@
+{
+    "metric": "val_accuracy",
+    "rows": [
+        {
+            "row_name": "3 digits",
+            "cols": [
+                {
+                    "col_name": "1k",
+                    "results_file": "experiments/sampling_strategies/basic/mul/3digits/1k/results.json"
+                },
+                {
+                    "col_name": "10k",
+                    "results_file": "experiments/sampling_strategies/basic/mul/3digits/10k/results.json"
+                },
+                {
+                    "col_name": "100k",
+                    "results_file": "experiments/sampling_strategies/basic/mul/3digits/100k/results.json"
+                }
+            ]
+        },
+        {
+            "row_name": "5 digits",
+            "cols": [
+                {
+                    "col_name": "1k",
+                    "results_file": "experiments/sampling_strategies/basic/mul/5digits/1k/results.json"
+                },
+                {
+                    "col_name": "10k",
+                    "results_file": "experiments/sampling_strategies/basic/mul/5digits/10k/results.json"
+                },
+                {
+                    "col_name": "100k",
+                    "results_file": "experiments/sampling_strategies/basic/mul/5digits/100k/results.json"
+                }
+            ]
+        },
+        {
+            "row_name": "10 digits",
+            "cols": [
+                {
+                    "col_name": "1k",
+                    "results_file": "experiments/sampling_strategies/basic/mul/10digits/1k/results.json"
+                },
+                {
+                    "col_name": "10k",
+                    "results_file": "experiments/sampling_strategies/basic/mul/10digits/10k/results.json"
+                },
+                {
+                    "col_name": "100k",
+                    "results_file": "experiments/sampling_strategies/basic/mul/10digits/100k/results.json"
+                }
+            ]
+        }
+    ]
+}
