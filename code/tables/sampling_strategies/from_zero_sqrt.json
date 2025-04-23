@@ -2,7 +2,7 @@
     "metric": "val_accuracy",
     "rows": [
         {
-            "row_name": "3 digits",
+            "row_name": "6 digits",
             "cols": [
                 {
                     "col_name": "1k",
@@ -19,7 +19,7 @@
             ]
         },
         {
-            "row_name": "5 digits",
+            "row_name": "10 digits",
             "cols": [
                 {
                     "col_name": "1k",
@@ -36,7 +36,7 @@
             ]
         },
         {
-            "row_name": "10 digits",
+            "row_name": "20 digits",
             "cols": [
                 {
                     "col_name": "1k",
