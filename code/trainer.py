@@ -9,7 +9,8 @@ from model import load_model_from_path, evaluate_loss, evaluate_accuracy
 class PerformanceTrackingCallback(TrainerCallback):
     def __init__(self, experiment_results, tokenizer,
             train_dataset, val_dataset, test_dataset,
-            logging_compute_accuracy):
+            logging_compute_accuracy,
+            strip_intermediate):
         super().__init__()
         self.experiment_results = experiment_results
         self.tokenizer = tokenizer
@@ -17,6 +18,7 @@ class PerformanceTrackingCallback(TrainerCallback):
         self.val_dataset = val_dataset
         self.test_dataset = test_dataset
         self.logging_compute_accuracy = logging_compute_accuracy
+        self.strip_intermediate = strip_intermediate
         
         self.best_model_path = None
         self.best_model_step = None
@@ -36,7 +38,9 @@ class PerformanceTrackingCallback(TrainerCallback):
             })
             if self.logging_compute_accuracy:
                 val_accuracy = evaluate_accuracy(
-                    model, self.tokenizer, self.val_dataset, batch_size)
+                    model, self.tokenizer, self.val_dataset,
+                    batch_size,
+                    self.strip_intermediate)
                 self.experiment_results.log_metrics(step, {
                     "val_accuracy": val_accuracy
                 })
@@ -51,7 +55,8 @@ class PerformanceTrackingCallback(TrainerCallback):
             train_loss = evaluate_loss(model, self.train_dataset, batch_size)
             val_loss = metrics["eval_loss"]
             val_accuracy = evaluate_accuracy(
-                model, self.tokenizer, self.val_dataset, batch_size)
+                model, self.tokenizer, self.val_dataset, batch_size,
+                self.strip_intermediate)
             self.experiment_results.log_metrics(step, {
                 "epoch": epoch,
                 "train_loss": train_loss,
@@ -87,11 +92,14 @@ class PerformanceTrackingCallback(TrainerCallback):
         test_loss = evaluate_loss(
             best_model, self.test_dataset, batch_size)
         train_accuracy = evaluate_accuracy(
-            best_model, self.tokenizer, self.train_dataset, batch_size)
+            best_model, self.tokenizer, self.train_dataset, batch_size,
+            self.strip_intermediate)
         val_accuracy = evaluate_accuracy(
-            best_model, self.tokenizer, self.val_dataset, batch_size)
+            best_model, self.tokenizer, self.val_dataset, batch_size,
+            self.strip_intermediate)
         test_accuracy = evaluate_accuracy(
-            best_model, self.tokenizer, self.test_dataset, batch_size)
+            best_model, self.tokenizer, self.test_dataset, batch_size,
+            self.strip_intermediate)
         self.experiment_results.log_best_model_metrics({
             "path": self.best_model_path,
             "step": self.best_model_step,
@@ -106,6 +114,10 @@ class PerformanceTrackingCallback(TrainerCallback):
 
 def create_trainer(model, tokenizer, train_dataset, val_dataset, test_dataset,
         experiment_results, training_params):
+
+    if "strip_intermediate" not in training_params:
+        training_params["strip_intermediate"] = False
+
     training_args = TrainingArguments(
         output_dir=training_params["output_dir"],
         eval_strategy="epoch",
@@ -118,7 +130,7 @@ def create_trainer(model, tokenizer, train_dataset, val_dataset, test_dataset,
         greater_is_better=False,
         per_device_train_batch_size=training_params["batch_size"],
         per_device_eval_batch_size=training_params["batch_size"],
-        num_train_epochs=training_params["max_epochs"],
+        num_train_epochs=training_params["max_epochs"]
     )
     
     trainer = Trainer(
@@ -133,7 +145,9 @@ def create_trainer(model, tokenizer, train_dataset, val_dataset, test_dataset,
                 train_dataset,
                 val_dataset,
                 test_dataset,
-                training_params["logging_compute_accuracy"]),
+                training_params["logging_compute_accuracy"],
+                training_params["strip_intermediate"]
+            )
             EarlyStoppingCallback(
                 early_stopping_patience= \
                     training_params["early_stopping_patience"],

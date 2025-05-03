@@ -32,7 +32,14 @@ def evaluate_loss(model, dataset, batch_size):
     eval_result = trainer.evaluate()
     return eval_result["eval_loss"]
 
-def evaluate_accuracy_batch(model, tokenizer, prompts, good_responses):
+def check_response(model_response, good_response,
+        strip_intermediate=False):
+    if strip_intermediate:
+        model_response = model_response.split("]")[-1]
+    return (model_response == good_response)
+
+def evaluate_accuracy_batch(model, tokenizer, prompts, good_responses,
+        check_fn):
     prompt_ids = [tokenizer.encode(prompt, add_special_tokens=False)
         for prompt in prompts]
     prompt_ids = torch.tensor(prompt_ids, device=model.device)
@@ -59,20 +66,26 @@ def evaluate_accuracy_batch(model, tokenizer, prompts, good_responses):
     
     num_good = 0
     for model_response, correct_response in zip(response_strs, good_responses):
-        if model_response == correct_response:
+        if check_fn(model_response, correct_response):
             num_good += 1
     accuracy = num_good / num_total
     return accuracy
 
-def evaluate_accuracy(model, tokenizer, dataset, batch_size):
+def evaluate_accuracy(model, tokenizer, dataset, batch_size,
+        strip_intermediate=False):
     num_batches = 0
     total_accuracy = 0.0
+    check_fn = (lambda model_response, correct_response:
+            check_response(model_response,
+            correct_response, strip_intermediate))
+
     for batch_start in range(0, len(dataset), batch_size):
         batch_end = batch_start + batch_size
         batch_prompts = dataset[batch_start:batch_end]["prompt_str"]
         batch_responses = dataset[batch_start:batch_end]["response_str"]
         batch_accuracy = evaluate_accuracy_batch(
-            model, tokenizer, batch_prompts, batch_responses)
+            model, tokenizer, batch_prompts, batch_responses,
+            check_fn)
         total_accuracy += batch_accuracy * len(batch_prompts) / len(dataset)
         num_batches += 1
     return total_accuracy
