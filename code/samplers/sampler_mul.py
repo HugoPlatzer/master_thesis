@@ -1,4 +1,4 @@
-from .sampling import get_sample_int
+from .sampling import get_sample_int, get_reversed_result
 
 class SamplerMul:
     def __init__(self, **kwargs):
@@ -7,7 +7,13 @@ class SamplerMul:
             self.sampling_strategy = kwargs["sampling_strategy"]
         else:
             self.sampling_strategy = "basic"
+
+        if "intermediate_steps" in kwargs:
+            self.intermediate_steps = kwargs["intermediate_steps"]
+        else:
+            self.intermediate_steps = "none"
     
+
     def get_sample(self):
         a = get_sample_int(self.digits, self.sampling_strategy)
         b = get_sample_int(self.digits, self.sampling_strategy)
@@ -16,5 +22,10 @@ class SamplerMul:
         b_str = str(b).zfill(self.digits)
         c_str = str(c).zfill(2 * self.digits)
         prompt = f"{a_str}*{b_str}="
-        response = c_str
+
+        if self.intermediate_steps == "reverse":
+            response = get_reversed_result(c_str) + c_str
+        elif self.intermediate_steps == "none":
+            response = c_str
+
         return {"prompt": prompt, "response": response}

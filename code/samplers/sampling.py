@@ -26,3 +26,7 @@ def get_sample_int(digits, sampling_strategy):
     else:
         raise Exception("invalid sampling strategy")
     return random.randint(lower_limit, upper_limit)
+
+
+def get_reversed_result(result_str):
+    return f"[{result_str[::-1]}]"
