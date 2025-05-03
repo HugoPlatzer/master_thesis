@@ -147,7 +147,7 @@ def create_trainer(model, tokenizer, train_dataset, val_dataset, test_dataset,
                 test_dataset,
                 training_params["logging_compute_accuracy"],
                 training_params["strip_intermediate"]
-            )
+            ),
             EarlyStoppingCallback(
                 early_stopping_patience= \
                     training_params["early_stopping_patience"],

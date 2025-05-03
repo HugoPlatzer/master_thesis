@@ -36,6 +36,7 @@ def check_response(model_response, good_response,
         strip_intermediate=False):
     if strip_intermediate:
         model_response = model_response.split("]")[-1]
+        good_response = good_response.split("]")[-1]
     return (model_response == good_response)
 
 def evaluate_accuracy_batch(model, tokenizer, prompts, good_responses,
