@@ -25,6 +25,6 @@
         "logging_compute_accuracy": true,
         "early_stopping_patience": 5,
         "early_stopping_threshold": 0.0001,
-        "strip_intermediate": false
+        "strip_intermediate": true
     }
 }
