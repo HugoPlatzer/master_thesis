@@ -22,6 +22,11 @@ find reverse/add/3digits/ -type f -name 'config.json' | xargs -I {} sh -c 'jq ".
 find reverse/ -type f -name 'config.json' | xargs -I {} sh -c 'jq ".sampler.params.intermediate_steps=\"reverse\"" --indent 4 {} | sponge {}'
 ```
 
+# Find all experiment dirs of some kind, apply some json transform to them
+```
+for f in $(find baseline/ -type d -name 1k); do conffile=$f/config.json; jq '.training_params.logging_steps=1' $conffile --indent 4 | sponge $conffile; done
+```
+
 ## Run all experiments in some directory (assumes no checkpoint config.json files)
 
 ```
