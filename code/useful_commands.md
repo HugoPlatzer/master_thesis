@@ -30,6 +30,6 @@ for f in $(find baseline/ -type d -name 1k); do conffile=$f/config.json; jq '.tr
 ## Run all experiments in some directory (assumes no checkpoint config.json files)
 
 ```
-find experiments/intermediate_steps/reverse/ -name '*k' -type d | sort -r | xargs echo "running experiment"
-find experiments/intermediate_steps/reverse/ -name '*k' -type d | sort -r | xargs python run_experiment.py
+find experiments/intermediate_steps/reverse/ -name '*k' -type d | sort -r | xargs -n 1 echo "running experiment"
+find experiments/intermediate_steps/reverse/ -name '*k' -type d | sort -r | xargs -n 1 python run_experiment.py
 ```
