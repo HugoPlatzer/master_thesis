@@ -14,6 +14,35 @@ class SamplerAdd:
         else:
             self.intermediate_steps = "none"
 
+    
+    @staticmethod
+    def get_add_scratchpad(a, b):
+        a_str = str(a)
+        b_str = str(b)
+        a_rev = a_str[::-1]
+        b_rev = b_str[::-1]
+        
+        max_len = max(len(a_rev), len(b_rev))
+        a_rev = a_rev.ljust(max_len, '0')
+        b_rev = b_rev.ljust(max_len, '0')
+        
+        carry = 0
+        steps = []
+        
+        for i in range(max_len):
+            digit_a = int(a_rev[i])
+            digit_b = int(b_rev[i])
+            total = digit_a + digit_b + carry
+            sum_digit = total % 10
+            new_carry = total // 10
+            
+            step_str = f"{digit_a}{digit_b}{carry}{sum_digit}{new_carry}"
+            steps.append(step_str)
+            
+            carry = new_carry
+        
+        result = a + b
+        return f"[{'|'.join(steps)}]{result}"
 
 
     def get_sample(self):

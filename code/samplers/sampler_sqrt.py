@@ -14,6 +14,39 @@ class SamplerSqrt:
         else:
             self.intermediate_steps = "none"
 
+    
+    @staticmethod
+    def get_sqrt_scratchpad(a):
+        scratchpad = f"{n}:["
+
+        low, high = 0, n
+        steps = []
+
+        while high - low > 1:
+            mid = (low + high) // 2  # floor division
+            square = mid * mid
+            steps.append(f"{{{low},{high}}}{mid}*{mid}={square}|")
+
+            if square <= n:
+                low = mid
+            else:
+                high = mid
+
+        # After loop, check which one is the correct integer square root
+        if high * high <= n:
+            result = high
+        else:
+            result = low
+
+        # Add the final step
+        steps.append(f"{{{low},{high}}}")
+
+        # Close the scratchpad
+        scratchpad += "\n  " + "\n  ".join(steps)
+        scratchpad += "\n]{}".format(result)
+
+        return scratchpad
+
 
     def get_sample(self):
         a = get_sample_int(self.digits, self.sampling_strategy)
