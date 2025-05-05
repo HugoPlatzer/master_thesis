@@ -2,13 +2,7 @@
 
 ## Copy all config.json files of experiment directories from old to new (including directory structure)
 ```
-src_dir="new"
-dest_dir="new"
-find "$src_dir" -type d -name '*k' -exec find {} -maxdepth 1 -type f -name 'config.json' \; | while read -r file; do
-    dest_path="$dest_dir/$(echo "$file" | sed "s#$src_dir/##")"
-    mkdir -p "$dest_path"
-    cp "$file" "$dest_path"
-done
+b=baseline; n=new; find "$b" -type d -name '*k' -print0 | while IFS= read -r -d '' d; do   r=${d#"$b"/};   mkdir -p "$n/$r";   cp "$d/config.json" "$n/$r/"; done
 ```
 
 ## Edit a single JSON config file
