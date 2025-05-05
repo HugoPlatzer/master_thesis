@@ -1,5 +1,8 @@
 import math
-from .sampling import get_sample_int, get_reversed_result
+from .sampling import (
+    get_sample_int,
+    get_reversed_result,
+    trim_scratchpad)
 
 class SamplerSqrt:
     def __init__(self, **kwargs):
@@ -17,9 +20,9 @@ class SamplerSqrt:
     
     @staticmethod
     def get_sqrt_scratchpad(a):
-        scratchpad = f"{n}:["
+        scratchpad = f"{a}:["
 
-        low, high = 0, n
+        low, high = 0, a
         steps = []
 
         while high - low > 1:
@@ -27,13 +30,13 @@ class SamplerSqrt:
             square = mid * mid
             steps.append(f"{{{low},{high}}}{mid}*{mid}={square}|")
 
-            if square <= n:
+            if square <= a:
                 low = mid
             else:
                 high = mid
 
         # After loop, check which one is the correct integer square root
-        if high * high <= n:
+        if high * high <= a:
             result = high
         else:
             result = low
@@ -59,7 +62,12 @@ class SamplerSqrt:
 
         if self.intermediate_steps == "reverse":
             response = get_reversed_result(k_str) + k_str
+        elif self.intermediate_steps == "scratchpad":
+            response = SamplerSqrt.get_sqrt_scratchpad(a)
+            response = trim_scratchpad(response)
         elif self.intermediate_steps == "none":
             response = k_str
+        else:
+            raise Exception("invalid intermediate steps type")
 
         return {"prompt": prompt, "response": response}

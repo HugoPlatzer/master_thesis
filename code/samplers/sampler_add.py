@@ -1,4 +1,7 @@
-from .sampling import get_sample_int, get_reversed_result
+from .sampling import (
+    get_sample_int,
+    get_reversed_result,
+    trim_scratchpad)
 
 class SamplerAdd:
     def __init__(self, **kwargs):
@@ -56,7 +59,12 @@ class SamplerAdd:
 
         if self.intermediate_steps == "reverse":
             response = get_reversed_result(c_str) + c_str
+        elif self.intermediate_steps == "scratchpad":
+            response = SamplerAdd.get_add_scratchpad(a, b)
+            response = trim_scratchpad(response)
         elif self.intermediate_steps == "none":
             response = c_str
+        else:
+            raise Exception("invalid intermediate steps type")
         
         return {"prompt": prompt, "response": response}

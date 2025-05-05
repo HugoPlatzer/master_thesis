@@ -30,3 +30,7 @@ def get_sample_int(digits, sampling_strategy):
 
 def get_reversed_result(result_str):
     return f"[{result_str[::-1]}]"
+
+
+def trim_scratchpad(s):
+    return s.replace(" ", "").replace("\n", "")

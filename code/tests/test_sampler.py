@@ -12,7 +12,8 @@ def test_sampler_add():
     samplers = [
             SamplerAdd(digits=5),
             SamplerAdd(digits=5, sampling_strategy="uniform_digits"),
-            SamplerAdd(digits=5, intermediate_steps="reverse")]
+            SamplerAdd(digits=5, intermediate_steps="reverse"),
+            SamplerAdd(digits=3, intermediate_steps="scratchpad")]
     for sampler in samplers:
         for i in range(5):
             sample = sampler.get_sample()
@@ -21,7 +22,8 @@ def test_sampler_add():
 def test_sampler_mul():
     samplers = [SamplerMul(digits=3),
             SamplerMul(digits=3, sampling_strategy="uniform_digits"),
-            SamplerMul(digits=3, intermediate_steps="reverse")]
+            SamplerMul(digits=3, intermediate_steps="reverse"),
+            SamplerMul(digits=2, intermediate_steps="scratchpad")]
     for sampler in samplers:
         for i in range(5):
             sample = sampler.get_sample()
@@ -30,7 +32,8 @@ def test_sampler_mul():
 def test_sampler_sqrt():
     samplers = [SamplerSqrt(digits=5),
         SamplerSqrt(digits=6, sampling_strategy="uniform_digits"),
-        SamplerSqrt(digits=6, intermediate_steps="reverse")]
+        SamplerSqrt(digits=6, intermediate_steps="reverse"),
+        SamplerSqrt(digits=6, intermediate_steps="scratchpad")]
     for sampler in samplers:
         for i in range(5):
             sample = sampler.get_sample()
