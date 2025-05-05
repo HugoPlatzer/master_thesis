@@ -52,20 +52,25 @@ class Experiment:
         else:
             self.train_sampler = val_test_sampler            
         
+        n_positions = self.config["model_params"]["n_positions"]
+
         self.train_dataset = create_dataset(
             self.train_sampler,
             self.tokenizer,
-            self.config["dataset_params"]["train_dataset_size"]
+            self.config["dataset_params"]["train_dataset_size"],
+            n_positions
         )
         self.val_dataset = create_dataset(
             self.val_sampler,
             self.tokenizer,
-            self.config["dataset_params"]["val_dataset_size"]
+            self.config["dataset_params"]["val_dataset_size"],
+            n_positions
         )
         self.test_dataset = create_dataset(
             self.test_sampler,
             self.tokenizer,
-            self.config["dataset_params"]["test_dataset_size"]
+            self.config["dataset_params"]["test_dataset_size"],
+            n_positions
         )
 
         self.model = create_model(
