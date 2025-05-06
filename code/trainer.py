@@ -91,9 +91,6 @@ class PerformanceTrackingCallback(TrainerCallback):
             best_model, self.val_dataset, batch_size)
         test_loss = evaluate_loss(
             best_model, self.test_dataset, batch_size)
-        train_accuracy = evaluate_accuracy(
-            best_model, self.tokenizer, self.train_dataset, batch_size,
-            self.strip_intermediate)
         val_accuracy = evaluate_accuracy(
             best_model, self.tokenizer, self.val_dataset, batch_size,
             self.strip_intermediate)
@@ -107,7 +104,6 @@ class PerformanceTrackingCallback(TrainerCallback):
             "train_loss": train_loss,
             "val_loss": val_loss,
             "test_loss": test_loss,
-            "train_accuracy": train_accuracy,
             "val_accuracy": val_accuracy,
             "test_accuracy": test_accuracy
         })
