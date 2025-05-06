@@ -19,8 +19,8 @@
         "test_dataset_size": 100
     },
     "training_params": {
-        "batch_size": 16,
-        "max_epochs": 10,
+        "batch_size": 8,
+        "max_epochs": 50,
         "logging_steps": 100,
         "logging_compute_accuracy": false,
         "early_stopping_patience": 5,

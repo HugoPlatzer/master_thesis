@@ -20,7 +20,7 @@
     },
     "training_params": {
         "batch_size": 32,
-        "max_epochs": 10,
+        "max_epochs": 50,
         "logging_steps": 100,
         "logging_compute_accuracy": false,
         "early_stopping_patience": 5,
