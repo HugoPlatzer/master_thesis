@@ -27,3 +27,25 @@ for f in $(find baseline/ -type d -name 1k); do conffile=$f/config.json; jq '.tr
 find experiments/intermediate_steps/reverse/ -name '*k' -type d | sort -r | xargs -n 1 echo "running experiment"
 find experiments/intermediate_steps/reverse/ -name '*k' -type d | sort -r | xargs -n 1 python run_experiment.py
 ```
+
+## Clean up extra files after experiments have completed in some directory
+
+```
+find . -name 'checkpoint-*' -exec rm -f {}/optimizer.pt {}/rng_state.pth {}/scheduler.pt {}/trainer_state.json {}/training_args.bin \;
+```
+
+## Create tgz file of some experiments dir
+```
+tar czf experiments.tgz experiments/intermediate_steps/reverse/
+```
+
+## Transfer experiments.tgz from remote server to localhost using ssh
+```
+sftp -P PORT root@IP_ADDR:/root/master_thesis/code/experiments.tgz .
+```
+
+## Unpack tgz file of experiments
+```
+tar tf ~/experiments.tgz
+tar xvf ~/experiments.tgz
+```
