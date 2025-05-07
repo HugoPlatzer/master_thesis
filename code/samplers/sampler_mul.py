@@ -26,10 +26,9 @@ class SamplerMul:
                 m_int = int(m)
                 prod = m_int * d + carry
                 digit = prod % 10
-                carry = prod // 10
-                # step string order: multiplicand_digit, multiplier_digit,
-                #                    carry_in, product_digit, carry_out
-                steps.append(f"{m_int}{d}{(prod-digit)//10}{digit}{carry}")
+                carry_new = prod // 10
+                steps.append(f"{m_int}{d}{carry}{digit}{carry_new}")
+                carry = carry_new
             return "{" + ",".join(steps) + "}", carry
         
         a_str, b_str = str(a), str(b)
@@ -84,7 +83,7 @@ class SamplerMul:
         addition_block = "{" + ";".join(steps) + "}"
         
         scratchpad = (
-            f"{a}*{b}=[\n"
+            f"["
             + "\n".join(rows)
             + "\n"
             + "|\n"

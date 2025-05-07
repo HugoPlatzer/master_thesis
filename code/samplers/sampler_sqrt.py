@@ -20,7 +20,7 @@ class SamplerSqrt:
     
     @staticmethod
     def get_sqrt_scratchpad(a):
-        scratchpad = f"{a}:["
+        scratchpad = f"["
 
         low, high = 0, a
         steps = []
