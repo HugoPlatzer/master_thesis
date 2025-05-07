@@ -49,3 +49,8 @@ sftp -P PORT root@IP_ADDR:/root/master_thesis/code/experiments.tgz .
 tar tf ~/experiments.tgz
 tar xvf ~/experiments.tgz
 ```
+
+## Change paths in a json file using sed
+```
+sed -i '' 's/baseline/intermediate_steps\/reverse/g' add.json
+```

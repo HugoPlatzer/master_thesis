@@ -1,0 +1,56 @@
+{
+    "metric": "val_accuracy",
+    "rows": [
+        {
+            "row_name": "6 digits",
+            "cols": [
+                {
+                    "col_name": "1k",
+                    "results_file": "experiments/intermediate_steps/reverse/sqrt/6digits/1k/results.json"
+                },
+                {
+                    "col_name": "10k",
+                    "results_file": "experiments/intermediate_steps/reverse/sqrt/6digits/10k/results.json"
+                },
+                {
+                    "col_name": "100k",
+                    "results_file": "experiments/intermediate_steps/reverse/sqrt/6digits/100k/results.json"
+                }
+            ]
+        },
+        {
+            "row_name": "10 digits",
+            "cols": [
+                {
+                    "col_name": "1k",
+                    "results_file": "experiments/intermediate_steps/reverse/sqrt/10digits/1k/results.json"
+                },
+                {
+                    "col_name": "10k",
+                    "results_file": "experiments/intermediate_steps/reverse/sqrt/10digits/10k/results.json"
+                },
+                {
+                    "col_name": "100k",
+                    "results_file": "experiments/intermediate_steps/reverse/sqrt/10digits/100k/results.json"
+                }
+            ]
+        },
+        {
+            "row_name": "20 digits",
+            "cols": [
+                {
+                    "col_name": "1k",
+                    "results_file": "experiments/intermediate_steps/reverse/sqrt/20digits/1k/results.json"
+                },
+                {
+                    "col_name": "10k",
+                    "results_file": "experiments/intermediate_steps/reverse/sqrt/20digits/10k/results.json"
+                },
+                {
+                    "col_name": "100k",
+                    "results_file": "experiments/intermediate_steps/reverse/sqrt/20digits/100k/results.json"
+                }
+            ]
+        }
+    ]
+}
