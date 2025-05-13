@@ -6,15 +6,15 @@
             "cols": [
                 {
                     "col_name": "1k",
-                    "results_file": "experiments/intermediate_steps/reverse/add/3digits/1k/results.json"
+                    "results_file": "experiments/intermediate_steps/scratchpad/add/3digits/1k/results.json"
                 },
                 {
                     "col_name": "10k",
-                    "results_file": "experiments/intermediate_steps/reverse/add/3digits/10k/results.json"
+                    "results_file": "experiments/intermediate_steps/scratchpad/add/3digits/10k/results.json"
                 },
                 {
                     "col_name": "100k",
-                    "results_file": "experiments/intermediate_steps/reverse/add/3digits/100k/results.json"
+                    "results_file": "experiments/intermediate_steps/scratchpad/add/3digits/100k/results.json"
                 }
             ]
         },
@@ -23,15 +23,15 @@
             "cols": [
                 {
                     "col_name": "1k",
-                    "results_file": "experiments/intermediate_steps/reverse/add/5digits/1k/results.json"
+                    "results_file": "experiments/intermediate_steps/scratchpad/add/5digits/1k/results.json"
                 },
                 {
                     "col_name": "10k",
-                    "results_file": "experiments/intermediate_steps/reverse/add/5digits/10k/results.json"
+                    "results_file": "experiments/intermediate_steps/scratchpad/add/5digits/10k/results.json"
                 },
                 {
                     "col_name": "100k",
-                    "results_file": "experiments/intermediate_steps/reverse/add/5digits/100k/results.json"
+                    "results_file": "experiments/intermediate_steps/scratchpad/add/5digits/100k/results.json"
                 }
             ]
         },
@@ -40,15 +40,15 @@
             "cols": [
                 {
                     "col_name": "1k",
-                    "results_file": "experiments/intermediate_steps/reverse/add/10digits/1k/results.json"
+                    "results_file": "experiments/intermediate_steps/scratchpad/add/10digits/1k/results.json"
                 },
                 {
                     "col_name": "10k",
-                    "results_file": "experiments/intermediate_steps/reverse/add/10digits/10k/results.json"
+                    "results_file": "experiments/intermediate_steps/scratchpad/add/10digits/10k/results.json"
                 },
                 {
                     "col_name": "100k",
-                    "results_file": "experiments/intermediate_steps/reverse/add/10digits/100k/results.json"
+                    "results_file": "experiments/intermediate_steps/scratchpad/add/10digits/100k/results.json"
                 }
             ]
         }

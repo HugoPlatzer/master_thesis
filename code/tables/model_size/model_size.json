@@ -1,5 +1,5 @@
 {
-    "metric": "val_accuracy",
+    "metric": "test_accuracy",
     "rows": [
         {
             "row_name": "baseline",
