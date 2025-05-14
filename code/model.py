@@ -98,7 +98,7 @@ def generate_responses_batch(model, tokenizer, prompts):
     prompt_ids = torch.tensor(prompt_ids, device=model.device)
     prompt_length = prompt_ids.shape[1]
     model_max_length = model.config.n_positions
-    dummy_attention_mask = torch.ones_like(prompt_ids)
+    dummy_attention_mask = torch.ones_like(prompt_ids, device=model.device)
     model.eval()
     
     response_ids = model.generate(
@@ -118,6 +118,11 @@ def generate_responses_batch(model, tokenizer, prompts):
 
 
 def generate_responses(model, tokenizer, prompts, batch_size):
+    if torch.cuda.is_available():
+        model = model.to("cuda")
+    elif torch.backends.mps.is_available():
+        model = model.to("mps")
+
     responses = []
     for batch_start in range(0, len(prompts), batch_size):
         batch_end = batch_start + batch_size
