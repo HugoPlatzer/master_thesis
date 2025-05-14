@@ -1,0 +1,14 @@
+{
+    "model": "experiments/intermediate_steps/reverse/add/5digits/100k/checkpoint-4692/",
+    "sampler": {
+        "name": "SamplerAdd",
+        "params": {
+            "digits": 5,
+            "intermediate_steps": "reverse"
+        }
+    },
+    "random_seed": 1234,
+    "dataset_size": 10000,
+    "batch_size": 256,
+    "strip_intermediate": false
+}

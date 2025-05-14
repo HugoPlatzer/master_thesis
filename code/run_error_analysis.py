@@ -6,7 +6,7 @@ from pathlib import Path
 import samplers
 from tokenizer import ASCIITokenizer
 from dataset import create_dataset
-from model import load_model_from_path, generate_responses
+from model import load_model_from_path, generate_responses, check_response
 from experiment import set_random_seed
 
 
@@ -31,7 +31,11 @@ seed = config["random_seed"]
 set_random_seed(seed)
 
 dataset_size = config["dataset_size"]
-dataset = create_dataset(sampler, tokenizer, dataset_size)
+if "n_positions" in config:
+    n_positions = config["n_positions"]
+else:
+    n_positions = None
+dataset = create_dataset(sampler, tokenizer, dataset_size, n_positions)
 prompts = dataset["prompt_str"]
 correct_responses = dataset["response_str"]
 
@@ -39,10 +43,17 @@ batch_size = config["batch_size"]
 model_responses = generate_responses(
         model, tokenizer, prompts, batch_size)
 
+if "strip_intermediate" in config:
+    strip_intermediate = config["strip_intermediate"]
+else:
+    strip_intermediate = False
+
 wrong_responses = [(prompt, model_resp, correct_resp)
         for prompt, model_resp, correct_resp
         in zip(prompts, model_responses, correct_responses)
-        if model_resp != correct_resp]
+        if not check_response(model_resp,
+                correct_resp,
+                strip_intermediate)]
 num_wrong = len(wrong_responses)
 num_total = len(prompts)
 
