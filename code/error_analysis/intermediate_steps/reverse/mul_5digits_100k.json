@@ -1,7 +1,7 @@
 {
-    "model": "experiments/intermediate_steps/reverse/add/5digits/100k/checkpoint-4692/",
+    "model": "experiments/intermediate_steps/reverse/mul/5digits/100k/checkpoint-37927/",
     "sampler": {
-        "name": "SamplerAdd",
+        "name": "SamplerMul",
         "params": {
             "digits": 5,
             "intermediate_steps": "reverse"
