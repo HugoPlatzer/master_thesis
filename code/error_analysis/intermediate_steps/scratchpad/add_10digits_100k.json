@@ -1,0 +1,14 @@
+{
+    "model": "experiments/intermediate_steps/scratchpad/add/10digits/100k/checkpoint-5083/",
+    "sampler": {
+        "name": "SamplerAdd",
+        "params": {
+            "digits": 10,
+            "intermediate_steps": "scratchpad"
+        }
+    },
+    "random_seed": 1234,
+    "dataset_size": 100000,
+    "batch_size": 256,
+    "strip_intermediate": false
+}

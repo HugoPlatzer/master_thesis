@@ -1,0 +1,14 @@
+{
+    "model": "experiments/intermediate_steps/scratchpad/sqrt/6digits/100k/checkpoint-15625/",
+    "sampler": {
+        "name": "SamplerSqrt",
+        "params": {
+            "digits": 6,
+            "intermediate_steps": "scratchpad"
+        }
+    },
+    "random_seed": 1234,
+    "dataset_size": 100,
+    "batch_size": 256,
+    "strip_intermediate": false
+}
