@@ -130,9 +130,9 @@ def generate_responses(model, tokenizer, prompts, batch_size):
     for batch_start in range(0, len(prompts), batch_size):
         batch_end = batch_start + batch_size
         batch_prompts = prompts[batch_start:batch_end]
-        progress_bar.update(len(batch_prompts))
         batch_responses = generate_responses_batch(
             model, tokenizer, batch_prompts)
+        progress_bar.update(len(batch_prompts))
         responses.extend(batch_responses)
     progress_bar.close()
     return responses
