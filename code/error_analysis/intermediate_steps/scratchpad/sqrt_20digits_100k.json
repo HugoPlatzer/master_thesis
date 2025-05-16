@@ -3,7 +3,7 @@
     "sampler": {
         "name": "SamplerSqrt",
         "params": {
-            "digits": 6,
+            "digits": 20,
             "intermediate_steps": "scratchpad"
         }
     },
