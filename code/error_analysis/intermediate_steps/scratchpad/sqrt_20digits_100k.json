@@ -9,6 +9,6 @@
     },
     "random_seed": 1234,
     "dataset_size": 100,
-    "batch_size": 256,
+    "batch_size": 16,
     "strip_intermediate": false
 }
