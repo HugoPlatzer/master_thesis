@@ -1,6 +1,6 @@
 {
     "plot_type": "accuracy",
-    "legend_columns": 1,
+    "legend_columns": 3,
     "curves": [
         {
             "name": "baseline, 6 digits",
