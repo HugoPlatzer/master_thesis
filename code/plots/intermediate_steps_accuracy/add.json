@@ -1,0 +1,62 @@
+{
+    "plot_type": "accuracy",
+    "legend_columns": 1,
+    "curves": [
+        {
+            "name": "baseline, 3 digits",
+            "results_file": "experiments/baseline/add/3digits/100k/results.json",
+            "colormap": "Reds",
+            "colormap_position": 0.3
+        },
+        {
+            "name": "baseline, 5 digits",
+            "results_file": "experiments/baseline/add/5digits/100k/results.json",
+            "colormap": "Reds",
+            "colormap_position": 0.5
+        },
+        {
+            "name": "baseline, 10 digits",
+            "results_file": "experiments/baseline/add/10digits/100k/results.json",
+            "colormap": "Reds",
+            "colormap_position": 0.7
+        },
+
+        {
+            "name": "reverse, 3 digits",
+            "results_file": "experiments/intermediate_steps/reverse/add/3digits/100k/results.json",
+            "colormap": "Greens",
+            "colormap_position": 0.3
+        },
+        {
+            "name": "reverse, 5 digits",
+            "results_file": "experiments/intermediate_steps/reverse/add/5digits/100k/results.json",
+            "colormap": "Greens",
+            "colormap_position": 0.5
+        },
+        {
+            "name": "reverse, 10 digits",
+            "results_file": "experiments/intermediate_steps/reverse/add/10digits/100k/results.json",
+            "colormap": "Greens",
+            "colormap_position": 0.7
+        },
+
+        {
+            "name": "scratchpad, 3 digits",
+            "results_file": "experiments/intermediate_steps/scratchpad/add/3digits/100k/results.json",
+            "colormap": "Blues",
+            "colormap_position": 0.3
+        },
+        {
+            "name": "scratchpad, 5 digits",
+            "results_file": "experiments/intermediate_steps/scratchpad/add/5digits/100k/results.json",
+            "colormap": "Blues",
+            "colormap_position": 0.5
+        },
+        {
+            "name": "scratchpad, 10 digits",
+            "results_file": "experiments/intermediate_steps/scratchpad/add/10digits/100k/results.json",
+            "colormap": "Blues",
+            "colormap_position": 0.7
+        }
+    ]
+}

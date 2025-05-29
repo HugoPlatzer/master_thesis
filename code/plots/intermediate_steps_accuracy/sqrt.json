@@ -1,0 +1,62 @@
+{
+    "plot_type": "accuracy",
+    "legend_columns": 1,
+    "curves": [
+        {
+            "name": "baseline, 6 digits",
+            "results_file": "experiments/baseline/sqrt/6digits/100k/results.json",
+            "colormap": "Reds",
+            "colormap_position": 0.3
+        },
+        {
+            "name": "baseline, 10 digits",
+            "results_file": "experiments/baseline/sqrt/10digits/100k/results.json",
+            "colormap": "Reds",
+            "colormap_position": 0.5
+        },
+        {
+            "name": "baseline, 20 digits",
+            "results_file": "experiments/baseline/sqrt/20digits/100k/results.json",
+            "colormap": "Reds",
+            "colormap_position": 0.7
+        },
+
+        {
+            "name": "reverse, 6 digits",
+            "results_file": "experiments/intermediate_steps/reverse/sqrt/6digits/100k/results.json",
+            "colormap": "Greens",
+            "colormap_position": 0.3
+        },
+        {
+            "name": "reverse, 10 digits",
+            "results_file": "experiments/intermediate_steps/reverse/sqrt/10digits/100k/results.json",
+            "colormap": "Greens",
+            "colormap_position": 0.5
+        },
+        {
+            "name": "reverse, 20 digits",
+            "results_file": "experiments/intermediate_steps/reverse/sqrt/20digits/100k/results.json",
+            "colormap": "Greens",
+            "colormap_position": 0.7
+        },
+
+        {
+            "name": "scratchpad, 6 digits",
+            "results_file": "experiments/intermediate_steps/scratchpad/sqrt/6digits/100k/results.json",
+            "colormap": "Blues",
+            "colormap_position": 0.3
+        },
+        {
+            "name": "scratchpad, 10 digits",
+            "results_file": "experiments/intermediate_steps/scratchpad/sqrt/10digits/100k/results.json",
+            "colormap": "Blues",
+            "colormap_position": 0.5
+        },
+        {
+            "name": "scratchpad, 20 digits",
+            "results_file": "experiments/intermediate_steps/scratchpad/sqrt/20digits/100k/results.json",
+            "colormap": "Blues",
+            "colormap_position": 0.7
+        }
+    ]
+}
