@@ -1,0 +1,5 @@
+{
+    "model_path": "experiments/baseline/add/3digits/100k/checkpoint-4301/",
+    "prompt_str": "123+456=",
+    "response_str": "0579"
+}

@@ -1,6 +1,7 @@
 import sys
 import json
 import torch
+import matplotlib
 import matplotlib.pyplot as plt
 
 from model import load_model_from_path
@@ -14,11 +15,14 @@ if len(sys.argv) != 2:
 config_file = sys.argv[1]
 config = json.loads(open(config_file).read())
 
+matplotlib.rc("text", usetex=True)
+matplotlib.rc("font", family="serif", size=7)
+
 model = load_model_from_path(config["model_path"])
 
 tokenizer = ASCIITokenizer()
-token_seq = tokenizer.encode(config["prompt_str"],
-        add_special_tokens=False)
+input_str = config["prompt_str"] + config["response_str"]
+token_seq = tokenizer.encode(input_str, add_special_tokens=False)
 token_tensor = torch.tensor([token_seq])
 state = model.forward(token_tensor, output_attentions=True)
 
@@ -34,11 +38,17 @@ num_layers = attention_matrices.size()[0]
 num_heads = attention_matrices.size()[1]
 
 fig, axes = plt.subplots(nrows=num_layers, ncols=num_heads,
-        figsize=(12, 12))
-fig.subplots_adjust(hspace=0.1, wspace=0.1)
+        figsize=(5.5, 3.5),
+        gridspec_kw={"wspace": 0.05, "hspace": 0.05},
+        sharex=True, sharey=True)
 
-prompt_str = config["prompt_str"]
-prompt_str_shifted = config["prompt_str"][1:] + "."
+
+row_labels = config["response_str"] + "."
+col_labels = config["prompt_str"] + config["response_str"]
+
+# only keep rows of attention matrices where tokens of
+# response_str are generated, plus EOS token
+attention_matrices = attention_matrices[:, :, -len(row_labels):, :]
 
 for layer_idx in range(num_layers):
     for head_idx in range(num_heads):
@@ -46,19 +56,27 @@ for layer_idx in range(num_layers):
         row_index = num_layers - 1 - layer_idx
         col_index = head_idx
         ax = axes[row_index][col_index]
-        ax.imshow(M)
-        ax.set_xticks(range(len(prompt_str)))
-        ax.set_xticklabels(prompt_str)
-        ax.set_yticks(range(len(prompt_str_shifted)))
-        ax.set_yticklabels(prompt_str_shifted)
+        ax.imshow(M, aspect=1.5)
+        
+        ax.set_xticks(range(len(col_labels)))
+        ax.set_xticklabels(col_labels)
+        ax.set_yticks(range(len(row_labels)))
+        ax.set_yticklabels(row_labels)
+
+        if layer_idx != 0:
+            ax.tick_params(bottom=False)
+        if head_idx != 0:
+            ax.tick_params(left=False)
+
 
 for layer_idx in range(num_layers):
     row_index = num_layers - 1 - layer_idx
-    axes[row_index][0].set_ylabel(f"Layer {layer_idx + 1}")
+    axes[row_index][0].set_ylabel(
+            f"\\textbf{{Layer {layer_idx + 1}}}")
 
 for head_idx in range(num_heads):
-    axes[num_layers - 1][head_idx].set_xlabel(f"Head {head_idx + 1}")
+    axes[num_layers - 1][head_idx].set_xlabel(
+            f"\\textbf{{Head {head_idx + 1}}}")
 
-plt.tight_layout()
 output_file = config_file.rsplit(".", 1)[0] + ".pdf"
-plt.savefig(output_file)
+plt.savefig(output_file, bbox_inches="tight")
