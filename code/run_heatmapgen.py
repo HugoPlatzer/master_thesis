@@ -15,8 +15,10 @@ if len(sys.argv) != 2:
 config_file = sys.argv[1]
 config = json.loads(open(config_file).read())
 
+plot_type = config["plot_type"]
+
 matplotlib.rc("text", usetex=True)
-matplotlib.rc("font", family="serif", size=7)
+matplotlib.rc("font", family="serif", size=config["font_size"])
 
 model = load_model_from_path(config["model_path"])
 
@@ -37,11 +39,9 @@ attention_matrices = torch.tensor(attention_matrices)
 num_layers = attention_matrices.size()[0]
 num_heads = attention_matrices.size()[1]
 
-fig, axes = plt.subplots(nrows=num_layers, ncols=num_heads,
-        figsize=(5.5, 3.5),
-        gridspec_kw={"wspace": 0.05, "hspace": 0.05},
-        sharex=True, sharey=True)
-
+figure_width = config["figure_width"]
+figure_height = config["figure_height"]
+figure_gap = config["figure_gap"]
 
 row_labels = config["response_str"] + "."
 col_labels = config["prompt_str"] + config["response_str"]
@@ -50,33 +50,62 @@ col_labels = config["prompt_str"] + config["response_str"]
 # response_str are generated, plus EOS token
 attention_matrices = attention_matrices[:, :, -len(row_labels):, :]
 
-for layer_idx in range(num_layers):
-    for head_idx in range(num_heads):
-        M = attention_matrices[layer_idx][head_idx]
+
+def plot_single():
+    plot_layer = config["plot_layer"]
+    M = attention_matrices[plot_layer, :, :, :]
+    M = torch.mean(M, dim=0)
+
+    fig, ax = plt.subplots(figsize=(figure_width, figure_height))
+    ax.imshow(M, aspect="auto")
+
+    ax.set_xticks(range(len(col_labels)))
+    ax.set_xticklabels(col_labels)
+    ax.set_yticks(range(len(row_labels)))
+    ax.set_yticklabels(row_labels)
+
+
+def plot_full():
+    fig, axes = plt.subplots(nrows=num_layers, ncols=num_heads,
+            figsize=(figure_width, figure_height),
+            gridspec_kw={"wspace": figure_gap, "hspace": figure_gap},
+            sharex=True, sharey=True)
+
+    for layer_idx in range(num_layers):
+        for head_idx in range(num_heads):
+            M = attention_matrices[layer_idx][head_idx]
+            row_index = num_layers - 1 - layer_idx
+            col_index = head_idx
+            ax = axes[row_index][col_index]
+            ax.imshow(M, aspect="auto")
+            
+            ax.set_xticks(range(len(col_labels)))
+            ax.set_xticklabels(col_labels)
+            ax.set_yticks(range(len(row_labels)))
+            ax.set_yticklabels(row_labels)
+
+            if layer_idx != 0:
+                ax.tick_params(bottom=False)
+            if head_idx != 0:
+                ax.tick_params(left=False)
+
+    for layer_idx in range(num_layers):
         row_index = num_layers - 1 - layer_idx
-        col_index = head_idx
-        ax = axes[row_index][col_index]
-        ax.imshow(M, aspect=1.5)
-        
-        ax.set_xticks(range(len(col_labels)))
-        ax.set_xticklabels(col_labels)
-        ax.set_yticks(range(len(row_labels)))
-        ax.set_yticklabels(row_labels)
+        axes[row_index][0].set_ylabel(
+                f"\\textbf{{Layer {layer_idx + 1}}}")
 
-        if layer_idx != 0:
-            ax.tick_params(bottom=False)
-        if head_idx != 0:
-            ax.tick_params(left=False)
+    for head_idx in range(num_heads):
+        axes[num_layers - 1][head_idx].set_xlabel(
+                f"\\textbf{{Head {head_idx + 1}}}")
 
 
-for layer_idx in range(num_layers):
-    row_index = num_layers - 1 - layer_idx
-    axes[row_index][0].set_ylabel(
-            f"\\textbf{{Layer {layer_idx + 1}}}")
+if plot_type == "single":
+    plot_single()
+elif plot_type == "full":
+    plot_full()
+else:
+    raise Exception("invalid plot type", plot_type)
 
-for head_idx in range(num_heads):
-    axes[num_layers - 1][head_idx].set_xlabel(
-            f"\\textbf{{Head {head_idx + 1}}}")
 
 output_file = config_file.rsplit(".", 1)[0] + ".pdf"
 plt.savefig(output_file, bbox_inches="tight")

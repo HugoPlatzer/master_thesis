@@ -1,0 +1,11 @@
+{
+    "plot_type": "single",
+    "plot_layer": 0,
+    "model_path": "experiments/intermediate_steps/reverse/add/3digits/100k/checkpoint-5865/",
+    "prompt_str": "123+456=",
+    "response_str": "[9750]0579",
+    "figure_width": 4.0,
+    "figure_height": 2.0,
+    "figure_gap": 0.05,
+    "font_size": 7
+}
