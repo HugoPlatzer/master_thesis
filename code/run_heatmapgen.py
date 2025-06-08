@@ -41,7 +41,7 @@ num_heads = attention_matrices.size()[1]
 
 figure_width = config["figure_width"]
 figure_height = config["figure_height"]
-figure_gap = config["figure_gap"]
+colormap = config["colormap"]
 
 row_labels = config["response_str"] + "."
 col_labels = config["prompt_str"] + config["response_str"]
@@ -57,7 +57,7 @@ def plot_single():
     M = torch.mean(M, dim=0)
 
     fig, ax = plt.subplots(figsize=(figure_width, figure_height))
-    ax.imshow(M, aspect="auto")
+    ax.imshow(M, aspect="auto", cmap=colormap)
 
     ax.set_xticks(range(len(col_labels)))
     ax.set_xticklabels(col_labels)
@@ -66,6 +66,8 @@ def plot_single():
 
 
 def plot_full():
+    figure_gap = config["figure_gap"]
+
     fig, axes = plt.subplots(nrows=num_layers, ncols=num_heads,
             figsize=(figure_width, figure_height),
             gridspec_kw={"wspace": figure_gap, "hspace": figure_gap},
@@ -77,7 +79,7 @@ def plot_full():
             row_index = num_layers - 1 - layer_idx
             col_index = head_idx
             ax = axes[row_index][col_index]
-            ax.imshow(M, aspect="auto")
+            ax.imshow(M, aspect="auto", cmap=colormap)
             
             ax.set_xticks(range(len(col_labels)))
             ax.set_xticklabels(col_labels)

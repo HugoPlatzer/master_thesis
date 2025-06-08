@@ -6,6 +6,6 @@
     "response_str": "[9750]0579",
     "figure_width": 4.0,
     "figure_height": 2.0,
-    "figure_gap": 0.05,
-    "font_size": 7
+    "font_size": 7,
+    "colormap": "viridis"
 }
