@@ -7,7 +7,8 @@
 **/*.pickle
 **/*.hdf5
 **/*.bin
+**/*.swo
 **/*.swp
+**/*.pdf
 **/logfile.txt
-**/plot.pdf
 **/checkpoint-*/
