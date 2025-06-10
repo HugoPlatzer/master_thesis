@@ -1,0 +1,11 @@
+{
+    "plot_type": "single",
+    "plot_layer": 0,
+    "model_path": "experiments/baseline/sqrt/6digits/100k/checkpoint-12512/",
+    "prompt_str": "123456:",
+    "response_str": "351",
+    "figure_width": 4.0,
+    "figure_height": 2.0,
+    "font_size": 8,
+    "colormap": "viridis"
+}

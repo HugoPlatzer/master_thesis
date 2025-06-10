@@ -1,0 +1,11 @@
+{
+    "plot_type": "single",
+    "plot_layer": 0,
+    "model_path": "experiments/intermediate_steps/scratchpad/add/3digits/100k/checkpoint-1173/",
+    "prompt_str": "123+456=",
+    "response_str": "[36090|25070|14050]579",
+    "figure_width": 5.0,
+    "figure_height": 4.0,
+    "font_size": 8,
+    "colormap": "viridis"
+}

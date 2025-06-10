@@ -1,0 +1,11 @@
+{
+    "plot_type": "single",
+    "plot_layer": 0,
+    "model_path": "experiments/baseline/add/3digits/100k/checkpoint-4301/",
+    "prompt_str": "123+456=",
+    "response_str": "0579",
+    "figure_width": 4.0,
+    "figure_height": 2.0,
+    "font_size": 8,
+    "colormap": "viridis"
+}
