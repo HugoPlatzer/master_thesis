@@ -25,7 +25,7 @@ The training texts could also all be in a structured question-answer pair form, 
 \begin{itemize}
 \item Translation tasks: "en: The house is big.  de: Das Haus ist groß."
 \item Classification tasks: "text:  what a cool product, would buy again  sentiment: happy"
-\item Mathematical tasks: "21*2=42" or "123: odd number" / "124: even number" \citepage{3}{yang2023gpt}
+\item Mathematical tasks: "21*2=42" or "123: odd number" / "124: even number" \citepage{3}{nocalculator}
 \end{itemize}
 
 When the models is well-trained on these question-answer pair texts, it can be asked a question by simply leaving out the answer part at the end of the text, like "21*3=". \cite{alammar-transformer} A good model would be able to generate the correct answer for similar questions by inference from the many examples it has seen, even when the exact question posed is not in its training data.
@@ -177,7 +177,7 @@ OpenAI GPT2 was released in four versions with different parameter counts:
     columns/n_blocks/.style={column name={$n_{blocks}$}},
     columns/d_hidden/.style={column name={$d_{hidden}$}},
     columns/n_heads/.style={column name={$n_{heads}$}},
-    columns/d_head/.style={column name={$d_{head}$}},
+    columns/d_head/.style={column name={$d_{head}$}}
 }
 
 \subsubsection{Processing steps}
@@ -204,12 +204,16 @@ Transformer networks do not operate with integer token IDs, but with state vecto
 This means the token sequence needs to be converted into a sequence of such vectors before feeding it through the model. This happens during the preprocessing stage.
 For this, GPT2 has a learnable token embedding matrix $v_{token}$.  Because the GPT2 tokenizer has a vocabulary size of 50257 (\ref{gpt2:tokenizer}), this matrix is of size $50257 \times d_{hidden}$.
 
+\begin{samepage}
+
 Furthermore, because the processing blocks of a transformer model have no positional awareness, information about the position of a vector within the sequence needs to be included as well \citepage{6}{allyouneed}.
 In GPT2, this is done by another learnable embedding matrix $v_{pos}$ storing a vector for each position up to some limit, which will become the maximum sequence length the model can handle \citepage{5}{improvinglu}  . For GPT2, this maximum sequence length has been fixed at 1024 \citepage{4}{unsupervisedmultitask} \cite{HuggingFaceGPT2}.
 The positional embedding matrix $v_{token}$ thus has a size of $1024 \times d_{hidden}$.
 The starting vector $y_i$ for a token value $x_i$ at position $i$ is then given as \citepage{3}{allyouneed}:
 
 $$y_i = v_{token}(x_i) + v_{pos}(i)$$
+
+\end{samepage}
 
 
 \subsubsection{GPT2 block}
@@ -250,6 +254,8 @@ The normalization happens independently for each vector $x_i$ (i.e. at each posi
 
 \subsubsection{GPT2 block: Residual connection}
 
+\begin{samepage}
+
 $$y_i = x_i + f(x_i)$$
 
 as opposed to $y_i = f(x_i)$ without a residual connection \cite[p. 3]{allyouneed} \cite{residual}.
@@ -257,6 +263,8 @@ as opposed to $y_i = f(x_i)$ without a residual connection \cite[p. 3]{allyounee
 A residual connection allows the input to "bypass" the learned function of the model, by adding the input to the output vector.
 Such connections are found in almost all models having many steps/layers, because they were found to greatly help when training deep models.
 This is because when using residual connections, the input data does not need to flow through all computation steps before reaching a given point, instead it can bypass some of them, allowing later computations to access earlier data \citepage{1-2}{residual}.
+
+\end{samepage}
 
 \subsubsection{GPT2 block: Attention mechanism}
 
@@ -271,7 +279,7 @@ The general idea of an attention mechanism is to compare the vector at one posit
 This is the only part of the entire model where the output at a given position also depends on other (previous) positions. All other components of the model process each position independently.
 Nonetheless, the learnable parameters of the attention mechanism, which are linear transformations to generate query, key, value vectors and project the output, are independent of position.
 
-
+\includediagram{diagrams/gpt2/attention_dot}{Structure of the Scaled Dot-product attention mechanism. This diagram illustrates the computation of the output position $a_3$. The other output positions $a_i$ are computed in a similar fashion, replacing $q_3$ in the diagram with $q_i$ and considering $k_1 \ldots k_i$ and $v_1 \ldots v_i$, giving the diagram $i$ columns.}
 
 For each position $i$ $(1 \leq i \leq n_{pos})$ the following steps are performed \citepage{4}{allyouneed} \cite{alammar-transformer} \cite{alammar-gpt2}:
 
@@ -286,13 +294,12 @@ For each position $i$ $(1 \leq i \leq n_{pos})$ the following steps are performe
  $$k_i = W_k x_i + b_k$$
  $$v_i = W_v x_i + b_v$$
 
-
-
 \item The query, key and value vectors $q_i, k_i, v_i$ are split into $n_{heads}$ segments of equal size $d_{head} = \frac{d_{hidden}}{n_{heads}}$. $q_{i_s}, k_{i_s}, v_{i_s} \in \mathbb{R}^{d_{head}}$. The following steps are performed for each segment $s$ $(1 \leq s \leq n_{heads})$. This is called multi-head attention and was found to be beneficial to model performance comparing to just using a single head \citepage{4-5}{allyouneed} \cite{alammar-gpt2}.
 Multi-head attention can also be described as running the Scaled Dot-product attention mechanism $n_{heads}$ times in parallel with each query/key/value vector having the size $d_{head} = \frac{d_{hidden}}{n_{heads}}$ with different learnable parameters for each head, then concatenating and projecting the outputs for all heads at each position \citepage{4-5}{allyouneed}.
 
-\includediagram{diagrams/gpt2/attention_dot}{Structure of the Scaled Dot-product attention mechanism. This diagram illustrates the computation of the output position $a_3$. The other output positions $a_i$ are computed in a similar fashion, replacing $q_3$ in the diagram with $q_i$ and considering $k_1 \ldots k_i$ and $v_1 \ldots v_i$, giving the diagram $i$ columns.}
 
+
+\begin{samepage}
 \begin{itemize}
 
 \item The query vector $q_{i_s}$ is compared with the key vector of each position $j$  $(1 \leq j \leq i)$ using dot product to generate a score value $a_{ij_s}\in \mathbb{R}$.
@@ -311,8 +318,10 @@ Positions after $i$ $(j > i)$ are not considered because of the autoregressive n
 \item Using the scores from before as weights, the output vector $o_{i_s}$ is "blended together" from the value vectors $v_{j_s}$ $(1 \leq j \leq i)$ \cite{alammar-gpt2}:
     $$o_{i_s} = \sum _{1 \leq j \leq i} softmax(a_{ij_s}) \ v_{j_s}$$
 
-\end{itemize}
+\item This so-called "Scaled Dot-product attention mechanism" is further illustrated in \cref{diagrams/gpt2/attention_dot}.
 
+\end{itemize}
+\end{samepage}
 
 
 \item The output vectors of the segments are concatenated:
@@ -370,4 +379,4 @@ As explained before (\ref{transformer:output}), the model should predict the nex
 Standard initialization techniques (for example uniform initialization) can be used for the weight and bias matrices \citepage{5}{improvinglu}.
 
 GPT2 uses the Adam optimizer \citepage{5}{improvinglu}.
-A naive stochastic gradient optimizer will not achieve good results when training transformer networks like GPT2, thus more advanced optimizers like Adam need to be used to make the model converge to a degree where it becomes useful \cite{adambeatsgd}.
+A naive stochastic gradient optimizer will not achieve good results when training transformer networks like GPT2, thus more advanced optimizers like Adam need to be used to make the model converge to a degree where it becomes useful \cite{adambeatssgd}.

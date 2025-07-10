@@ -1,10 +1,48 @@
+\thispagestyle{empty}
+\section*{Abstract}
+
+Transformer networks have proven successful in a number of domains, such as natural language translation, coding, and general question answering. Arithmetic tasks can be challenging for them however.
+We train a small 10 million parameter transformer decoder model on integer arithmetic tasks such as addition, multiplication and integer square root for various operand lengths and evaluate accuracy.
+Error samples are studied for patterns, then a number of different strategies for improving performance such as different sampling distributions, reversing digits, and step-by-step reasoning are tried. The internal workings of the model are inspected for patterns using attention heatmaps.
+
+\clearpage
+
+\tableofcontents
+\clearpage
+
 \section{Introduction}
 
-In 2017, the influential paper "Attention Is All You Need" \cite{allyouneed} was published. It showed that a new language model architecture, which they called the "Transformer", outperformed all previous models on English-French and English-German translation tasks, while also having lower training cost \citepage{8}{allyouneed}. Soon thereafter, variations of the transformer architecture described in this paper became the state of the art in most natural language processing tasks. They were also found to be competitive with established neural network architectures in other domains such as image classification \citepage{6}{tf-image}.
+In 2017, the influential paper "Attention Is All You Need" \cite{allyouneed} was published. It showed that a new language model architecture, which they called the "Transformer", outperformed all previous models on English-French and English-German translation tasks, while also having lower training cost \citepage{8}{allyouneed}. Soon thereafter, variations of the transformer architecture described in this paper became the state of the art in most natural language processing tasks. They were also found to be competitive with established neural network architectures in other domains such as image classification \citepage{6}{worth16words}.
 
 OpenAI's release of the ChatGPT web service in late 2022 \cite{openai_chatgpt_2022} made Transformer networks a topic of relevance for the general public: This AI chat assistant gave natural, helpful and human-sounding answers in a quality not seen before, showing strong skills in a wide array of domains such as computer science, history and creative writing \cite{Savelka_2023} \citepage{5}{openai2023gpt4}.
 
 While the details of the architecture of ChatGPT have not been released \cite{openai_chatgpt_2022} \cite{openai2023gpt4}, it is assumed that it is based on a transformer decoder architecture very similar to that of GPT2, which was released by OpenAI in 2019, with the main differences being a bigger model with more learnable parameters as well as a larger training dataset \cite{OpenGenus2023GPTComparison}.
 
 Even though transformer models are very strong at understanding the patterns of human language, they do have limitations in other areas such as performing arithmetics:
-For example, ChatGPT is unable to correctly multiply numbers with 4 or more decimal digits. It does however seem capable of adding numbers of arbitrary size \cite{openai2023gpt4} \citepage{9}{yang2023gpt}.  This work seeks to explore the limits on what transformer-style models are able to learn.
+For example, ChatGPT is unable to correctly multiply numbers with 4 or more decimal digits. It does however seem capable of adding numbers of arbitrary size \cite{openai2023gpt4} \citepage{9}{nocalculator}.  This work seeks to explore the limits on what transformer-style models are able to learn.
+
+\subsection{Neural networks and arithmetic}
+
+\cite{solving} showed that basic feed-forward networks can do binary addition with one hidden layer and binary multiplication with three hidden layers with perfect accuracy. This is purely a theoretical result however and does not consider training the model using a dataset from random initialization.
+
+\cite{visual} trained feed-forward neural networks on integer addition and multiplication: They implemented both addition of numbers represented by one-hot decimal digit vectors, as well as numbers represented by a 2D image of the number.
+
+\subsection{Transformer networks and arithmetic}
+
+\cite{teaching} was the main inspiration for our work: They tried to learn arithmetic to small transformer networks ("nanoGPT" with about 10 million parameters). First, they train on 3-digit integer addition and compare final model performance with various training dataset sizes. They then experiment on techniques like result reversal and step-by-step thinking to improve performance when increasing operand digits. They also experiment with 2-digit multiplication and approximate square root of decimal numbers in the range $[0,10]$.
+
+\cite{goat} uses a much larger transformer network with about 7 billion parameters. They try to train on addition and multiplication up to 16 digits. They do use step-by-step thinking. Accuracy was near perfect on addition but they failed to learn multiplication.
+
+\cite{memtocomp} tries to train transformer models on binary addition and multiplication as opposed to the base 10 digits used in the papers mentioned before. They train on 7 operand bits and use almost the whole space of all possible $2^{14}$ operand combinations in the training set.
+
+\cite{rightembeddings} focuses on length generalization - the capability of the model to work on operand lengths larger than the ones seen in training. They use a large training dataset of 20 million samples of mixed operand lengths. Using some tweaks to the model's embeddings, they achieve near-perfect accuracy for addition and multiplication, as well as some degree of length generalization for addition.
+
+\cite{nocalculator} trained various transformer models from 10M to 2B parameters. They divide training into two phases, with the first phase containing simple operations up to 5 digits and the second phase containing harder operations with operands up to 12 digits. They achieve near-perfect accuracy for 3 and 5 digit addition with about 40\% accuracy for 5 digit multiplication.
+
+\cite{implicit} also tries to learn arithmetic with the help of chain-of-thought / step-by-step reasoning, but has the idea of then training the model to successively hide its reasoning steps, in the end yielding a model that just outputs the correct result for an arithmetic task. 
+
+\cite{positionmatters} explores the role of positional encoding schemes for transformers in the context of learning arithmetic and length generalization. Positional encoding schemes are ways in which position information is embedded into the token sequence to make the model grasp the order of tokens. This ranges from no positional encoding at all to more sophisticated schemes involving vector rotation.
+
+\cite{lengthandcount} also explores the topic of length generalization, this time both in the size of operands and the number of operands (e.g. multiple additions or multiplications per prompt).
+
+\cite{lengthgen} also focuses on length generalization for the operations of addition, multiplication and modular arithmetic. They tested absolute and relative positional embeddings, and achieve perfect accuracy for addition from 6-20 digits for either embedding type. For multiplication they trained on 3x5 digit multiplication and then tried to extrapolate up to 3x35 digit multiplication. However, multiplication with two large operands of 5 or 10 digits each was not tested.

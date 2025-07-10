@@ -1,0 +1,41 @@
+\section{Summary}
+
+Addition was generally easily learned by baseline transformer models as long as the dataset size was at least 10k (\cref{fig:baseline_add}). There results are in line with \cite{teaching}.
+
+Multiplication proved much tougher, with only about 20\% accuracy achieved for 3-digit multiplication and zero accuracy for 5 and 10 digits (\cref{fig:baseline_mul}).
+
+Integer square root, for a comparable operand size (single operand with twice as many digits as the two operand of addition or multiplication) proved to be somewhat in the middle. Our 100k dataset allowed 99\% accuracy for 6 digit integer square root and around 60\% accuracy for 10 digit integer square root, with zero accuracy for 20 digit integer square root (\cref{fig:baseline_sqrt}).
+
+\subsection{Errors}
+Errors for addition and multiplication were generally single/multiple digits being off in the middle of the sum/product. This matches the error patterns observed in \citepage{7}{lengthgen}, which shows digits in the middle of the result taking longer to converge and finishing at lower accuracy.
+
+\subsection{Attempted improvements}
+Changing the model size did result in a model with bigger vectors or more layers needing fewer training steps to achieve the same accuracy (\cref{fig:model_size_add}, \cref{fig:model_size_mul}) but did not make a substantial difference in model capabilities.
+
+Changing the digit sampling from uniform across the whole sample space to bit-uniform or digit-uniform provided little improvement either. This stands in contrast to \cite{positionmatters} where both uniform-digit sampling and result reversal provided some improvement in model accuracy.
+
+Scratchpads proved effective to improve multiplication accuracy: Even though accuracies obtained were only 63\% for 5 digits and 23\% for 10 digits (\cref{tbl:scratchpad_mul}), this signifies a marked improvement over
+
+\subsection{Future work}
+
+Some future areas of research that might be worth exploring are:
+
+\begin{itemize}
+\item It is unclear whether the stopping condition we used does lead to premature termination of training - looking at accuracy curves suggests this might be a possibility. Focusing not only on loss but also accuracy might ensure training does not stop before the model reaches maximum accuracy.
+
+\item In the same way, training when using scratchpad in our case was limited by resources available to us, training for more epochs would allow to see the actual limitations of scratchpad training for multiplication on our model better.
+
+\item We did not analyze variance between multiple training runs as even a single training run took substantial resources. It would however be interesting to see if a task that normally fails to converge occasionally does converge or vice versa.
+
+\item It would be interesting to see whether a second model could learn to predict where the main model makes a mistake and try to correct it, especially for longer scratchpads
+
+\item It would be worth combining result reversal with uniform-digit sampling to try and replicate the good  results for multiplication in \cite{positionmatters}.
+
+\item The good results of basic feed-forward networks in \cite{visual} would make it worthwhile to explore their limits, especially with regards to longer scratchpad sequences. It would be worth finding out at which point transformers start having an advantage over older, more basic networks. Other structures like 1-dimensional CNNs or recurrent networks could be compared too.
+
+\item Using a simpler, more straightforward scratchpad for multiplication as in \cite{implicit} would reduce sequence length and thus accelerate training. Performance between such a bare-bones scratchpad and the more elaborate one we are using should be compared.
+
+\item At the same time, a better scratchpad for integer square root should be devised. It must be reasonably short, yet not leave big chunks like the computation of squares without intermediate steps.
+
+\item The inner mechanisms of the model could be explored further - our heatmaps show some clear, logical relationships between input and output in the first layer already - but it does not explain the whole "algorithm" learned by the model. Anaylsis would have to focus on the more opaque patterns in later layers of the model.
+\end{itemize}
