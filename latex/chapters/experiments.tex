@@ -147,13 +147,33 @@ It is evaluated just like validation dataset accuracy, but on the test dataset. 
 
 \section{Experimental results}
 
-\subsection{Baseline experiments}
+We wanted to compare the performance of the models we trained to the models of other studies on transformers and arithmetic. In addition, we needed to establish baseline performance metrics to compare the effectiveness of various changes to the model, data, and training regime we are going to attempt.
+Based on the experimental setup described above, we thus performed a number of baseline experiments. This means for each of the following configurations we ran 3 experiments, one with a training dataset size of 1k, one with training dataset size 10k and one with training dataset size 100k:
 
-Based on the experimental setup described above, we created models and evaluated their training progress for the addition and multiplication tasks, varying numbers of operand digits and training dataset sizes.
+\begin{itemize}
+	\item Addition, 3 digits
+	\item Addition, 5digits
+	\item Addition, 10 digits
+	\item Multiplication, 3 digits
+	\item Multiplication, 5 digits
+	\item Multiplication, 10 digits
+	\item Integer square root, 6 digits
+	\item Integer square root, 10 digits
+	\item Integer square root, 20 digits
+\end{itemize}
 
-\subsubsection{Addition}
+Thie leads to a total of 27 experiments.
+For each experiment, we tracked the development of accuracy on the validation dataset for this experiment (1k samples for each experiment, these samples of course match the operation and operand size of the experiment).
+To get a better idea not just of final accuracy, but of the development of accuracy during training runs, we also generated accuracy curves. plotting model accuracy at each training/optimization step.
 
-Final accuracy numbers obtained when training the model on the addition task are reported in \cref{tbl:baseline_add}. The development of accuracy during training is illustrated in \cref{fig:baseline_add}.
+
+\subsection{Addition baseline}
+
+For the addition operation, we can see in \cref{tbl:baseline_add} that addition up to 10 digits can be learned, as long as the training dataset has at least 10k samples. Accuracy numbers are high, but short of 100\% for 5 and 10 digit addition, meaning there are quite a few errors left in the validation dataset. Only 3 digit addition achieved perfect accuracy.
+
+Considering the development of accuracy during training, we can see in \cref{fig:baseline_add} that accuracy flatlines until a few hundred to a few thousand optimization steps are performed. More operand digits mean more optimization steps to reach the point of accuracy leaving zero. Interestingly, larger dataset sizes also require slightly more optimization steps to leave zero accuracy.
+After leaving zero, accuracy quickly jumps to about 80\%, then slowly keeps climbing to close to 100\%.
+Based on these accuracy curves, it does not seem unreasonable that training for longer that early stopping permits (\cref{early_stopping}) would have resulted in even better accuracy. Investigating the type and parameters of our early stopping criterion could be worthwhile.
 
 \includeAccuracyTable{experiment_results/baseline_final_accuracy/add.csv}{tbl:baseline_add}{Final model accuracy on the test dataset for the addition operation for the given training dataset sizes and operand digits.}{}
 
@@ -161,7 +181,11 @@ Final accuracy numbers obtained when training the model on the addition task are
 
 \subsubsection{Multiplication}
 
-Final accuracy numbers obtained when training the model on the multiplication task are reported in \cref{tbl:baseline_mul}. The development of accuracy during training is illustrated in \cref{fig:baseline_mul}.
+For the multiplication task, we can see, in \cref{tbl:baseline_mul}, a very different picture to the addition task. Accuracy never gets above zero, except for the 3 digits, 10k dataset experiment, where it reaches about 1\%, and the 3 digits, 100k dataset experiment, where it reaches about 22\%.
+This suggests that learning multiplication, all else being equal, is harder than learning addition.
+
+When looking at the accuracy curves in  \cref{fig:baseline_mul}, we can see that for the only experiment where accuracy clearly leaves zero (3 digit multiplication, 100k dataset) accuracy does not jump quickly to a certain value as it did with addition, but slowly keeps climbing until early stopping terminates training.
+For the experiments that do not achieve any accuracy, we can see that the number of optimization steps performed until training is aborted depends mostly on training dataset size and not much on operand digits, with the experiments with 1k dataset getting aborted after about 200 steps, and the experiments with 100k dataset getting aborted after about 40000 steps.
 
 \includeAccuracyTable{experiment_results/baseline_final_accuracy/mul.csv}{tbl:baseline_mul}{Final model accuracy on the test dataset for the multiplication operation for the given training dataset sizes and operand digits.}{}
 
@@ -169,7 +193,12 @@ Final accuracy numbers obtained when training the model on the multiplication ta
 
 \subsubsection{Square root}
 
-Final accuracy numbers obtained when training the model on the square root task are reported in \cref{tbl:baseline_sqrt}. The development of accuracy during training is illustrated in \cref{fig:baseline_sqrt}.
+
+For the square root task, we can see, in \cref{tbl:baseline_sqrt}, accuracy numbers that lie somewhere between those for addition and multiplication.
+For 6 digit integer square root, there was high but not perfect accuracy when using a 10k or 100k training dataset.
+For 10 digit integer square root, accuracy was 63\% for the 100k dataset but remained low otherwise. For 20 digit integer square root, no samples in the validation dataset where predicted correctly.
+
+When looking at the accuracy curves in \cref{fig:baseline_sqrt}, we can see curves that are more similar to those of the multiplication experiment than the addition experiments, with accuracy slowly climbing from zero. Once again, it looks like early stopping might prevent the model from achieving their full accuracy potential.
 
 \includeAccuracyTable{experiment_results/baseline_final_accuracy/sqrt.csv}{tbl:baseline_sqrt}{Final model accuracy on the test dataset for the square root operation for the given training dataset sizes and operand digits.}{}
 
