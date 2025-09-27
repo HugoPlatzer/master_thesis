@@ -147,6 +147,8 @@ It is evaluated just like validation dataset accuracy, but on the test dataset. 
 
 \section{Experimental results}
 
+\label{baseline}
+
 We wanted to compare the performance of the models we trained to the models of other studies on transformers and arithmetic. In addition, we needed to establish baseline performance metrics to compare the effectiveness of various changes to the model, data, and training regime we are going to attempt.
 Based on the experimental setup described above, we thus performed a number of baseline experiments. This means for each of the following configurations we ran 3 experiments, one with a training dataset size of 1k, one with training dataset size 10k and one with training dataset size 100k:
 
@@ -223,7 +225,7 @@ as well as tasks where the final model showed poor performance or did not even m
     \item Square root (20 digits, 100k training samples)
 \end{itemize}
 
-For each of these tasks, a separate error anaylsis dataset of 100k samples was created and the responses of the best model that was saved during training evaluated on it. A selection of the respective errors per task is presented below.
+For each of these tasks, a separate error analysis dataset of 100k samples was created and the responses of the best model that was saved during training evaluated on it. A selection of the respective errors per task is presented below.
 
 \subsubsection{Addition}
 
@@ -389,12 +391,17 @@ For the multiplication task with 5 digits, which did not achieve above-zero accu
 }
 
 
-For the integer square root task with 6 operand digits, the model achieved about 99\% accuracy (\cref{tbl:baseline_sqrt}). The observed errors show the model answer being off by one from the correct answer (\cref{tbl:errors_sqrt_20digits}). Also, the regular square root for the integers of the failed tasks was very close to some integer for 9 out of 10 failed tasks, showing these tasks are close to a square number, which are points from which on the integer square root increases by one.
+For the integer square root task with 6 operand digits, the model achieved about 99\% accuracy (\cref{tbl:baseline_sqrt}). The observed errors show the model answer being off by one from the correct answer (\cref{tbl:errors_sqrt_20digits}). Also, the real square root of the failed tasks was very close to an integer for 9 out of 10 failed tasks, which means the task was close to a square number, which are points from which on the integer square root increases by one. It is reasonable to assume that for such a "close call" it is harder to find the exact integer square root.
 
-For the integer square root task with 20 operand digits, the model did not achieve above-zero accuracy. Analyzing some of the failed tasks shows the model predictions only have the leftmost digits correct, with about 4 out of 10 digits of the result being correct. Also, these tasks are not unusually close to a square number in contrast to the failed tasks for 6 operand digits.
+For the integer square root task with 20 operand digits, the model did not achieve above-zero accuracy. Analyzing some of the failed tasks shows the model predictions only have the leftmost digits correct, with about 4 out of 10 digits of the result being correct. Also, these tasks are not particularly close to a square number, which stands in contrast to the failed tasks for 6 operand digits.
+
+\subsubsection{Conclusion}
+
+We can see that the errors our model makes follow clear patterns: If the model is trained successfully (achieves good accuracy) the wrong answer is similar to the correct answer, with either a single digit being wrong in the case of addition and multiplication, or the square root being off by one in the case of integer square root. If the model is trained unsuccessfully (zero accuracy achieved) errors often affect more digits (as in the case of 5-digit multiplication).
 
 
 \subsection{Model size experiments}
+\label{model_size_experiments}
 
 To see whether changing the number of parameters of the model improves accuracy, we tried each of the following changes to model dimensions:
 
@@ -449,6 +456,7 @@ Changing the number of attention heads, which does not impact the number of mode
 For the multiplication task with 5 operand digits, we can see in \cref{tbl:model_size} and \cref{fig:model_size_mul} that none of the model size changes allowed the model to learn this harder task.
 
 \subsection{Sampling methods}
+\label{sampling methods}
 
 The distribution based on which training samples are picked can have a big impact on the performance of machine learning models. To find out how much of an improvement can be had on the tasks we study just by picking sampling methods, we experimented with three sampling methods: From-zero sampling, uniform digits  sampling and uniform bits sampling.
 
@@ -572,10 +580,12 @@ The integer square root task is somewhat in between addition and multiplication 
 
 
 \subsection{Step-by-step computation}
+\label{stepbystep}
 
 Providing some intermediate steps how to arrive at a result within the training data as opposed to just input/output pairs can make a big improvement to the performance of machine learning models. We tested two different strategies: Reversing the digits of the result, and detailing a step-by step arithmetic process to compute the result, similar to doing addition / multiplication on paper or in an algorithm.
 
 \subsubsection{Result reversal}
+\label{resultreversal}
 
 When computing a sum or product by hand, one starts from the right, computing the least significant digits of the result before moving left to the more significant digits. However, in the baseline experiments, the model needs to predict the most significant digit first and the least significant last.
 
@@ -757,6 +767,7 @@ Compared to baseline, we can see the result reversal model only got 3 out of 10 
 Also there is an interesting pattern not seen in the baseline errors: A lot of repeated digit 8's in the less significant digits where the model is wrong. This corresponds to similar digit repetititons for the multiplication task errors (\cref{tbl:reverse_errors_mul_5digits}).
 
 \subsection{Step-by-step computation: Scratchpads}
+\label{scratchpad}
 
 Compared to augmenting the training sample with the reversed result, which is a simple process that does not tell the model in detail how to arrive at the result, a scratchpad is a detailed, step-by-step, digit-by-digit walkthrough of a basic algorithm solving the task, decomposing it into small intermediate chunks.
 
@@ -1547,6 +1558,7 @@ For the square root task with 6 operand digits (\cref{fig:intermediate_steps_acc
 For 10 operand digits, scratchpad actually failed to converge, as opposed to baseline and result reversal. This happened despite taking more optimization steps until training was stopped. It would thus be reasonable to assume that the form of scratchpad we used here, which does not further elaborate on the squaring step, is not helpful for model training, as opposed to the successful addition and multiplication scratchpads.
 
 \subsection{Attention heatmaps}
+\label{heatmap}
 
 To get some degree of insight into how the trained model computes the results for the arithmetic tasks presented to it, we generated 2D heatmaps showing activation of the attention mechanism for various input sequences.
 
