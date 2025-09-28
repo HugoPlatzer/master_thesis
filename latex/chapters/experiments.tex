@@ -181,7 +181,7 @@ Based on these accuracy curves, it does not seem unreasonable that training for 
 
 \includePDFPlot{experiment_results/baseline_accuracy/add.pdf}{fig:baseline_add}{Development of accuracy on the validation dataset when training for the addition task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
 
-\subsubsection{Multiplication}
+\subsection{Multiplication baseline}
 
 For the multiplication task, we can see, in \cref{tbl:baseline_mul}, a very different picture to the addition task. Accuracy never gets above zero, except for the 3 digits, 10k dataset experiment, where it reaches about 1\%, and the 3 digits, 100k dataset experiment, where it reaches about 22\%.
 This suggests that learning multiplication, all else being equal, is harder than learning addition.
@@ -193,8 +193,7 @@ For the experiments that do not achieve any accuracy, we can see that the number
 
 \includePDFPlot{experiment_results/baseline_accuracy/mul.pdf}{fig:baseline_mul}{Development of accuracy on the validation dataset when training for the multiplication task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
 
-\subsubsection{Square root}
-
+\subsection{Square root baseline}
 
 For the square root task, we can see, in \cref{tbl:baseline_sqrt}, accuracy numbers that lie somewhere between those for addition and multiplication.
 For 6 digit integer square root, there was high but not perfect accuracy when using a 10k or 100k training dataset.
@@ -406,17 +405,21 @@ We can see that the errors our model makes follow clear patterns: If the model i
 To see whether changing the number of parameters of the model improves accuracy, we tried each of the following changes to model dimensions:
 
 \begin{itemize}
-    \item Change the vector size $n_{embd}$ from 384 to either 192 or 768.
-    \item Change the number of GPT2 blocks from 6 to either 3 or 12.
-    \item Change the number of attention heads from 6 to either 3 or 12.
+    \item Change the vector size $n_{embd}$ from 384 to either 192 or 768. This causes a change to the number of learnable model parameters: The model with $n_{embd}=192$ has about 2.7M parameters, the baseline model with $n_{embd}=384$ about 11M parameters, and the model with $n_{embd}=768$ about 43M parameters. Thus doubling $n_{embd}$ roughly quadruples the number of parameters (due to matrices for transformations on vectors twice the size having 4 times as many parameters).
+    \item Change the number of GPT2 blocks $n_{blocks}$ from 6 to either 3 or 12. This also changes the number of parameters, but in a linear fashion: The model with 3 blocks has 5.4M parameters, and the model with 12 blocks has 21M parameters. 
+    \item Change the number of attention heads $n_{heads}$ from 6 to either 3 or 12. This has no effect on the number of model parameters, it only affects the "partitioning" of the parameters inside the model.
 \end{itemize}
 
+We did not try to combine these changes, each experiment only had one parameter of the model architecture changed.
 Due to time/hardware constraints, we limited experiments to the following tasks:
 
 \begin{itemize}
-    \item Addition with 10 operand digits, 100k dataset.
-    \item Multiplication with 10 operand digits, 100k dataset.
+    \item Addition with 10 operand digits, 100k training dataset.
+    \item Multiplication with 5 operand digits, 100k training dataset.
 \end{itemize}
+
+We picked these two tasks from the baseline experiments because addition with 10 digits could be learned well with the 100k dataset, while still being harder than 3 or 5 digit addition, allowing more chances to see a difference in model peformance in terms of how many optimization steps it takes to converge.
+Similarly, multiplication with 5 digits and 100k training dataset was chosen because the baseline model could not learn it and achieved zero accuracy. At the same time, learning 5 digt multiplication seemed somewhat realistic with a more capable model architecture, considering that 3 digit multiplication could be learned at a low but not zero (22\%) accuracy.
 
 \subsubsection{Model size experiments: Addition}
 
@@ -439,7 +442,7 @@ Due to time/hardware constraints, we limited experiments to the following tasks:
     columns/mul_5digits_100k/.style={column name={\makecell[r]{mul\\(5 digits, 100k)}}},
 }
 
-\includePDFPlot{experiment_results/model_size_accuracy/add.pdf}{fig:model_size_add}{Development of accuracy on the validation dataset when training for the addition task (10 digits, 100k dataset) for different changes in model configuration.}
+
 
 For the addition task, we can see in \cref{tbl:model_size} that all of the tried model configurations were able to learn the task successfully, although there are small differences in final accuracy, such as the $n_{embd}=768$ model finishing with perfect accuracy on the test dataset.
 
@@ -449,9 +452,13 @@ Increasing or decreasing the number of GPT2 blocks/layers however only made a mi
 
 Changing the number of attention heads, which does not impact the number of model parameters but only the "partitioning" of data inside the model, also had only a minor impact on convergence speed.
 
-\subsubsection{Model size experiments: Multiplication}
+\includePDFPlot{experiment_results/model_size_accuracy/add.pdf}{fig:model_size_add}{Development of accuracy on the validation dataset when training for the addition task (10 digits, 100k dataset) for different changes in model configuration.}
 
 \includePDFPlot{experiment_results/model_size_accuracy/mul.pdf}{fig:model_size_mul}{Development of accuracy on the validation dataset when training for the multiplication task (5 digits, 100k dataset) for different changes in model configuration.}
+
+
+\subsubsection{Model size experiments: Multiplication}
+
 
 For the multiplication task with 5 operand digits, we can see in \cref{tbl:model_size} and \cref{fig:model_size_mul} that none of the model size changes allowed the model to learn this harder task.
 
@@ -1594,40 +1601,43 @@ When looking at the later blocks, there are also some spots of high activation, 
 
 Since we found out that the most visible attention patterns are in the first block, to keep the diagrams of reasonable size especially for larger sequences, for the rest of the diagrams only the attention mechanism of the first GPT2 block is considered, and the attention values of all 6 heads are averaged.
 
-\includePDFPlot{experiment_results/heatmaps/add_simple_1.pdf}{fig:heatmap_add_simple1}{First block activation heatmap for the addition task "123+456".}
+\includePDFPlot{experiment_results/heatmaps/add_simple_1.pdf}{fig:heatmap_add_simple1}{First block attention heatmap for the addition task "123+456", averaged over all 6 heads.}
 
-The single-diagram heatmap of \cref{fig:heatmap_add_simple1} for the same addition task shows the same pattern mentioned before, with an output digit being connected to those two input digits that would make sense for addition, with the relationship being clear for the digits "579" and a bit less prominent for the digit "0".
+The single-diagram heatmap of \cref{fig:heatmap_add_simple1} for the same addition task shows the same pattern mentioned before, with an output digit being connected to those two input digits being added for this position, with the relationship being clear for the digits "579" and a bit less prominent for the digit "0".
 
-\includePDFPlot{experiment_results/heatmaps/add_simple_2.pdf}{fig:heatmap_add_simple2}{First block activation heatmap for the addition task "999+001".}
+\includePDFPlot{experiment_results/heatmaps/add_simple_2.pdf}{fig:heatmap_add_simple2}{First block attention heatmap for the addition task "999+001", averaged over all 6 heads.}
 
 There is little change to the previous diagram in \cref{fig:heatmap_add_simple2} which shows the same addition model working on different numbers, namely the addition "999+001". Only minor changes in attention value are visible when doing addition of different numbers using the same model.
 
-\includePDFPlot{experiment_results/heatmaps/add_5digits_1.pdf}{fig:heatmap_add_5digits}{First block activation heatmap for the addition task "12345+67890".}
+\includePDFPlot{experiment_results/heatmaps/add_5digits_1.pdf}{fig:heatmap_add_5digits}{First block attention heatmap for the addition task "12345+67890", averaged over all 6 heads.}
 
 When switching to a model trained for 5-digit addition and the addition task "12345+67890" (\cref{fig:heatmap_add_5digits}) we can still see a similar pattern of output digits referring to those input digits that make sense when thinking about an addition algorithm. However the pattern is somewhat more diffuse for the more significant output digits, which are also attending to less significant digits of the input numbers somewhat.
 
-\includePDFPlot{experiment_results/heatmaps/add_rev_1.pdf}{fig:heatmap_add_rev}{First block activation heatmap for the addition task "123+456", using result reversal.}
+\includePDFPlot{experiment_results/heatmaps/add_rev_1.pdf}{fig:heatmap_add_rev}{First block attention heatmap for the addition task "123+456", using result reversal, averaged over all 6 heads.}
 
 For 3-digit addition using result reversal (\cref{fig:heatmap_add_rev}), we can see a very clear pattern of the final output digits attending to the corresponding digits of the reversed result. There however is not such a clear pattern for the reversed addition that happens before, with the output digits "9750" not having a strong connection to the matching input digits as was seen before for normal addition.
 
-\includePDFPlot{experiment_results/heatmaps/add_scratch_1.pdf}{fig:heatmap_add_scratch}{First block activation heatmap for the addition task "123+456", using result reversal.}
+\includePDFPlot{experiment_results/heatmaps/add_scratch_1.pdf}{fig:heatmap_add_scratch}{First block attention heatmap for the addition task "123+456", using result reversal, averaged over all 6 heads.}
 
-For the addition task using scratchpad (\cref{fig:heatmap_add_scratch}), we can also see some patterns: For the individual addition steps, the input digits are fetched as the first two digits of each step. We can also see that the old carry value (third digit of each step) somewhat attends to the fifth digit of the previous step, which is the output carry value of that previous step.
+For the addition task using the scratchpad (\cref{fig:heatmap_add_scratch}), we can also see some patterns: For the individual addition steps, the input digits are fetched as the first two digits of each step. We can also see that the old carry value (third digit of each step) to some degree attends to the fifth digit of the previous step, which is the output carry value of that previous step.
 
 \subsubsection{Multiplication task}
 
-\includePDFPlot{experiment_results/heatmaps/mul_1.pdf}{fig:heatmap_mul}{First block activation heatmap for the multiplication task "123*456".}
+\includePDFPlot{experiment_results/heatmaps/mul_1.pdf}{fig:heatmap_mul}{First block attention heatmap for the multiplication task "123*456", averaged over all 6 heads.}
 
 For the multiplication task with 3 digits (\cref{fig:heatmap_mul}) our model actually computes the wrong result 056188 instead of the correct result 056088 which is not unexpected considering its low accuracy at about 20\% (\cref{tbl:baseline_mul}).
 
 We can see the 3 least significant digits of the product (188) attending primarily to the  least significant digits of the input numbers (3 and 6). The 3rd most significant digit (6) has an attention pattern without clear focus. The 1st and 2nd most significant digits of the product (0 and 5) attend to the most significant digits of the input (1 and 4).
 
-This does not follow a pattern clearly related to a normal multiplication algorithm: For the least significant digit of the product only the least significant digit of the factors should be relevant, for the second least significant digit this should extend to the first and second digit of the factors and so on, which does not match the pattern visible in the diagram. 
+This does not follow a pattern clearly related to a normal multiplication algorithm: For the least significant digit of the product only the least significant digit of the factors should be relevant, for the second least significant digit this should extend to the first and second digit of the factors and so on, which does not match the pattern visible in the diagram.
+This corresponds well to the fact that accuracy achieved for multiplication was much poorer that for addition (only 22\% for 3-digit multiplication, see \cref{tbl:baseline_mul}), prompting speculation whether models with high accuracy on an arithmetic task show more meaningful digit relationships in their heatmaps that those with low accuracy.
 
 \subsubsection{Square root task}
 
-\includePDFPlot{experiment_results/heatmaps/sqrt_1.pdf}{fig:heatmap_sqrt}{First block activation heatmap for the integer square root task "123456".}
+\includePDFPlot{experiment_results/heatmaps/sqrt_1.pdf}{fig:heatmap_sqrt}{First block attention heatmap for the integer square root task "123456", averaged over all 6 heads.}
 
 For the square root taks with 6 digits (\cref{fig:heatmap_sqrt}) we can see the least significant digit of the output "1" attending to the 3 most significant digits of the input (and slightly to previous output digit "3") whereas the more significant output digit 5 attends mostly to the second most significant input digit "2" and the most significant output digit "3" attends mostly to the most significant input digit "1".
 
-This also does not clearly correspond to a normal integer square root algorithm as for example the least significant 3 digits of the input are not considered at all by the model's attention pattern, while for example 123000 has an integer square root of 350 whereas 123999 has a square root of 352. These digits must thus be considered only at later blocks of the model not visible in this diagram.
+This also does not clearly correspond to a normal integer square root algorithm as for example the least significant 3 digits of the input are not considered at all by the model's attention pattern, while for example 123000 has an integer square root of 350 whereas 123999 has a square root of 352. These digits must thus be considered, if they are even considered at all, only at later blocks of the model not visible in this diagram.
+
+Accuracy was 98\% for 6-digit integer square root (\cref{tbl:baseline_sqrt}), but for this operation it is plausible that the model just guesses the square root based on the first few digits, which would of course fail on numbers close to a square number which require precise computation, but such hard cases should be only a small fraction of the test dataset (which is uniformly selected from all 6-digit integers).
