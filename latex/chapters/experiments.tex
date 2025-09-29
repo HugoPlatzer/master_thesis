@@ -490,34 +490,34 @@ A number of bits $k$ is picked uniformly at random from $[1, p]$. Then the opera
     \begin{minipage}[t]{0.47\linewidth}
         \hfill
         \includeAccuracyTableCore{experiment_results/sampling_strategies/basic_add.csv}{}
-        \captionof{table}{Basic sampling}
+        \captionof{table}{Basic sampling.}
     \end{minipage}
     \hfill
     \begin{minipage}[t]{0.47\linewidth}
         \hfill
         \includeAccuracyTableCore{experiment_results/sampling_strategies/from_zero_add.csv}{}
-        \captionof{table}{From-zero sampling}
+        \captionof{table}{From-zero sampling.}
     \end{minipage}
 
     \vspace{0.5cm}
     \begin{minipage}[t]{0.47\linewidth}
         \hfill
         \includeAccuracyTableCore{experiment_results/sampling_strategies/uniform_digits_add.csv}{}
-        \captionof{table}{Uniform digits sampling}
+        \captionof{table}{Uniform digits sampling.}
     \end{minipage}
     \hfill
     \begin{minipage}[t]{0.47\linewidth}
         \hfill
         \includeAccuracyTableCore{experiment_results/sampling_strategies/uniform_bits_add.csv}{}
-        \captionof{table}{Uniform bits sampling}
+        \captionof{table}{Uniform bits sampling.}
     \end{minipage}
     \label{tbl:sampling_strategies_add}
 \end{table}
 
 
-For the addition task (table in \cref{tbl:sampling_strategies_add}) there were no dramatic differences in achieved model capability for the studied sampling methods. With a 1k training dataset size, none of the methods achieved high accuracy for any operand size, for 10k it was a mix with high accuracy for 3 operand digits and lower accuracy for 10 operand  digits. 100k dataset size allowed for good accuracy for all operand sizes.
+For the addition task there were no dramatic differences in achieved model capability for the studied sampling methods  (\cref{tbl:sampling_strategies_add}). With a 1k training dataset size, none of the methods achieved high accuracy for any operand size, for 10k it was a mix with high accuracy for 3 operand digits and lower accuracy for 10 operand  digits. 100k dataset size allowed for good accuracy for all operand sizes.
 
-There were, however, some less significant but still noticeable differences: Uniform-digits and uniform-bits sampling performed very similar to one another. Both achieved about 40\% accuracy for 3 digits, 1k dataset size while basic sampling and from-zero sampling remained close to zero. On the other hand, they both had somewhat lower accuracy compared to basic sampling for 10k dataset size. From-zero sampling performed very similar to basic sampling,  except for 10 digits, where 10k training samples were not enough to achieve convergence.
+There were, however, some less significant but still noticeable differences when comparing to the other sampling methods: Uniform digits and uniform bits sampling performed very similar to one another. Both achieved about 40\% accuracy for 3 digits, 1k dataset size while basic sampling and from-zero sampling remained close to zero. Here, the mix of easier (smaller, often single-digit) and harder (larger) training samples might have allowed for quicker convergence as we intended. On the other hand, they both had somewhat lower accuracy compared to basic sampling for 10k dataset size. From-zero sampling performed very similar to basic sampling,  except for 10 digits, where 10k training samples were not enough to achieve convergence. In that case, it could be that uniform digits and uniform bits sampling did not allow for enough training samples with the full 10 decimal digits in the training dataset if the training dataset size is small and the number of possible bits/digits is large.
 
 
 \subsubsection{Results: Multiplication}
@@ -526,31 +526,31 @@ There were, however, some less significant but still noticeable differences: Uni
     \begin{minipage}[t]{0.47\linewidth}
         \hfill
         \includeAccuracyTableCore{experiment_results/sampling_strategies/basic_mul.csv}{}
-        \captionof{table}{Basic sampling}
+        \captionof{table}{Basic sampling.}
     \end{minipage}
     \hfill
     \begin{minipage}[t]{0.47\linewidth}
         \hfill
         \includeAccuracyTableCore{experiment_results/sampling_strategies/from_zero_mul.csv}{}
-        \captionof{table}{From-zero sampling}
+        \captionof{table}{From-zero sampling.}
     \end{minipage}
 
     \vspace{0.5cm}
     \begin{minipage}[t]{0.47\linewidth}
         \hfill
         \includeAccuracyTableCore{experiment_results/sampling_strategies/uniform_digits_mul.csv}{}
-        \captionof{table}{Uniform digits sampling}
+        \captionof{table}{Uniform digits sampling.}
     \end{minipage}
     \hfill
     \begin{minipage}[t]{0.47\linewidth}
         \hfill
         \includeAccuracyTableCore{experiment_results/sampling_strategies/uniform_bits_mul.csv}{}
-        \captionof{table}{Uniform bits sampling}
+        \captionof{table}{Uniform bits sampling.}
     \end{minipage}
     \label{tbl:sampling_strategies_mul}
 \end{table}
 
-As expected, the multiplication task is much harder to learn, with most combinations of operand size and dataset size leaving the final model at zero accuracy. This does not change significantly based on the sampling method used, however uniform-digits and uniform-bits sampling do lead to a  slight increase in accuracy for the 100k-dataset, 3-digits case, which given the limited sample space and large number of samples, is the easiest case as expected.
+As expected, the multiplication task is much harder to learn, with most combinations of operand size and dataset size leaving the final model at zero accuracy. This does not change significantly based on the sampling method used, however uniform digits and uniform bits sampling do lead to a  slight increase in accuracy for the 100k-dataset, 3-digits case, which given the limited sample space and large number of samples, is the easiest case as expected.
 
 \subsubsection{Results: Square root}
 
@@ -559,31 +559,31 @@ As expected, the multiplication task is much harder to learn, with most combinat
     \begin{minipage}[t]{0.47\linewidth}
         \hfill
         \includeAccuracyTableCore{experiment_results/sampling_strategies/basic_sqrt.csv}{}
-        \captionof{table}{Basic sampling}
+        \captionof{table}{Basic sampling.}
     \end{minipage}
     \hfill
     \begin{minipage}[t]{0.47\linewidth}
         \hfill
         \includeAccuracyTableCore{experiment_results/sampling_strategies/from_zero_sqrt.csv}{}
-        \captionof{table}{From-zero sampling}
+        \captionof{table}{From-zero sampling.}
     \end{minipage}
 
     \vspace{0.5cm}
     \begin{minipage}[t]{0.47\linewidth}
         \hfill
         \includeAccuracyTableCore{experiment_results/sampling_strategies/uniform_digits_sqrt.csv}{}
-        \captionof{table}{Uniform digits sampling}
+        \captionof{table}{Uniform digits sampling.}
     \end{minipage}
     \hfill
     \begin{minipage}[t]{0.47\linewidth}
         \hfill
         \includeAccuracyTableCore{experiment_results/sampling_strategies/uniform_bits_sqrt.csv}{}
-        \captionof{table}{Uniform bits sampling}
+        \captionof{table}{Uniform bits sampling.}
     \end{minipage}
     \label{tbl:sampling_strategies_sqrt}
 \end{table}
 
-The integer square root task is somewhat in between addition and multiplication  for learning difficulty. The accuracy tables for basic and from-zero sampling also look very similar here.  Uniform-digits and uniform-bits sampling lead to slightly worse accuracy numbers, but the general characteristic is the same here: The accuracy numbers mostly depend on the operation  learned (addition vs multiplication vs square root) and only slightly change based on the sampling method.
+The integer square root task is somewhat in between addition and multiplication  for learning difficulty. The accuracy tables for basic and from-zero sampling also look very similar for this task.  Uniform digits and uniform bits sampling lead to slightly worse accuracy numbers, but the general characteristic is the same: The accuracy numbers mostly depend on the operation learned (addition vs multiplication vs square root) and only slightly change based on the sampling method.
 
 
 \subsection{Step-by-step computation}
