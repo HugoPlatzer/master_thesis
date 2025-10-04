@@ -196,6 +196,7 @@ When using the model to extend a given starting text (prompt), the following ste
 The token ID sequence is then converted back into text using the tokenizer vocabulary. This results in the original text plus new text appended by the model. If the model is well trained to the language/task, the generated text will match the given starting text (prompt) both syntactically and semantically.
 
 \subsubsection{GPT2 preprocessing}
+\label{gpt2_preproc}
 
 \includediagram{diagrams/gpt2/preproc}{GPT2 preprocessing stage on an example token sequence. Based on the token position and value, embedding vectors are summed to give the starting vector at this position.}
 
@@ -267,6 +268,7 @@ This is because when using residual connections, the input data does not need to
 \end{samepage}
 
 \subsubsection{GPT2 block: Attention mechanism}
+\label{gpt2_attn}
 
 \includediagram{diagrams/gpt2/attention_multihead}{Structure of the Multi-head attention mechanism. This example uses two positions $x_1, x_2$ and two attention heads $h_1, h_2$. The actual model can in theory handle arbitrary sequence lengths and also has more attention heads.}
 

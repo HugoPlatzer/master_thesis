@@ -39,6 +39,7 @@ Let $a, b$ be positive integers and let $c=a+b$. The model is then trained on st
 Let $a, b$ be positive integers and let $c=a \cdot b$. The model is then trained on sequences of the form $a \cdot b=c$.
 
 \subsubsection{Square root}
+\label{isqrt}
 
 In addition to addition and multiplication, we also study the learnability of the square root function. Instead of the regular square root function with irrational values, we use integer square root. This is consistent with the addition and multiplication operations in that it is an integer to integer mapping, with exactly one correct, finite answer for each input number, yet being equivalent to approximating the regular square root function.
 
@@ -589,20 +590,21 @@ The integer square root task is somewhat in between addition and multiplication 
 \subsection{Step-by-step computation}
 \label{stepbystep}
 
-Providing some intermediate steps how to arrive at a result within the training data as opposed to just input/output pairs can make a big improvement to the performance of machine learning models. We tested two different strategies: Reversing the digits of the result, and detailing a step-by step arithmetic process to compute the result, similar to doing addition / multiplication on paper or in an algorithm.
+Providing some intermediate steps how to arrive at the result within each training sample as opposed to just input/output pairs can make a substantial improvement to final accuracy when transformer models learn addition, especially with more operand digits (\citepage{15}{teaching}).
+Similar to \cite{teaching}, we tested two different strategies: Reversing the digits of the result, and detailing a step-by step arithmetic process to compute the result, similar to doing addition or multiplication on paper or in an algorithm. This we refer to as a "scratchpad". We expanded the experiments in \cite{teaching} beyond addition to multiplication and integer square root with varying operand sizes, testing whether result reversal or scratchpad could also help with learnability for these harder operations.
 
 \subsubsection{Result reversal}
 \label{resultreversal}
 
 When computing a sum or product by hand, one starts from the right, computing the least significant digits of the result before moving left to the more significant digits. However, in the baseline experiments, the model needs to predict the most significant digit first and the least significant last.
 
-To accurately predict the most significant digit of a sum, one generally needs to have the exact result of the sum computed already (think about operands where the sum is close to wrapping on the most-significant digit, i.e. small changes in the operand can cause a change in the most significant digit of the sum).
+To accurately predict the most significant digit of a sum, one generally needs to have the exact result of the sum computed already (think about operands where the sum is close to wrapping on the most-significant digit, i.e., small changes in the operand can cause a change in the most significant digit of the sum).
 
 In contrast, knowing the least significant digits of the operands is sufficient to compute the least significant digit of the sum. Thus, it seems reasonable to assume that computing a sum "backwards" would be easier for a model than computing it in normal digit order.
 
-\subsubsection{Result reversal: Training samples}
+\subsubsection{Training samples}
 
-To allow the model to first write down the reversed sum before "committing" to the actual result, we modify the training samples: After the \verb|=| sign, which is the point from which the model is asked to predict the rest of the training sample (which is the sum that we want to know to test addition capability), we put the reversed digits of the sum in brackets before the normal sum.
+To allow the model to first write down the reversed sum before "committing" to the actual result, we modify the training samples: After the = sign, which is the point from which the model is asked to predict the rest of the training sample (which is the sum that we want to know to test addition capability), we put the reversed digits of the sum in brackets before the normal sum.
 For example, the training sample
 
 \begin{lstlisting}
@@ -616,12 +618,12 @@ would be transformed into:
     456+789=[5421]1245
 \end{lstlisting}
 
-\noindent
-When evaluating the model output for correctness, the part in brackets is dropped, which then allows the model prediction to be compared to the correct result just like for the baseline experiments.
-
 For the multiplication and square root tasks, the digits of the product or integer square root are reversed in the same fashion - first writing the reversed result in brackets before writing the actual result.
 
-\subsubsection{Result reversal: Changes to experimental setup}
+\noindent
+Due to the augmented training samples, we also change the way we evaluate correctness when evaluating model performance: For the baseline experiments, we compared the whole output after the = sign. For the result reversal experiments, we first strip the part in brackets (the reversed result) and then only compare what comes after it (the actual result).
+
+\subsubsection{Changes to baseline setup}
 
 \includeTable
 {
@@ -647,25 +649,67 @@ For the multiplication and square root tasks, the digits of the product or integ
 }
 
 Augmenting the training samples with the reversed result of the arithmetic operation results in increased sample length (\cref{tbl:reverse_sample_lengths}).
-This means we have to increase the number of positions in the model configuration to handle these longer sequences. The increase is, however, not big enough to necessitate other changes to the training regime such as reduced batch sizes or fewer epochs - we can keep the default batch size of 256 and epoch limit of 200 (\cref{expsetup:batchsize}, \cref{expsetup:learnrate}).
+This means we have to increase the number of positions in the model configuration to handle these longer sequences. This does lead to more model parameters due to each position having a learnable positional embedding vector (\cref{gpt2_preproc}). The increase however is just a minute fraction of the total parameters (e.g., 10.710 million parameters for the 10-digit addition baseline requiring 34 positions, and 10.715 million parameters for 10-digit addition with result reversal requiring 47 positions). This minute increase does not necessitate other changes to the training regime such as reduced batch sizes or fewer epochs - we can keep the default batch size of 256 and epoch limit of 200 (\cref{expsetup:batchsize}, \cref{expsetup:learnrate}).
 
 \subsubsection{Result reversal: Results}
 
-\includeAccuracyTable{experiment_results/intermediate_steps/reverse/add.csv}{tbl:reverse_add}{Final model accuracy on the test dataset for the addition task (with result reversal) for the given training dataset sizes and operand digits.}{}
+\begin{table}[H]
+	\begin{minipage}[t]{0.47\linewidth}
+		\hfill
+		\includeAccuracyTableCore{experiment_results/intermediate_steps/reverse/add.csv}{}
+		\captionof{table}{Final model accuracy on the test dataset for the addition task (with result reversal) for the given training dataset sizes and operand digits.}
+		\label{tbl:reverse_add}
+	\end{minipage}
+	\hfill %%%
+	\begin{minipage}[t]{0.47\linewidth}
+		\hfill
+	    \includeAccuracyTableCore{experiment_results/baseline_final_accuracy/add.csv}{}
+		\captionof{table}{Baseline additon accuracy (without result reversal).}
+		\label{tbl:reverse_add_baseline}
+	\end{minipage}
+\end{table}
 
-For the addition task (\cref{tbl:reverse_add}), when compared to the baseline experiments (\cref{tbl:baseline_add}), result reversal led to somewhat successful training (71\% accurracy) for the 3 digits, 1k dataset scenario, which could not be learned in baseline. However, training failed for the 10 digits, 10k dataset scenario.
+For the addition task (\cref{tbl:reverse_add}), when compared to the baseline experiments (\cref{tbl:reverse_add_baseline}), result reversal led to somewhat successful training (71\% accurracy) for the 3 digits, 1k dataset scenario, which could not be learned in baseline. However, training failed for the 10 digits, 10k dataset scenario.
 
 To us it is not clear whether this is due to a true difference in the learnability between the two training sample structures, or simply due to variance between training runs. Similar differences observed in the sampling strategy experiments (\cref{tbl:sampling_strategies_add}) might point towards the latter.
 
-It is also worth noting that for result reversal, 5 of the 9 scenarios, including all operand sizes for the 100k dataset size, led to perfect accuracy (1000/1000 samples correct) on the training dataset, while for the baseline addition experiments accuracy was not quite perfect for all experiments with 5 and 10 operand digits.
+It is also worth noting that for result reversal, 5 of the 9 scenarios, including all operand sizes for the 100k dataset size, led to perfect test accuracy (all 1000 samples correct), while for the baseline addition experiments accuracy was not quite perfect for the experiments with 5 and 10 operand digits.
 
-\includeAccuracyTable{experiment_results/intermediate_steps/reverse/mul.csv}{tbl:reverse_mul}{Final model accuracy on the test dataset for the multiplication task (with result reversal) for the given training dataset sizes and operand digits.}{}
+\begin{table}[H]
+	\begin{minipage}[t]{0.47\linewidth}
+		\hfill
+		\includeAccuracyTableCore{experiment_results/intermediate_steps/reverse/mul.csv}{}
+		\captionof{table}{Final model accuracy on the test dataset for the multiplication task (with result reversal) for the given training dataset sizes and operand digits.}
+		\label{tbl:reverse_mul}
+	\end{minipage}
+	\hfill %%%
+	\begin{minipage}[t]{0.47\linewidth}
+		\hfill
+		\includeAccuracyTableCore{experiment_results/baseline_final_accuracy/mul.csv}{}
+		\captionof{table}{Baseline multiplication accuracy (without result reversal).}
+		\label{tbl:reverse_mul_baseline}
+	\end{minipage}
+\end{table}
 
-For the multiplication task (\cref{tbl:reverse_add}), results were in general very similar to those obtained without result reversal (\cref{tbl:baseline_sqrt}). This operation thus remained the hardest of three studied and could not be made easier for the model by first presenting the digit-reversed product in the training samples.
+For the multiplication task (\cref{tbl:reverse_mul}), results were in general very similar to those obtained without result reversal (\cref{tbl:reverse_mul_baseline}). This operation thus remained the hardest of the three studied and could not be made easier for the model by first presenting the digit-reversed product in the training samples.
 
-\includeAccuracyTable{experiment_results/intermediate_steps/reverse/sqrt.csv}{tbl:reverse_sqrt}{Final model accuracy on the test dataset for the square root task (with result reversal) for the given training dataset sizes and operand digits.}{}
+\begin{table}[H]
+	\begin{minipage}[t]{0.47\linewidth}
+		\hfill
+		\includeAccuracyTableCore{experiment_results/intermediate_steps/reverse/sqrt.csv}{}
+		\captionof{table}{Final model accuracy on the test dataset for the square root task (with result reversal) for the given training dataset sizes and operand digits.}
+		\label{tbl:reverse_sqrt}
+	\end{minipage}
+	\hfill %%%
+	\begin{minipage}[t]{0.47\linewidth}
+		\hfill
+		\includeAccuracyTableCore{experiment_results/baseline_final_accuracy/sqrt.csv}{}
+		\captionof{table}{Baseline square root accuracy (without result reversal).}
+		\label{tbl:reverse_sqrt_baseline}
+	\end{minipage}
+\end{table}
 
-For the square root task (\cref{tbl:reverse_sqrt}), the results were also very similar to the baseline task without result reversal (\cref{tbl:baseline_sqrt}), without significant differences in which scenarios could be learned and  the final accuracies obtained.
+For the square root task (\cref{tbl:reverse_sqrt}), the results were also very similar to the baseline task without result reversal (\cref{tbl:reverse_sqrt_baseline}), without significant differences in which scenarios could be learned and  the final accuracies obtained.
 
 \subsubsection{Result reversal: Error analysis}
 
@@ -676,7 +720,7 @@ We wanted to investigate whether there was any difference in the error patterns 
 \label{resutl_reversal_error_add}
 
 For both the addition task with 5 digit and the addition task with 10 digit operands, when training using result reversal on a 100k training dataset, there were \textbf{no errors} in the entire 100k error analysis dataset, meaning the model performed each addition correctly. This corresponds to the perfect scores seen on the test dataset for these tasks (\cref{tbl:reverse_add}).
-It stands in contrast to the baseline experiments, where despite 99\% accuracy, it was not hard to still find numbers where the addition was performed wrong (\cref{tbl:baseline_add}).
+It stands in contrast to the baseline experiments, where despite 99\% accuracy, it was not hard to still find numbers where the addition was performed incorrectly (\cref{tbl:baseline_add}).
 
 \subsubsection{Result reversal: Error analysis (multiplication)}
 
@@ -718,7 +762,7 @@ task;model;correct\\
     columns/correct/.style={column name={Correct result}}
 }
 
-For the multiplication task with 3 digits (\cref{tbl:reverse_errors_mul_3digits}), the error patterns observed were basically the same as for the baseline experiments  (\cref{tbl:errors_mul_3digits}): Single digits being off by one or, oftentimes, more than one.
+For the multiplication task with 3 digits (\cref{tbl:reverse_errors_mul_3digits}), the error patterns observed were basically the same as for the baseline experiments  (\cref{tbl:errors_mul_3digits}): Single digits being off by one or, sometimes, more than one.
 The mistakes are already present in the reversed result,
 which is then reversed correctly.
 
@@ -769,9 +813,9 @@ task;model;correct;sqrt\\
 
 For the 6-digit square root task (\cref{tbl:reverse_errors_sqrt_6digits}), the error patterns are also similar to the baseline (\cref{tbl:errors_sqrt_6digits}): Off-by-one errors on numbers where the operand is close to a square number, and the model "picked the wrong side".
 
-For the 20-digit square root task (\cref{tbl:reverse_errors_sqrt_20digits}), the error patterns once again more or less match baseline (\cref{tbl:errors_sqrt_20digits}): The 3 most significant digits are correct, the rest are wrong.
-Compared to baseline, we can see the result reversal model only got 3 out of 10 most significant digits correct for the examples in the table, whereas for baseline it was 4 or even 5 correct digits for the examples.
-Also there is an interesting pattern not seen in the baseline errors: A lot of repeated digit 8's in the less significant digits where the model is wrong. This corresponds to similar digit repetititons for the multiplication task errors (\cref{tbl:reverse_errors_mul_5digits}).
+For the 20-digit square root task (\cref{tbl:reverse_errors_sqrt_20digits}), the error patterns once again more or less match the baseline (\cref{tbl:errors_sqrt_20digits}): the 3 most significant digits are correct, the rest are wrong.
+Compared to the baseline, we can see the result reversal model only got 3 out of 10 most significant digits correct for the examples in the table, whereas for the baseline it was 4 or even 5 correct digits for the examples.
+Also there is an interesting digit pattern not seen in the baseline errors. A lot of repeated "8"s in the less significant digits where the model is wrong. This corresponds to similar digit repetititons for the multiplication task errors (\cref{tbl:reverse_errors_mul_5digits}).
 
 \subsection{Step-by-step computation: Scratchpads}
 \label{scratchpad}
@@ -783,7 +827,7 @@ Similar to result reversal, we put the scratchpad (the intermediate steps) in br
 \subsubsection{Scratchpad: Addition}
 \label{add_scratchpad}
 
-For the addition task, the scratchpad illustrates basic digit-by digit addition of two integers: Add two digits of operands plus carry from the previous step, separate ones and tens, take ones as a digit of the sum, keep tens as carry. Move one digit to the left and repeat until the operands have been full processed. For the training sample
+For the addition task, the scratchpad illustrates basic digit-by digit addition of two integers: Add two digits of operands plus carry from the previous step, separate ones and tens, take ones as a digit of the sum, keep tens as carry. Move one digit to the left and repeat until the operands have been fully processed. For the training sample
 
 \begin{lstlisting}
     456+789=1245
@@ -797,13 +841,16 @@ the sample with scratchpad looks like this:
 \end{lstlisting}
 
 \noindent
-Each step is separated by \verb!|! characters. The two summand digits, currect carry, sum digit, and new carry are written for each step.
+Each step is separated by \verb!|! characters. The two summand digits, previous carry, sum digit, and new carry are written for each step.
 The scratchpad is deliberately kept minimal because of the increase in training time with increased sample length.
+
+\label{training_time_growth}
+This increase in training time is not due to an increase in model parameters, but rather due to the model's attention mecachism comparing one position to all previous positions (\cref{gpt2_attn}). This causes training time to increase quadratically with sequence length. Memory requirements also increase quadratically due to the resulting attention matrix when comparing each position with each previous one.
 
 \subsubsection{Scratchpad: Multiplication}
 \label{mul_scratchpad}
 
-Basic multiplication works by doing single-digit multiplication between one factor of the product and all digits of the other factor, then adding an appropriate amount of zero digits to each intermediate product, then computing the sum of all the intermediate products. This process forms the basis for our multiplication scratchpad. For example, the multiplication task
+Basic multiplication works by doing single-digit multiplication between the multiplicand and all digits of the multiplier, then adding an appropriate amount of zero digits to each intermediate product, then computing the sum of all the intermediate products. This process forms the basis for our multiplication scratchpad. For example, the multiplication task
 
 \begin{lstlisting}
     67*89=5963
@@ -824,13 +871,28 @@ is transformed into
 \noindent
 The multiplication scratchpad is divided by \verb!|! into the part computing the digit products and the part doing the final addition.
 Each digit product has its own scratchpad enclosed in \verb!{}!.
-The computation of the digit products also happens digit by digit similar to the addition scratchpad in \cref{add_scratchpad}.
-The final addition also happens similarly to the addition scratchpad example, with the modification that intermediate steps are separated by semicolons. Also, the summand digits, carry value, sum digit and new carry are separated by commas. This is because for larger multiplications, many digit products need to be added, thus possibly leading to carry values greater than 9, requiring multiple carry digits. This, in our opinion, warranted a proper separation of the components of each addition step for a clearer scratchpad.
+
+The computation of the digit products happens like this (example for the multiplication $67 \cdot 80$):
+
+\begin{lstlisting}
+	*80{78065,68535}5360
+\end{lstlisting}
+
+First comes the multiplier (80 in this case), then the multiplication steps in curly braces, then the result of the digit multiplication.
+For each multiplication step, we list five digits: First, the corresponding digit of the multiplicand (first 7, then 6 for 67), then the digit of the multiplier (always 8 for 80), then the previous carry, then the output digit, then the current carry.
+
+The final addition happens like this ($5360+603$ for our example):
+
+\begin{lstlisting}
+	{03,0,3,0;60,0,6,0;36,0,9,0;5,0,5,0}
+\end{lstlisting}
+
+Each addition step is separated by semicolons. The parts of each addition step are separated by commas. For each addition step, we first list the corresponding digits of the summands (e.g., 0 and 3 for the first step of $5360+603$). Then we list the previous carry, then the output digit, and finally, the current carry.
 
 \subsubsection{Scratchpad: Square root}
 \label{sqrt_scratchpad}
 
-One straightforward way to compute the integer square root of an integer $n$ is by using a binary search algorithm, which is illustrated by the following pseudocode:
+A straightforward way to compute the integer square root of an integer $n$ is by using a binary search algorithm, which is illustrated by the following pseudocode:
 
 \begin{lstlisting}
     low, high = 0, n
@@ -850,20 +912,33 @@ One straightforward way to compute the integer square root of an integer $n$ is 
 The integer square root scratchpad we use follows the steps of this algorithm, illustrated on the training sample \verb|123:11| :
 
 \begin{lstlisting}
-    123:[
-        {0,123} 61*61=3721|
-        {0,61} 30*30=900|
-        {0,30} 15*15=225|
-        {0,15} 7*7=49|
-        {7,15} 11*11=121|
-        {11,15} 13*13=169|
-        {11,13} 12*12=144|
-        {11,12}
-    ]11
+123:[
+    {0,123} 61*61=3721| 
+    {0,61} 30*30=900|
+    {0,30} 15*15=225|
+    {0,15} 7*7=49|
+    {7,15} 11*11=121|
+    {11,15} 13*13=169|
+    {11,13} 12*12=144|
+    {11,12}
+]11
 \end{lstlisting}
 
-It would be nice to include the multiplication scratchpad from \cref{mul_scratchpad} for the square operations of this algorithm, however to keep training feasible we have to keep the samples below a few thousand characters. Considering the fact that we want to compute square roots of 6, 10, and 20 digit integers as in the baseline experiments, this is not possible unfortunately.
-Thus we simply include the square operations without their own scratchpads and hope this illustration of binary search still provides improved accuracy compared to the no scratchpad baseline.
+The steps of the binary search algorithm are in brackets, separated by pipes.
+Consider the first step for example:
+
+\begin{lstlisting}
+	{0,123} 61*61=3721
+\end{lstlisting}
+
+The current search range is in braces, for this step it is from 0 to 123.
+Then, the midpoint of the search range (61) is squared to 3721.
+We are looking for the integer square root of 123, which is the largest integer whose square is at most 123 ()\cref{isqrt}). Because 3721 is larger than $n=123$, the search range in the next step gets restricted to the lower half, which is from 0 to 61.
+The algorithm ends when the search range consists of at most two integers (11 and 12 in this case), at which point the larger one is tested, as $12*12=144$ is too large, $11$ is the correct integer square root.
+
+
+It would have been nice to include the multiplication scratchpad from \cref{mul_scratchpad} for the square operations of this algorithm, however to keep training feasible we have to keep the samples below a few thousand characters. Considering the fact that we want to compute square roots of 6, 10, and 20 digit integers as in the baseline experiments, this is not possible.
+Thus we simply include the square operations without their own scratchpads and hope this illustration of binary search still provides improved accuracy compared to the baseline.
 
 
 \subsubsection{Scratchpads: Changes to experimental setup (experiment-specific)}
@@ -897,8 +972,8 @@ Augmenting the training samples with a scratchpad that details the steps of the 
 These large sequences of sometimes well beyond 1000 characters necessitate some changes to the training regime. Based on the available hardware, we need to make training batches and the intermediate results during forward/backward pass fit into GPU memory (\cref{expsetup:hardware}). The smaller batches in turn mean more optimization steps per epoch, thus taking more time to do training for a given number of epochs. At the same time, a training batch with longer sequences results in larger matrices during optimization, thus taking more time per batch than the same batch size with shorter sequences.
 Time for evaluating the model (generating answers for the samples in the test/validation dataset to test accuracy) also rises proportionally to the lengths of the sequences being generated, meaning it can become a significant part of training time when sequences are long due to an elaborate scratchpad being trained on.
 
-We want to keep the duration for a single experiment (e.g.: square root, using scratchpad, 20 digits, 100k dataset) below 24 hours on the available hardware (\cref{expsetup:hardware}).
-We still want to run all experiments, even those with the largest dataset size of 100k, thus we made the compromise of reducing the maximum number of training epochs for the experiments that would take too much time otherwise. This does have the downside of the models being undertrained (unless early stopping would have halted training before the epoch limit) but seems like the best choice given the time and hardware constraints.
+We want to keep the duration for a single experiment (e.g., square root, using scratchpad, 20 digits, 100k dataset) below 24 hours on the available hardware (\cref{expsetup:hardware}).
+We still want to run all experiments, even those with the largest dataset size of 100k, thus we made the compromise of reducing the maximum number of training epochs for the experiments that would take too much time otherwise. This does have the downside of the models being undertrained (unless early stopping would have halted training before the epoch limit) but it seems like the best choice given the time and hardware constraints.
 
 \includeTable
 {
@@ -1042,7 +1117,7 @@ For the multiplication operation (\cref{tbl:scratchpad_training_mul}) the batch 
     \end{tabular}}}
 }
 
-For the square root operation (\cref{tbl:scratchpad_training_sqrt}) the batch sizes and epoch counts needed to be cut even more, even down to a batch size of 1 and epoch count of 1 for the task with 20 operand digits and 100k dataset. Even though this results in much less training than the comparable baseline task, we still think it is better trying to at least get a glimpse of training results for this task instead of not including it at all.
+For the square root operation (\cref{tbl:scratchpad_training_sqrt}), due to time and memory constraints (see \cref{training_time_growth}), the batch sizes and epoch counts needed to be cut even more, even down to a batch size of 1 and epoch count of 1 for the task with 20 operand digits and 100k dataset. Even though this results in much less training than the comparable baseline task, we still think it is better trying to at least get a glimpse of training results for this task instead of not including it at all.
 
 \subsubsection{Scratchpads: Changes to experimental setup (general)}
 
