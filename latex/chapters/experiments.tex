@@ -1126,14 +1126,43 @@ For testing accuracy, we only consider the final result after the scratchpad in 
 
 \subsubsection{Scratchpads: Results}
 
-\includeAccuracyTable{experiment_results/intermediate_steps/scratchpad/add.csv}{tbl:scratchpad_add}{Final model accuracy on the test dataset for the addition task (with scratchpad) for the given training dataset sizes and operand digits.}{}
+\begin{table}[H]
+	\begin{minipage}[t]{0.47\linewidth}
+		\hfill
+		\includeAccuracyTableCore{experiment_results/intermediate_steps/scratchpad/add.csv}{}
+		\captionof{table}{Final model accuracy on the test dataset for the addition task (with scratchpad) for the given training dataset sizes and operand digits.}
+		\label{tbl:scratchpad_add}
+	\end{minipage}
+	\hfill %%%
+	\begin{minipage}[t]{0.47\linewidth}
+		\hfill
+		\includeAccuracyTableCore{experiment_results/baseline_final_accuracy/add.csv}{}
+		\captionof{table}{Baseline addition accuracy (without scratchpad).}
+		\label{tbl:scratchpad_add_baseline}
+	\end{minipage}
+\end{table}
 
-For the addition task  (\cref{tbl:scratchpad_add}) there are clear improvements over baseline (\cref{tbl:baseline_add}): For the 1k dataset size, training was more or less successful for all operand sizes (good accuracy but not 100\%), whereas there was no accuracy for the baseline experiments at 1k dataset size.
+For the addition task  (\cref{tbl:scratchpad_add}) there are clear improvements over the baseline (\cref{tbl:scratchpadd_add_baseline}): For the 1k dataset size, training was more or less successful for all operand sizes (good accuracy but not 100\%), whereas there was no accuracy for the baseline experiments at 1k dataset size.
 For 10k and 100k dataset sizes, there was perfect accuracy for all operand sizes, whereas in the baseline experiments accuracy was perfect only for 3 digit addition.
 
-\includeAccuracyTable{experiment_results/intermediate_steps/scratchpad/mul.csv}{tbl:scratchpad_mul}{Final model accuracy on the test dataset for the multiplication task (with scratchpad) for the given training dataset sizes and operand digits.}{}
+\begin{table}[H]
+	\begin{minipage}[t]{0.47\linewidth}
+		\hfill
+		\includeAccuracyTableCore{experiment_results/intermediate_steps/scratchpad/mul.csv}{}
+		\captionof{table}{Final model accuracy on the test dataset for the multiplication task (with scratchpad) for the given training dataset sizes and operand digits.}
+		\label{tbl:scratchpad_mul}
+	\end{minipage}
+	\hfill %%%
+	\begin{minipage}[t]{0.47\linewidth}
+		\hfill
+		\includeAccuracyTableCore{experiment_results/baseline_final_accuracy/mul.csv}{}
+		\captionof{table}{Baseline multiplication accuracy (without scratchpad).}
+		\label{tbl:scratchpad_mul_baseline}
+	\end{minipage}
+\end{table}
 
-For the multiplication task (\cref{tbl:scratchpad_mul}), there were even more significant improvements made by providing the scratchpad: For the baseline experiments (\cref{tbl:baseline_mul}) only 3 digits, 10k dataset and 3 digits, 100k dataset provided above-zero accuracy, and even there it was only about 20\%. When using the scratchpad, accuracy is good for 
+
+For the multiplication task (\cref{tbl:scratchpad_mul}), there were even more significant improvements made by providing the scratchpad: For the baseline experiments (\cref{tbl:scratchpad_mul_baseline}) only 3 digits, 10k dataset and 3 digits, 100k dataset provided above-zero accuracy, and even there it was only about 20\%. When using the scratchpad, accuracy is good for 
 3 digits, 10k and 100k dataset sizes. Even for 5 and 10 digit multiplication, there is some degree of accuracy obtained, whereas it was a flat zero in the baseline experiments.
 
 Because the accuracy numbers for 5 and 10 digits are somewhat "in the middle", showing the model is able to do a significant portion of multiplications correctly, but still making some errors, it is not unreasonable to assume training for longer would have made the model able to perform 5 and 10 digit multiplications with high accuracy. In contrast to the baseline, we had to limit training epochs for the multiplication scratchpad experiments to keep training times reasonable (\cref{tbl:scratchpad_training_mul}).
@@ -1141,9 +1170,23 @@ Because the accuracy numbers for 5 and 10 digits are somewhat "in the middle", s
 It is also an interesting observation that accuracies obtained on the 100k training dataset were lower than those on the 10k dataset. Training was limited to 50 epochs for the 10k dataset and 5 epochs for the 100k dataset (\cref{tbl:scratchpad_training_mul}). However, the total amount of training batches / optimization steps is the same for both scenarios, but the variety of training samples is lower in the 10k dataset scenario, increasing the risk of overfitting.
 We would thus have expected better scores for the 100k dataset despite the lower epoch count.
 
-\includeAccuracyTable{experiment_results/intermediate_steps/scratchpad/sqrt.csv}{tbl:scratchpad_sqrt}{Final model accuracy on the test dataset for the square root task (with scratchpad) for the given training dataset sizes and operand digits.}{}
+\begin{table}[H]
+	\begin{minipage}[t]{0.47\linewidth}
+		\hfill
+		\includeAccuracyTableCore{experiment_results/intermediate_steps/scratchpad/sqrt.csv}{}
+		\captionof{table}{Final model accuracy on the test dataset for the square root task (with scratchpad) for the given training dataset sizes and operand digits.}
+		\label{tbl:scratchpad_sqrt}
+	\end{minipage}
+	\hfill %%%
+	\begin{minipage}[t]{0.47\linewidth}
+		\hfill
+		\includeAccuracyTableCore{experiment_results/baseline_final_accuracy/sqrt.csv}{}
+		\captionof{table}{Baseline square root accuracy (without scratchpad).}
+		\label{tbl:scratchpad_sqrt_baseline}
+	\end{minipage}
+\end{table}
 
-For the square root task (\cref{tbl:scratchpad_sqrt}) the results were, interestingly, generally worse than baseline (\cref{tbl:baseline_sqrt}). This might be for a number of reasons:
+For the square root task (\cref{tbl:scratchpad_sqrt}) the results were, interestingly, generally worse than baseline (\cref{tbl:scratchpad_sqrt_baseline}). This might be for a number of reasons:
 First of all, we had to reduce the amount of training epochs, even more so than for the multiplication tasks, due to the very long scratchpads (\cref{tbl:scratchpad_sample_lengths}). Thus the resulting models are most likely severely undertrained.
 
 Also, there is an important difference in the scratchpad structure between addition/multiplication and square root: For the addition and multiplication operations, the task was decomposed down into the smallest of pieces (single-digit addition and multiplication) (\cref{add_scratchpad}, \cref{mul_scratchpad}). Whereas for the square root task, we modeled the steps of the binary search algorithm but just left the squaring operations of large numbers as-is, without any explanation on how to compute the squares (we could not include this information as it would have made the scratchpads too massive) (\cref{sqrt_scratchpad}).
@@ -1253,7 +1296,7 @@ Thus both result reversal and scratchpads allow for training a model that has a 
 98090
 \end{lstlisting} \\
 
-\ErrorAnalysisTableEnd{tbl:errors_scratchpad_mul3}{Error examples for the multiplication task, using scratchpad, 3 digit operands.}
+\ErrorAnalysisTableEnd{tbl:errors_scratchpad_mul3}{Error examples for the multiplication task (3 digits, 100k training dataset, using scratchpad, trained for 5 epochs).}
 
 For the 3-digit multiplication task (\cref{tbl:errors_scratchpad_mul3}), we can see there were no errors in the single-digit multiplications. In the first error sample, the model fetched the wrong digit from the single-digit results during the addition phase. We hypothesize this could be due to there being multiple single-digit products that are zero, thus making it harder to pick the right digits due to the uneven length of the products.
 
@@ -1314,7 +1357,7 @@ For the other two error samples, the model did the entire calculation correctly,
 }]
 1715521605
 \end{lstlisting} \\ \ErrorAnalysisTableRule
-\ErrorAnalysisTableEnd{tbl:errors_scratchpad_mul5_1}{Error example for the multiplication task, 5 digits, using scratchpad (example 1).}
+\ErrorAnalysisTableEnd{tbl:errors_scratchpad_mul5_1}{Error example 1 for the multiplication task (5 digits, 100k training dataset, using scratchpad, trained for 5 epochs).}
 
 \ErrorAnalysisTableBegin
 \begin{lstlisting}
@@ -1367,7 +1410,7 @@ For the other two error samples, the model did the entire calculation correctly,
 }]
 240264280
 \end{lstlisting} \\
-\ErrorAnalysisTableEnd{tbl:errors_scratchpad_mul5_2}{Error example for the multiplication task, 5 digits, using scratchpad (example 2).}
+\ErrorAnalysisTableEnd{tbl:errors_scratchpad_mul5_2}{Error example 2 for the multiplication task(5 digits, 100k training dataset, using scratchpad, trained for 5 epochs).}
 
 
 \ErrorAnalysisTableBegin
@@ -1424,7 +1467,7 @@ For the other two error samples, the model did the entire calculation correctly,
 2058581023
 \end{lstlisting}
 \\
-\ErrorAnalysisTableEnd{tbl:errors_scratchpad_mul5_3}{Error example for the multiplication task, 5 digits, using scratchpad (example 3).}
+\ErrorAnalysisTableEnd{tbl:errors_scratchpad_mul5_3}{Error example 3 for the multiplication task(5 digits, 100k training dataset, using scratchpad, trained for 5 epochs).}
 
 For the multiplication task with 5 operand digits, the first example (\cref{tbl:errors_scratchpad_mul5_1}) shows the model failing to compute the correct sum based on the correct list of digits and current carry value. This led to some digits in the middle of the product being wrong.
 
@@ -1491,7 +1534,7 @@ In summary, there was only one error observed in the digit multiplication stage 
 ]
 957
 \end{lstlisting} \\
-\ErrorAnalysisTableEnd{tbl:errors_scratchpad_sqrt6_1}{Error example for the square root task, 6 digits, using scratchpad (example 1).}
+\ErrorAnalysisTableEnd{tbl:errors_scratchpad_sqrt6_1}{Error example 1 for the square root task, (6 digits, 100k training dataset, using scratchpad, trained for 5 epochs).}
 
 
 \ErrorAnalysisTableBegin
@@ -1543,7 +1586,7 @@ In summary, there was only one error observed in the digit multiplication stage 
 ]
 441
 \end{lstlisting} \\
-\ErrorAnalysisTableEnd{tbl:errors_scratchpad_sqrt6_2}{Error example for the square root task, 6 digits, using scratchpad (example 2).}
+\ErrorAnalysisTableEnd{tbl:errors_scratchpad_sqrt6_2}{Error example 2 for the square root task (6 digits, 100k training dataset, using scratchpad, trained for 5 epochs).}
 
 \ErrorAnalysisTableBegin
 \begin{lstlisting}
@@ -1597,7 +1640,7 @@ In summary, there was only one error observed in the digit multiplication stage 
 749
 \end{lstlisting} \\
 \\
-\ErrorAnalysisTableEnd{tbl:errors_scratchpad_sqrt6_3}{Error example for the square root task, 6 digits, using scratchpad (example 3).}
+\ErrorAnalysisTableEnd{tbl:errors_scratchpad_sqrt6_3}{Error example 3 for the square root task (6 digits, 100k training dataset, using scratchpad, trained for 5 epochs).}
 
 For the square root task with 6 digits, in the first example (\cref{tbl:errors_scratchpad_sqrt6_1}) we can see the model making mistakes in squaring large numbers at the beginning of the algorithm. This, however, did not influence the final result as the algorithm always has to take a few steps in the same direction at the start due do the large search interval $[0, n]$.
 The model did make another mistake at the very end of the algorithm, picking the wrong half of the search space and then picking the wrong one of two numbers for the final square root.
@@ -1615,7 +1658,7 @@ We wanted to investigate how quickly the model achieved good accuracy for the va
 
 The diagrams only show accuracy development for the 100k dataset size for brevity.
 
-For scratchpad-based training, we evaluated accuracy only once every epoch and reduced the evaluation dataset to 10 samples (\cref{scratchpad_changes}). This of course leads to less precise curves, but can still give a rough idea about training progress.
+For scratchpad-based training, we evaluated accuracy only once every epoch and reduced the validation dataset to 10 samples (\cref{scratchpad_changes}). This of course leads to less precise curves, but can still give a rough idea about training progress.
 
 \includePDFPlot{experiment_results/intermediate_steps_accuracy/add.pdf}{fig:intermediate_steps_accuracy_add}{Development of accuracy on the validation dataset, when training the addition task using a 100k dataset using various training methods and operand digits.}
 
@@ -1628,7 +1671,7 @@ Using a scratchpad leads to much faster convergence, where 3 digit addition alre
 
 \includePDFPlot{experiment_results/intermediate_steps_accuracy/mul.pdf}{fig:intermediate_steps_accuracy_mul}{Development of accuracy on the validation dataset, when training the multiplication task using a 100k dataset using various training methods and operand digits.}
 
-For the multiplication task (\cref{fig:intermediate_steps_accuracy_mul}), we can see that only scratchpad with 3 digit multiplication converged to 100\%. For the same task, baseline and result reversal had similar curves, starting to leave zero at about 5000 steps, and ending at around 20\% accuracy after about 40000 steps.
+For the multiplication task (\cref{fig:intermediate_steps_accuracy_mul}), we can see that only scratchpad with 3 digit multiplication converged to 100\%. For the same task, baseline and result reversal had similar curves, starting to leave zero at about 3000 steps, and ending at around 20\% accuracy after about 40000 steps.
 
 For 5 and 10 digit multiplication, only scratchpad-based training achieved above-zero accuracy, while still remaining at around 20\% accuracy and taking between 3000 and 20000 steps to start converging.
 It might however converge all the way to 100\% given continued training, but resource constraints made us limit the number of training epochs (\cref{scratchpad_changes}).
