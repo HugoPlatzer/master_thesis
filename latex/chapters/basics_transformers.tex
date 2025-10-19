@@ -82,8 +82,8 @@ Each integer $x_i$ references one of the possible tokens of the model $(1 \leq x
 \label{transformer:output}
 
 For each position in the input sequence, the model outputs a probability distribution, predicting the next token based on the input tokens up to this position. 
-The output of the model is a sequence of probability distributions $y_i$ $(1 \leq i \leq n_{pos})$. $y_i \in \mathbb{R}^{n_{vocab}}$, $0 \leq {y_i}_j \leq 1$ \citepage{5}{allyouneed} \cite{HuggingFaceGPT2}.
-$y_i$ should tell which token most likely follows after all the tokens $x_1 \ldots x_i$.
+The output of the model is a sequence of probability distributions $\mathbf{y}_i$ $(1 \leq i \leq n_{pos})$. $\mathbf{y}_i \in \mathbb{R}^{n_{vocab}}$, $0 \leq (\mathbf{y}_i)_j \leq 1$ \citepage{5}{allyouneed} \cite{HuggingFaceGPT2}.
+$\mathbf{y}_i$ should model which token most likely follows after all the tokens $x_1 \ldots x_i$.
 
 During training, all output positions are useful as they allow to optimize the model to correctly predict $x_2$ based on $x_1$,
 $x_3$ based on $x_1$ and $x_2$, $x_{n_{pos}}$ based on $x_1 \ldots x_{n_{pos}-1}$, all in a single training step. This greatly reduces training time for longer sequences \cite{alammar-gpt2}.
@@ -128,24 +128,22 @@ After sufficient pre-training, the model is then fine-tuned on question-answer p
 Due to the well-known phenomenon of transfer learning \cite{transferlearning}, the pre-trained model will have already internalized the structure of natural language, source code and maths. 
 This allows a relatively small amount of hand picked fine-tuning examples to make it significantly stronger compared to just training on the question-answer pairs on a freshly initalized model \citepage{8}{improvinglu}.
 
-\subsection{Transformer architecture by example: OpenAI GPT2}
+\subsection{OpenAI GPT2}
 
-A good example of a successful decoder model is OpenAI's GPT2 \cite{unsupervisedmultitask} \cite{OpenAI2019BetterLM} \cite[source code]{HuggingFaceGPT2}: It was released in 2019 and demonstrated the ability to write realistic articles based on a given starting prompt. This model is useful for explaining the details of the transformer architecture, because its weights and code were released, its proven effectiveness in generating meaningful text, and due to the fact that its even more powerful successors have not experienced significant architectural changes \cite{OpenGenus2023GPTComparison}.
+A good example of a successful decoder model is OpenAI's GPT2 \cite{unsupervisedmultitask} \cite{OpenAI2019BetterLM} \cite[source code]{HuggingFaceGPT2}. It was released in 2019 and demonstrated the ability to write realistic articles based on a given starting prompt. This model is useful for explaining the details of the transformer architecture, because the model weights and code were released, its proven effectiveness in generating meaningful text, and due to the fact that its even more powerful successors have not experienced significant architectural changes \cite{OpenGenus2023GPTComparison}.
 
-\subsubsection{Architecture}
-
-\includediagram{diagrams/gpt2/overview}{Overview of the GPT2 model (gpt2-small, 12 blocks, $n_{hidden} = 768$).}
+\subsubsection{Achitecture}
 
 For understanding GPT2, it is important to realize the multiple dimensions at play inside the model \cite{alammar-gpt2} \citepage{6}{allyouneed}:
 There are multiple positions, as many as there are tokens in the input sequence: $n_{pos}$.
 Each position is a vector of fixed dimension having $n_{hidden}$ real numbers as components.
-Also, in practice, multiple input sequences can be processed in parallel for better efficiency (batching).
+In practice, multiple input sequences can be processed in parallel for better efficiency (batching).
 For simplicity, in this explanation we only consider a batch of size 1, i.e. a single input sequence.
 
-In practice, when libraries implement this kind of model, the steps described now are done using matrix operations
-for optimal parallelism, or optimized in other ways. The step-by-step manner used to describe the operations,
+When libraries implement this kind of model, the steps described now are done using matrix operations
+for optimal parallelism, are optimized in other ways. The step-by-step manner used to describe the operations,
 especially the attention mechanism, is helpful because it is easiest to understand, but real-world code
-utilizing e.g. GPU parallelism would use better optimized algorithms to achieve the same output \cite{choi2023unleashing} \citepage{524}{yu2022orca}. 
+utilizing, e.g., GPU parallelism would use better optimized algorithms to achieve the same output \cite{choi2023unleashing} \citepage{524}{yu2022orca}. 
 
 For each computation step described in the following sections, $x_i$ describes the input vector to that step (at position $i$), while $y_i$ describes the output vector
 at that step. In the previous section, $x_i$ was used to refer to the input (token ID sequence) and $y_i$ to the final output of the model (probabilities).
@@ -155,6 +153,8 @@ This also applies to other symbols like those describing weight matrices, etc. T
 
 The letter $i$ in the explanation always refers to the position within the sequence. In general, the same function is computed with the same learnable parameters
 for the inputs at each position independently. Only for the attention step, the inputs of previous positions are also contributing to the output \cite{alammar-gpt2}.
+
+\includediagram{diagrams/gpt2/overview}{Overview of a GPT2 model.}
 
 \subsubsection{Tokenization}
 
@@ -207,7 +207,7 @@ When using the model to extend a given starting text (prompt), the following ste
 
 The token ID sequence is then converted back into text using the tokenizer vocabulary. This results in the original text plus new text appended by the model. If the model is well trained to the language/task, the generated text will match the given starting text (prompt) both syntactically and semantically.
 
-\subsubsection{GPT2 preprocessing}
+\subsubsection{Preprocessing}
 \label{gpt2_preproc}
 
 \includediagram{diagrams/gpt2/preproc}{GPT2 preprocessing stage on an example token sequence. Based on the token position and value, embedding vectors are summed to give the starting vector at this position.}
@@ -246,7 +246,7 @@ The learnable parameters of each block are \cite{alammar-gpt2}:
  \item weight and bias for each of the two layer normalizations (at the end of each layer norm there is a linear transform): $W_{ln_1}, b_{ln_1} W_{ln_2}, b_{ln_2}$
 \end{itemize}
 
-\subsubsection{GPT2 block: Layer normalization}
+\subsubsection{Layer normalization}
 
 \includediagram{diagrams/gpt2/layernorm}{Detailed view of the layer normalization stage of the GPT2 block.}
 
@@ -265,7 +265,7 @@ Layer normalization has the advantage of not suffering from statistical noise wh
 
 The normalization happens independently for each vector $x_i$ (i.e. at each position $i$), but the learnable parameters $a$ and $b$ (like all learnable parameters of the model) are the same for each position.
 
-\subsubsection{GPT2 block: Residual connection}
+\subsubsection{Residual connection}
 
 \begin{samepage}
 
@@ -279,7 +279,7 @@ This is because when using residual connections, the input data does not need to
 
 \end{samepage}
 
-\subsubsection{GPT2 block: Attention mechanism}
+\subsubsection{Attention mechanism}
 \label{gpt2_attn}
 
 \includediagram{diagrams/gpt2/attention_multihead}{Structure of the Multi-head attention mechanism. This example uses two positions $x_1, x_2$ and two attention heads $h_1, h_2$. The actual model can in theory handle arbitrary sequence lengths and also has more attention heads.}
@@ -348,7 +348,7 @@ Positions after $i$ $(j > i)$ are not considered because of the autoregressive n
 
 \end{itemize}
 
-\subsubsection{GPT2 block: Multi-layer perceptron}
+\subsubsection{Multi-layer perceptron}
 
 \includediagram{diagrams/gpt2/mlp}{Multi-layer perceptron stage of the GPT2 block. It is a simple feed-forward neural network with two linear steps with bias and an activation function in between.}
 
@@ -358,7 +358,7 @@ As opposed to the original transformer, GPT2 uses the Gaussian Error Linear Unit
 $$x'_i = gelu(W_c x_i + b_c)$$
 $$y_i = W_p x'_i + b_p$$
 
-\subsubsection{GPT2 postprocessing}
+\subsubsection{Postprocessing}
 
 \includediagram{diagrams/gpt2/postproc}{Detailed example of the GPT2 postprocessing stage. $x_i$, the output of the last GPT2 block, is converted into token probabilities.}
 
