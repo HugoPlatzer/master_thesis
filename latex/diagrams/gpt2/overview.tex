@@ -23,15 +23,15 @@ align=right
 \node[tall block data node, right=of i1] (i2) {19 \\ is};
 \node[tall block data node, right=of i2] (i3) {7 \\ my};
 \node[fit node,fit=(i1)(i2)(i3)] (if) {};
-\node[my caption node, left=of if]{Integer (token) \\ sequence};
+\node[my caption node, left=of if]{Token (integer) \\ sequence};
 
 
 \node[my block node, color 1, above=of if] (pp) {Preprocessing};
 \draw[arrow style] (if) to (pp);
 
-\node[block data node, above=of pp] (v2) {$\mathbf{h}_2^{(0)}$};
-\node[block data node, left=of v2] (v1) {$\mathbf{h}_1^{(0)}$};
-\node[block data node, right=of v2] (v3) {$\mathbf{h}_3^{(0)}$};
+\node[block data node, above=of pp] (v2) {$\modHiddenAt{0}_2$};
+\node[block data node, left=of v2] (v1) {$\modHiddenAt{0}_1$};
+\node[block data node, right=of v2] (v3) {$\modHiddenAt{0}_3$};
 \node[fit node,fit=(v1)(v2)(v3)] (vf) {};
 \node[my caption node, left=of vf]{Vector \\ sequence};
 \draw[arrow style] (pp) to (vf);
@@ -49,9 +49,9 @@ align=right
 \node[my block node, color 2, above=of cdots] (b2) {GPT2 block};
 \draw[arrow style] (cdots) to (b2);
 
-\node[block data node, above=of b2] (hout2) {$\mathbf{h}_2^{(12)}$};
-\node[block data node, left=of hout2] (hout1) {$\mathbf{h}_1^{(12)}$};
-\node[block data node, right=of hout2] (hout3) {$\mathbf{h}_3^{(12)}$};
+\node[block data node, above=of b2] (hout2) {$\modHiddenAt{12}_2$};
+\node[block data node, left=of hout2] (hout1) {$\modHiddenAt{12}_1$};
+\node[block data node, right=of hout2] (hout3) {$\modHiddenAt{12}_3$};
 \draw[arrow style] (b2) to (hout2);
 \node[my caption node, left=of hout1]{Vector \\ sequence};
 
@@ -59,9 +59,9 @@ align=right
 \draw[arrow style] (hout2) to (pop);
 
 
-\node[block data node, above=of pop] (p2) {$\mathbf{y}_2$};
-\node[block data node, left=of p2] (p1) {$\mathbf{y}_1$};
-\node[block data node, right=of p2] (p3) {$\mathbf{y}_3$};
+\node[block data node, above=of pop] (p2) {$\modOut_2$};
+\node[block data node, left=of p2] (p1) {$\modOut_1$};
+\node[block data node, right=of p2] (p3) {$\modOut_3$};
 \node[fit node,fit=(p1)(p2)(p3)] (pf) {};
 \draw[arrow style] (pop) to (pf);
 \node[my caption node, left=of pf]{Probability \\ distribution \\ sequence};
