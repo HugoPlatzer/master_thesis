@@ -57,13 +57,14 @@ Token string: & "This" & " is" & $\cdots$ \\
 
 \matrix [caption matrix left, left=of m1] (m1c)
 {
-|[my caption node, align=right]| {Positional \\ embedding \\ matrix} \\ $v_{pos} \in \mathbb{R}^{1024 \times 768}$ \\
+|[my caption node, align=right]| {Positional \\ embedding \\ matrix} \\
+|[my caption node, align=right]| {$\begin{array}{r} \embPos \in \\ \mathbb{R}^{\dVocab \times \dHidden} \end{array}$} \\
 };
 
 \matrix [caption matrix right, right=of m2] (m2c)
 {
 |[my caption node, align=left]| {Token \\ embedding \\ matrix} \\
-$v_{token} \in \mathbb{R}^{50257 \times 768}$ \\
+|[my caption node, align=left]| {$\begin{array}{l} \embTok \in \\ \mathbb{R}^{\nPos \times \dHidden} \end{array}$} \\
 };
 
 \node[sum node, above=5mm of $(m1.north east)!0.5!(m2.north west)$] (sum) {};
@@ -76,7 +77,7 @@ $v_{token} \in \mathbb{R}^{50257 \times 768}$ \\
 \matrix [caption matrix left, left=of v] (vc)
 {
 |[my caption node, align=right]| {Initial vector at position 1} \\
-$x_{1} \in \mathbb{R}^{768}$ \\
+$\modHiddenAt{0}_1 \in \mathbb{R}^\dHidden$ \\
 };
 
 \begin{scope}[on background layer]

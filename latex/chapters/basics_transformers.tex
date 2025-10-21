@@ -192,7 +192,7 @@ OpenAI GPT2 was released in four versions with different parameter counts:
 
 \label{gpt2:tokenizer}
 
-The GPT2 models as released by OpenAI were trained using a Byte-pair encoding (BPE) tokenizer (see \cref{transformer:tokenization}) with a vocabulary of 50257 tokens \citepage{4}{unsupervisedmultitask} \cite{HuggingFaceGPT2}. The tokenizer was itself trained on a natural language corpus separately before training the actual models. The models were then configured with $\dVocab=50257$ and the training texts were processed using this tokenizer before being fed into the model. Thus, when using these models with the weights as released by OpenAI, the same tokenizer must be used for text generation during inference time as well. An example on how the tokenizer that was released with OpenAI GPT2 handles a sentence can be seen in \cref{diagrams/gpt2/tokenizer}.
+The GPT2 models as released by OpenAI were trained using a Byte-pair encoding (BPE) tokenizer (\cref{transformer:tokenization}) with a vocabulary of 50257 tokens \citepage{4}{unsupervisedmultitask} \cite{HuggingFaceGPT2}. The tokenizer was itself trained on a natural language corpus separately before training the actual models. The models were then configured with $\dVocab=50257$ and the training texts were processed using this tokenizer before being fed into the model. Thus, when using these models with the weights as released by OpenAI, the same tokenizer must be used for text generation during inference time as well. An example on how the tokenizer that was released with OpenAI GPT2 handles a sentence can be seen in \cref{diagrams/gpt2/tokenizer}.
 
 It is also possible to train a GPT2 model with a different tokenizer with, e.g., a smaller vocabulary. Instead of a proper tokenizer that was trained to efficiently chunk text in some natural language, other GPT2 implementations like nanoGPT \cite{nanogpt} use a simpler approach: Each ASCII character in the training text is mapped to one token, with the token value equal to the ASCII character value.
 This makes for a simpler overall implementation that keeps all the processing outside the tokenizer and inside the actual model.
@@ -204,39 +204,34 @@ The downside is that token sequences get significantly longer, thus a model with
 \subsubsection{Preprocessing}
 \label{gpt2_preproc}
 
+Transformer networks do not operate on integer token IDs, but on state vectors from $\mathbb{R}^{\dHidden}$. $\dHidden$, the dimension of the state vector at each position, is a parameter fixed at the time of model construction (\cref{gpt2:parameters}).
+This means the token sequence needs to be converted into a sequence of such vectors before feeding it through the model. This happens during the preprocessing stage, which is illustrated in \cref{diagrams/gpt2/preproc}.
+For converting the token IDs $\modIn_i$ into initial state vectors $\modHiddenAt{0}_i$, GPT2 has a learnable token embedding matrix $\embTok \in \mathbb{R}^{\dVocab \times \dHidden}$. Each row of this matrix stores the learnable initial state vector for the corresponding token ID.
+
+
+Because the blocks of the GPT2 have no positional awareness (their learnable parameters do not depend on the sequence position $i$), information about the position of a token within the sequence needs to be included as well \citepage{6}{allyouneed}.
+In GPT2, this is done by a learnable embedding matrix $\embPos \in \mathbb{R}^{\dVocab \times \dHidden}$ storing a learnable vector for each position up to the sequence length limit $\nPos$.
+
+The starting vector $\modHiddenAt{0}_i \in \mathbb{R}^\dHidden$ for a token value $\modIn_i$ at position $i$ is then given as \citepage{3}{allyouneed}:
+
+$$\modHiddenAt{0}_i = \embTokAt{x_i, :} + \embPosAt{i, :}$$.
+
+
 \includediagram{diagrams/gpt2/preproc}{GPT2 preprocessing stage on an example token sequence. Based on the token position and value, embedding vectors are summed to give the starting vector at this position.}
 
-Transformer networks do not operate with integer token IDs, but with state vectors from $\mathbb{R}^{d_{hidden}}$. $d_{hidden}$, the dimension of the state vectors at each position, is a parameter fixed at the time of model construction (\cref{gpt2:parameters}).
-
-This means the token sequence needs to be converted into a sequence of such vectors before feeding it through the model. This happens during the preprocessing stage.
-For this, GPT2 has a learnable token embedding matrix $v_{token}$.  Because the GPT2 tokenizer has a vocabulary size of 50257 (\cref{gpt2:tokenizer}), this matrix is of size $50257 \times d_{hidden}$.
-
-\begin{samepage}
-
-Furthermore, because the processing blocks of a transformer model have no positional awareness, information about the position of a vector within the sequence needs to be included as well \citepage{6}{allyouneed}.
-In GPT2, this is done by another learnable embedding matrix $v_{pos}$ storing a vector for each position up to some limit, which will become the maximum sequence length the model can handle \citepage{5}{improvinglu}  . For GPT2, this maximum sequence length has been fixed at 1024 \citepage{4}{unsupervisedmultitask} \cite{HuggingFaceGPT2}.
-The positional embedding matrix $v_{token}$ thus has a size of $1024 \times d_{hidden}$.
-The starting vector $y_i$ for a token value $x_i$ at position $i$ is then given as \citepage{3}{allyouneed}:
-
-$$y_i = v_{token}(x_i) + v_{pos}(i)$$
-
-\end{samepage}
 
 \subsubsection{Postprocessing}
-
-\includediagram{diagrams/gpt2/postproc}{Detailed example of the GPT2 postprocessing stage. $x_i$, the output of the last GPT2 block, is converted into token probabilities.}
-
 \label{gpt2:postproc}
 
 GPT2 uses a "language modeling head" \cite{HuggingFaceGPT2} to convert the outputs of the last block into token probabilities. This works in a similar way as the unsupervised learning objective described in \citepage{3}{improvinglu}. The same token embedding matrix $v_{token}$ that is also used in the preprocessing stage to convert tokens into vectors is used here (using matrix-vector product) to transform a $d$-dimensional vector into a $n_{tokens}$ dimensional vector, softmax then gives a probability distribution \cite{github-hf} \citepage{3}{improvinglu}.
 
 Before this conversion, a final layer normalization step is performed \citepage{4}{unsupervisedmultitask}.
 
+\includediagram{diagrams/gpt2/postproc}{Detailed example of the GPT2 postprocessing stage. $x_i$, the output of the last GPT2 block, is converted into token probabilities.}
+
 
 \subsubsection{Text generation}
 \label{gpt2:textgen}
-
-\includediagram{diagrams/gpt2/generation}{Text generation using the GPT2 model for the example starting text "where is". The rightmost probability distribution is used to pick the next token, after which the data, augmented with this new token, is fed through the model again.}
 
 During evaluation time, the goal is not just generate one token, but to meaningfully complete the input sequence, possibly using many more tokens.
 Nonetheless, the new tokens are generated one at a time. When the input is $x_1 \ldots x_n$, the last position of the output, $y_n$, is used to generate a new token $x_{n+1}$.
@@ -245,6 +240,8 @@ top-k, top-p, or trivially by picking the highest probability, which would mean 
 This could be fine for e.g. a mathematical task, but for more creative tasks like story generation, diversity of generated candidates is useful.
 
 The sampling of new tokens happens until a stop token is generated, the model maximum $n_{pos_{max}}$ is reached or some other abort condition is met. \cite[p.2 ]{allyouneed}
+
+\includediagram{diagrams/gpt2/generation}{Text generation using the GPT2 model for the example starting text "where is". The rightmost probability distribution is used to pick the next token, after which the data, augmented with this new token, is fed through the model again.}
 
 
 \subsubsection{Training}
@@ -260,6 +257,10 @@ Standard initialization techniques (for example uniform initialization) can be u
 
 GPT2 uses the Adam optimizer \citepage{5}{improvinglu}.
 A naive stochastic gradient optimizer will not achieve good results when training transformer networks like GPT2, thus more advanced optimizers like Adam need to be used to make the model converge to a degree where it becomes useful \cite{adambeatssgd}.
+
+
+
+
 
 
 \subsection{GPT2 block structure}
