@@ -24,7 +24,7 @@ node distance=15mm and 0mm,
 
 
 
-\node[data node] (x) {$x_i$};
+\node[data node] (x) {$\modHiddenAt{\nBlocks}_i$};
 \node[block node, color 1, large gap, above=of x] (ln) {Final Layer Norm};
 \draw[arrow style] (x) to (ln);
 
@@ -76,7 +76,7 @@ node[block node, color 3, above=of add, minimum width=\n1] (sm) {Softmax};
 
 \draw [arrow style] (add) to (sm);
 
-\node[data node, large gap, above=of sm] (y) {$y_i$};
+\node[data node, large gap, above=of sm] (y) {$\modOut_i$};
 
 \draw [arrow style] (sm) to (y);
 
@@ -100,21 +100,21 @@ at (vtoken.west|-y)
 \node[my caption node] at (cap) {Output vector of final GPT2 block \\
 $
 \begin{aligned}
-x_i \in \mathbb{R}^{n_{hidden}}
+\modHiddenAt{\nBlocks}_i \in \mathbb{R}^{n_{hidden}}
 \end{aligned}
 $};
 \node[my caption node] at (cap|-ln) {One last layer normalization stage (same structure as in GPT2 blocks) };
 \node[my caption node] at (cap|-sm) { Apply softmax to get a valid probability distribution };
-\node[my caption node] at (cap|-mul1) { Blend columns of $v_{token}$ according to normalized $x_i$ (matrix-vector product) };
-\node[my caption node, below=of vtoken, align=left, text width=4cm] { Token embedding matrix $v_{token}$ taken from the preprocessing stage. Each row represents the embedding vector for a token from the vocabulary. \\
+\node[my caption node] at (cap|-mul1) { Blend columns of $\embTok$ according to normalized $\modHiddenAt{\nBlocks}_i$ (matrix-vector product) };
+\node[my caption node, below=of vtoken, align=left, text width=4cm] { Token embedding matrix $\embTok$ taken from the preprocessing stage. Each row represents the embedding vector for a token from the vocabulary. \\
 $
 \begin{aligned}
-v_{token} \in \mathbb{R}^{n_{vocab} \times d_{hidden}}
+\embTok \in \mathbb{R}^{\dVocab \times \dHidden}
 \end{aligned}
 $};
 \node[my caption node] at (cap|-y) {Model-estimated probabilites for token at position $i+1$ \\
 $
 \begin{aligned}
-y_i \in \mathbb{R}^{n_{vocab}}
+\modOut_i \in \mathbb{R}^\dVocab
 \end{aligned}
 $};
