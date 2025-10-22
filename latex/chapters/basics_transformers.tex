@@ -149,10 +149,10 @@ Creating this token sequence from the input text is done by the tokenizer (\cref
 	We denote the input vectors to block number $\modLayer$ as $\modHiddenAt{\modLayer-1}_i$ and the output vectors of that block as $\modHiddenAt{\modLayer}_i$. Thus for a model with, e.g., 12 blocks, the inputs to the first block are $\modHiddenAt{0}_i$ and the outputs after the last block are $\modHiddenAt{12}_i$.
 	
 	Each block outputs a vector sequence of the same dimensions as its input.
-	The GPT2 block is described in \cref{gpt2:block} and consists of multiple layers including normalization, a feed-forward network and the attention mechanism. The attention mechanism (\cref{gpt2_attn}) is special to transformer networks and the only point in the model where vectors are not transformed independently, i.e., the output vector at position $i$ depends not just on the input vector at position $i$, but also on the vectors at all previous positions $1 \leq i' < i$.
+	The GPT2 block structure is described in detail in \cref{gpt2:block} and consists of multiple layers including normalization, a feed-forward network and the attention mechanism. The attention mechanism (\cref{gpt2_attn}) is special to transformer networks and the only point in the model where vectors are not transformed independently, i.e., the output vector of the attention mechanism at position $i$  depends not just on the input vector at position $i$, but also on the vectors at all previous positions $1 \leq i' < i$.
 	The job of the block and the attention mechanism in particular is to allow the model to learn how later elements of the training sequences are influenced by previous elements, e.g., capitalized words mostly appearing after points and spaces (ends of sentences) in English training texts.
 	
-	\item After the last block there is the postprocessing stage. Its job is to convert each hidden vector $\modHiddenAt{\nBlocks}_i$ into a probability distribution $\modOut_i \in \mathbb{R}^{\dVocab}$. This is also done with a learnable embedding matrix.
+	\item After the last block there is the postprocessing stage (\cref{gpt2:postproc}). Its job is to convert each hidden vector $\modHiddenAt{\nBlocks}_i$ into a probability distribution $\modOut_i \in \mathbb{R}^{\dVocab}$. This is also done with a learnable embedding matrix.
 	
 	During training (\cref{gpt2:training}), the model parameters are optimized so that every $\modOut_i$ correctly predicts the next token in the training sequence, $\modIn_{i+1}$.
 	During inference (\cref{gpt2:textgen}), only the last distribution, $\modOut_n$, is used to sample a predicted token $\modIn_{n+1}$, which then is appended to the input sequence for the next generation step.
@@ -160,7 +160,17 @@ Creating this token sequence from the input text is done by the tokenizer (\cref
 
 \includediagram{diagrams/gpt2/overview}{Overview of a GPT2 model. This example uses a model with $\nBlocks=12$ blocks, $\dHidden=768$ hidden vector size. The model is processing a sequence of length 3. Models can also process longer sequences than shown in this example, up to their positional limit $\nPos$ which is configurable at model creation time as is the number of blocks and hidden vector size.}
 
-\subsubsection{Number of parameters}
+\subsubsection{Learnable parameters}
+
+The GPT2 model has learnable parameters in the preprocessing, GPT2 block and postprocessing stages:
+
+\begin{itemize}
+		\item \textbf{Preprocessing:}: For the preprocessing stage (\cref{gpt2_preproc}), the learnable parameters are the embedding matrices $\embTok$ and $\embPos$.
+		\item \textbf{GPT2 block:}: Each of the $\nBlocks$ blocks has its own independent set of learnable parameters, which consist of layer normalization parameters, attention parameters and feed-forward network parameters. They are explained in more detail in \cref{gpt2:block}.
+		\item \textbf{Postprocessing:}: For the postprocessing stage (\cref{gpt2:postproc}), the only learnable parameters are the weights and biases of its layer normalization substage. As the matrix for converting hidden vectors back to token probabilities is tied to $\embTok$, it is not counted here.
+\end{itemize}
+
+\subsubsection{Model size variants}
 
 \label{gpt2:parameters}
 
@@ -180,7 +190,7 @@ OpenAI GPT2 was released in four versions with different parameter counts:
 	Versions of GPT2 released with different parameter counts \cite{hfpretrained}: $\nBlocks$ is the number of GPT2 blocks, $\dHidden$ is the vector size at each position, $\nHeads$ is the number of attention heads and $\dHead$ is the size of each attention head.
 }
 {%
-	columns/name/.style={column name={Model size}},
+	columns/name/.style={column name={Model variant}},
 	columns/n_params/.style={column name={No. of parameters}},
 	columns/n_blocks/.style={column name={$\nBlocks$}},
 	columns/d_hidden/.style={column name={$\dHidden$}},
@@ -216,7 +226,7 @@ In GPT2, this is done by a learnable embedding matrix $\embPos \in \mathbb{R}^{\
 The starting vector $\modHiddenAt{0}_i \in \mathbb{R}^\dHidden$ for a token value $\modIn_i$ at position $i$ is then given in \cref{eq:gpt2_preproc} as the sum of the token and positional embedding vectors \citepage{3}{allyouneed}:
 
 \begin{equation}
-	\modHiddenAt{0}_i = \embTokAt{x_i, :} + \embPosAt{i, :}
+	\modHiddenAt{0}_i = \embTokAt{\modIn_i, :} + \embPosAt{i, :}
 	\label{eq:gpt2_preproc}
 \end{equation}
 
@@ -243,7 +253,7 @@ Finally, softmax is applied to transform this vector $\modOut'_i$ into a proper 
 	\label{eq:postproc}
 \end{equation}
 
-\includediagram{diagrams/gpt2/postproc}{Detailed example of the GPT2 postprocessing stage. $x_i$, the output of the last GPT2 block, is converted into token probabilities.}
+\includediagram{diagrams/gpt2/postproc}{Detailed example of the GPT2 postprocessing stage. $\modHiddenAt{\nBlocks}_i$, the output of the last GPT2 block, is converted into token probabilities.}
 
 
 \subsubsection{Text generation}
