@@ -263,14 +263,13 @@ Due to the limited dimensions of the positional embedding matrix $\embPos$, GPT2
 \label{gpt2:training}
 
 GPT2 uses a training objective similar to \citepage{3}{improvinglu} where a large text corpus is used to make the model predict the next token based on the tokens up to this point.
-In \cite{improvinglu} this is called "Unsupervised pre-training", however other authors refer to similar automated labeling techniques as "self-supervised learning" \cite{selfsupervised} \cite{selfsupervisedvisual}.
-In contrast to classical supervised learning, the training samples in self-supervised learning are not manually labeled, but the inputs and labels are created from each training sample using some mathematical function. An example of this could be erasing some pixels of an image in the input while leaving them untouched in the label.
-For training transformer decoder models like GPT2, the training goal typically is to make the model complete the sample texts when only some part at the start of the sample is given.
-To achieve this, each sample
+In \cite{improvinglu} this is called "unsupervised pre-training", however other authors refer to similar automated labeling techniques as "self-supervised learning" \cite{selfsupervised} \cite{selfsupervisedvisual}.
+In contrast to classical supervised learning, the training samples in self-supervised learning are not manually labeled, but the inputs and labels are automatically created from each training sample using some mathematical function. An example of this could be erasing some pixels of an image in the input while leaving them untouched in the label.
+For training transformer decoder models like GPT2, the training goal typically is to make the model correctly complete a text similar to the training samples when only the start of such a text is given.
+To achieve this, each training sample's token sequence $\modIn_1 \ldots \modIn_n$ is shifted by one position: the inputs to the model are $\modIn_1 \ldots \modIn_{n-1}$ and the corresponding labels are $\modIn_2 \ldots \modIn_n$. This makes the model learn to predict $\modIn_{i+1}$ based on $\modIn_1 \ldots \modIn_i$ for all $i$ from $1$ to $n-1$ in a single optimization step (also see \cref{transformer:output}).
 
-Cross-entropy loss is used on each output position $\modOut_i$ to measure the deviation between the output $\modOut_i$ and the ideal $\modTarget_i$,
-where $\modTarget_i$ represents the probability distribution of a guaranteed token with ID $\modIn_{i+1}$ \citepage{2}{unsupervisedmultitask} \cite{HuggingFaceGPT2}.
-As explained before (\cref{transformer:output}), the model should predict the next input token at each output position. This means, when having a training sample sequence $\modIn_1 \ldots \modIn_n$, the inputs to the model would be $\modIn_1 \ldots \modIn_{n-1}$, whereas the ideal outputs would be $\modIn_2 \cdots \modIn_n$ (the inputs shifted by one position) \citepage{3}{improvinglu} \citepage{7}{reasonoverscenegraphs}.
+For each probability distribution $\modOut_i$ output by the model, cross-entropy loss is used to measure the deviation between $\modOut_i$ and the ideal $\modTarget_i$,
+where $\modTarget_i$ is the probability distribution of a guaranteed token with ID $\modIn_{i+1}$ \citepage{2}{unsupervisedmultitask} \cite{HuggingFaceGPT2}.
 
 Standard initialization techniques (for example uniform initialization) can be used for the weight and bias matrices \citepage{5}{improvinglu}.
 
