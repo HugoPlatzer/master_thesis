@@ -25,9 +25,9 @@ minimum height=8mm,
 \node[container node, right=of x2c] (x3c) {};
 
 
-\node[my data node] (x1) at (x1c) {$x_1$};
-\node[my data node] (x2) at (x2c) {$x_2$};
-\node[my data node] (x3) at (x3c) {$x_3$};
+\node[my data node] (x1) at (x1c) {$\modHiddenAt{l-1}_1$};
+\node[my data node] (x2) at (x2c) {$\modHiddenAt{l-1}_2$};
+\node[my data node] (x3) at (x3c) {$\modHiddenAt{l-1}_3$};
 
 
 \node[my block node, color 1a, above=of x1c] (ln1_1) {Layer norm I};
@@ -85,9 +85,9 @@ node[full block node, minimum width=\n1, color 2, above=of ln1_2] (attn) {Multi-
 \draw[behind arrow style] (r1_3.west) to (x3c.west|-r1_3.west) to (x3c.west|-r2_3) to (r2_3);
 \end{scope}
 
-\node[my data node, above=of r2_1] (y1) {$y_1$};
-\node[my data node, above=of r2_2] (y2) {$y_2$};
-\node[my data node, above=of r2_3] (y3) {$y_3$};
+\node[my data node, above=of r2_1] (y1) {$\modHiddenAt{l}_1$};
+\node[my data node, above=of r2_2] (y2) {$\modHiddenAt{l}_2$};
+\node[my data node, above=of r2_3] (y3) {$\modHiddenAt{l}_3$};
 
 \draw[arrow style] (r2_1) to (y1);
 \draw[arrow style] (r2_2) to (y2);

@@ -314,10 +314,16 @@ A naive stochastic gradient optimizer will not achieve good results when trainin
 
 \label{gpt2:block}
 
-\includediagram{diagrams/gpt2/block}{Overview of the GPT2 block components. This example shows 3 positions $x_1 \ldots x_3$, but the actual model is flexible regarding sequence length.}
+
 
 Each block has an attention sub-block, an MLP(multi-layer perceptron) sub-block as well as layer normalization stages and residual connections \citepage{3}{allyouneed} \citepage{4}{improvinglu}.
 The operations of the block are executed for each position $i$, but the learnable parameters are the same independent of the position. Different blocks however have different parameters.
+This structure is shown in \cref{diagrams/gpt2/block}.
+
+\includediagram{diagrams/gpt2/block}{Overview of the components of a GPT2 block with index $\modLayer$. This example shows 3 positions $\modHiddenAt{\modLayer}_1 \ldots \modHiddenAt{\modLayer}_3$, but the actual model is flexible regarding sequence length.}
+
+
+\subsubsection{Learnable parameters}
 
 The learnable parameters of each block are \cite{alammar-gpt2}:
 
@@ -328,6 +334,7 @@ The learnable parameters of each block are \cite{alammar-gpt2}:
  \item weight and bias of the two linear transformations within the MLP sub-block
  \item weight and bias for each of the two layer normalizations (at the end of each layer norm there is a linear transform): $W_{ln_1}, b_{ln_1} W_{ln_2}, b_{ln_2}$
 \end{itemize}
+
 
 \subsubsection{Layer normalization}
 \label{gpt2:layernorm}
