@@ -1,0 +1,25 @@
+\subsubsection{Learnable parameters}
+
+The GPT2 model has learnable parameters in the preprocessing, GPT2 block and postprocessing stages:
+
+\begin{itemize}
+	\item \textbf{Preprocessing:}: For the preprocessing stage (\cref{gpt2_preproc}), the learnable parameters are the embedding matrices $\embTok$ and $\embPos$.
+	\item \textbf{GPT2 block:}: Each of the $\nBlocks$ blocks has its own independent set of learnable parameters, which consist of layer normalization parameters, attention parameters and feed-forward network parameters. They are explained in more detail in \cref{gpt2:block}.
+	\item \textbf{Postprocessing:}: For the postprocessing stage (\cref{gpt2:postproc}), the only learnable parameters are the weights and biases of its layer normalization substage. As the matrix for converting hidden vectors back to token probabilities is tied to $\embTok$, it is not counted here.
+\end{itemize}
+
+
+
+
+
+\subsubsection{Learnable parameters}
+
+The learnable parameters of each block are \cite{alammar-gpt2}:
+
+\begin{itemize}
+	\item weight and bias of the linear transformation that generates query, key, value vectors from the input vector
+	at the start of the attention mechanism: $W_q, b_q, W_k, b_k, W_v, b_v$
+	\item weight and bias of the linear transformation "projection" at the end of the attention mechanism: $W_p$, $b_p$
+	\item weight and bias of the two linear transformations within the MLP sub-block
+	\item weight and bias for each of the two layer normalizations (at the end of each layer norm there is a linear transform): $W_{ln_1}, b_{ln_1} W_{ln_2}, b_{ln_2}$
+\end{itemize}

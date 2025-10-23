@@ -179,15 +179,7 @@ Creating this token sequence from the input text is done by the tokenizer (\cref
 
 \includediagram{diagrams/gpt2/overview}{Overview of a GPT2 model. This example uses a model with $\nBlocks=12$ blocks, $\dHidden=768$ hidden vector size. The model is processing a sequence of length 3. Models can also process longer sequences than shown in this example, up to their positional limit $\nPos$ which is configurable at model creation time as is the number of blocks and hidden vector size.}
 
-\subsubsection{Learnable parameters}
 
-The GPT2 model has learnable parameters in the preprocessing, GPT2 block and postprocessing stages:
-
-\begin{itemize}
-		\item \textbf{Preprocessing:}: For the preprocessing stage (\cref{gpt2_preproc}), the learnable parameters are the embedding matrices $\embTok$ and $\embPos$.
-		\item \textbf{GPT2 block:}: Each of the $\nBlocks$ blocks has its own independent set of learnable parameters, which consist of layer normalization parameters, attention parameters and feed-forward network parameters. They are explained in more detail in \cref{gpt2:block}.
-		\item \textbf{Postprocessing:}: For the postprocessing stage (\cref{gpt2:postproc}), the only learnable parameters are the weights and biases of its layer normalization substage. As the matrix for converting hidden vectors back to token probabilities is tied to $\embTok$, it is not counted here.
-\end{itemize}
 
 \subsubsection{Model size variants}
 
@@ -311,41 +303,26 @@ A naive stochastic gradient optimizer will not achieve good results when trainin
 
 
 \subsection{GPT2 block structure}
-
 \label{gpt2:block}
 
+The GPT2 blocks are the core of the model, where it learns to draw connections between the vectors at different positions, and data can flow between positions.
+Because its structure is somewhat complex, we dedicated this separate section to it.
 
+A high-level overview of the structure of a GPT2 block is presented in \cref{diagrams/gpt2/block}.
+The inputs to the block with index $\modLayer$ are the vectors $\modHiddenAt{l-1}_1 \ldots \modHiddenAt{l-1}_n$, which are the outputs of the previous block. For $\modLayer = 1$, the first block, its inputs $\modHiddenAt{0}_1 \ldots \modHiddenAt{0}_n$ are the outputs of the preprocessing stage (\cref{gpt2_preproc}).
 
-Each block has an attention sub-block, an MLP(multi-layer perceptron) sub-block as well as layer normalization stages and residual connections \citepage{3}{allyouneed} \citepage{4}{improvinglu}.
-The operations of the block are executed for each position $i$, but the learnable parameters are the same independent of the position. Different blocks however have different parameters.
-This structure is shown in \cref{diagrams/gpt2/block}.
+Each block starts with layer normalization (\cref{gpt2:layernorm}). This is followed by the attention mechanism (\cref{gpt2_attn}), then a second layer normalization stage, and finally the Multi-layer perceptron (\cref{gpt2:mlp}). There are residual connections that allow data to flow around the block as well as through it (\cref{gpt2:residual}).
 
 \includediagram{diagrams/gpt2/block}{Overview of the components of a GPT2 block with index $\modLayer$. This example shows 3 positions $\modHiddenAt{\modLayer}_1 \ldots \modHiddenAt{\modLayer}_3$, but the actual model is flexible regarding sequence length.}
 
 
-\subsubsection{Learnable parameters}
-
-The learnable parameters of each block are \cite{alammar-gpt2}:
-
-\begin{itemize}
-\item weight and bias of the linear transformation that generates query, key, value vectors from the input vector
-   at the start of the attention mechanism: $W_q, b_q, W_k, b_k, W_v, b_v$
- \item weight and bias of the linear transformation "projection" at the end of the attention mechanism: $W_p$, $b_p$
- \item weight and bias of the two linear transformations within the MLP sub-block
- \item weight and bias for each of the two layer normalizations (at the end of each layer norm there is a linear transform): $W_{ln_1}, b_{ln_1} W_{ln_2}, b_{ln_2}$
-\end{itemize}
 
 
 \subsubsection{Layer normalization}
 \label{gpt2:layernorm}
 
-\includediagram{diagrams/gpt2/layernorm}{Detailed view of the layer normalization stage of the GPT2 block.}
+Seen in \cref{diagrams/gpt2/layernorm}.
 
-$$x_i = x_{i_j} (1 \leq j \leq n_{hidden})$$
-
-$$x'_{i_j} = \frac {x_{i_j} - \mu(x_i)} {\sqrt {\sigma^2(x_i)+\epsilon}} $$
-
-$$y_{i_j} = a_j x'_{i_j} + b_j$$
 
 $\mu$ and $\sigma^2$ are the mean and variance of a vector, $\epsilon$ is a small positive real constant added for numerical stability, and $a$ and $b$ are learnable gain and bias vectors of dimension $n_{hidden}$.
 
@@ -356,7 +333,28 @@ Layer normalization has the advantage of not suffering from statistical noise wh
 
 The normalization happens independently for each vector $x_i$ (i.e. at each position $i$), but the learnable parameters $a$ and $b$ (like all learnable parameters of the model) are the same for each position.
 
+
+\begin{equation}
+	\modHiddenAt{l-1}_i
+	\label{eq:layernorm_in}
+\end{equation}
+
+\begin{equation}
+	(\modHiddenAt{l, ln1'}_i)_j = \frac
+	{(\modHiddenAt{l-1}_i)_j - \mu(\modHiddenAt{l-1}_i)}
+	{\sqrt {\sigma^2(\modHiddenAt{l-1}_i)+\epsilon}}
+	\label{eq:layernorm_mid}
+\end{equation}
+
+\begin{equation}
+	(\modHiddenAt{l, ln1}_i)_j = a^{(l, ln1)}_j (\modHiddenAt{l, ln1'}_i)_j + b^{(l, ln1)}_j
+	\label{eq:layernorm_out}
+\end{equation}
+
+\includediagram{diagrams/gpt2/layernorm}{Detailed view of the layer normalization stage of the GPT2 block.}
+
 \subsubsection{Residual connection}
+\label{gpt2:residual}
 
 \begin{samepage}
 
@@ -440,6 +438,7 @@ Positions after $i$ $(j > i)$ are not considered because of the autoregressive n
 \end{itemize}
 
 \subsubsection{Multi-layer perceptron}
+\label{gpt2:mlp}
 
 \includediagram{diagrams/gpt2/mlp}{Multi-layer perceptron stage of the GPT2 block. It is a simple feed-forward neural network with two linear steps with bias and an activation function in between.}
 

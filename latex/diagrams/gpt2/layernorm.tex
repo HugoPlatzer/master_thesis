@@ -27,22 +27,6 @@ x_{1_{(1)}} & x_{1_{(2)}} & \cdots & x_{1_{(d)}} \\
 
 \coordinate (dd) at ($(dx) + (-2mm, 0)$);
 
-\node[caption node, align=right, left=of dd] (ddx) {
-$
-\begin{aligned} 
-x_i &\in \mathbb{R}^{d_{hidden}} \\
-x_{i_{(d)}} &\in \mathbb{R} \\
-\end{aligned}
-$
-};
-\node[caption node, align=right, left=of m-1-1 -| dd] (ddy) {
-$
-\begin{aligned} 
-y_i &\in \mathbb{R}^{d_{hidden}} \\
-y_{i_{(d)}} &\in \mathbb{R} \\
-\end{aligned}
-$
-};
 
 
 \node[caption node, left=of m-2-1 -| dd] {Add per-position bias $b_j$};
