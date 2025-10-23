@@ -7,7 +7,7 @@ Classical dense/feed-forward neural networks are a poor fit for such tasks, as t
 Thus researchers started using approaches like recurrent neural networks (RNN) \cite{phrasereps}, convolutional neural networks (CNN) \cite{convseq} and long short-term memory (LSTM) \cite{seq2seq}.
 While these approaches did make the parameter count more manageable due to their sparse architecture, they still had issues with training on long sequences and learning long-distance correlations within a sequence.
 
-Transformer models were introduced in \cite{allyouneed} in the context of machine translation to help address the aforementioned issues. Later on, they proved useful for many other tasks. 
+Transformer models were introduced in the influential paper "Attention as all you need" \cite{allyouneed} in the context of machine translation to help address the aforementioned issues. Later on, they proved useful for many other tasks. 
 
 Due to their parallelized architecture which will be explained in detail later, transformers allow for training on long sequences in a single optimization step, greatly increasing training throughput \citepage{1}{allyouneed}. They also have full connection between any two points in the sequence in each layer of the network, mitigating the problem of long-range dependencies being only considered across multiple model steps/layers in CNNs or RNNs which makes information loss more likely \citepage{6}{allyouneed}.
 
@@ -130,6 +130,25 @@ After sufficient pre-training, the model is then fine-tuned on question-answer p
 
 Due to the well-known phenomenon of transfer learning \cite{transferlearning}, the pre-trained model will have already internalized the structure of natural language, source code and maths. 
 This allows a relatively small amount of hand picked fine-tuning examples to make it significantly stronger compared to just training on the question-answer pairs on a freshly initalized model \citepage{8}{improvinglu}.
+
+\subsection{Attention mechanism}
+
+Before transformers, model architectures such as recurrent neural networks (RNN) and Long Short Term Memory (LSTM) were commonly used to handle textual or other sequential data. They ingest the tokenized text one token at a time, keeping one or multiple fixed vectors of model state. Transformers, in contrast, dropped recurrence and handle the entire sequence in parallel \citepage{1}{allyouneed}.
+
+To draw connections between elements of the token sequence, they use a so-called attention mechanism. It is in fact the only part of the model that connects the different parts of the sequence it is processing, all other components of a transformer model handle each position independently. The concept of an attention mechanism is best explained using a high-level example \cite{alammar-gpt2}: Suppose the model is processing the sentence "A robot must obey orders given to it" and each word is one token. The model should learn that there is a connection from the pronoun "it" to the earlier noun "robot".
+The model's attention mechanism would do the following when handling the token "it":
+\begin{enumerate}
+	\item Generate a query vector $\mathbf{q}_{\mathrm{it}} = f_q("\mathrm{it}")$ for the token "it" using a function $f_q$ that depends on learned parameters of the model (often a linear transformation).
+	\item Generate key vectors $\mathbf{k}_t$ for all the tokens $t$ of the sentence, using another learned function $f_k$: $\mathbf{k}_{\mathrm{a}} = f_k(\mathrm{"a"})$, $\mathbf{k}_{\mathrm{robot}} = f_k(\mathrm{"robot"})$, \ldots, $\mathbf{k}_{\mathrm{it}} = f_k(\mathrm{"it")}$.
+	\item Compute numeric similarity scores $s$ between the query vector and each key vector, using a measure like dot product: $s_{\mathrm{a}} = \mathbf{\mathbf{q}}_{\mathrm{it}} \cdot \mathbf{k}_{\mathrm{a}}$, $s_{\mathrm{robot}} = \mathbf{q}_{\mathrm{it}} \cdot \mathbf{k}_{\mathrm{robot}}$, \ldots, $s_{\mathrm{it}} = \mathbf{q}_{\mathrm{it}} \cdot \mathbf{k}_{\mathrm{it}}$.
+	\item Normalize the similarity scores $s$ using Softmax to get the normalized scores $s'_t$ for each token $t$. This ensures that $\sum_t s'_t = 1$.
+	\item Generate value vectors $\mathbf{v}_t$ for all the tokens $t$ of the sentence, using another learned function $f_v$: $\mathbf{v}_{\mathrm{a}} = f_v(\mathrm{"a"})$, $\mathbf{v}_{\mathrm{robot}} = f_v(\mathrm{"robot"})$, \ldots, $\mathbf{v}_{\mathrm{it}} = f_v(\mathrm{"it")}$.
+	\item Using the normalized similarity scores, blend the value vectors together to get the attention output vector for "it": $\mathbf{a}_{\mathrm{it}} = \sum_t s'_t \mathbf{v}_t$. 
+\end{enumerate}
+
+Assuming the model has learned to generate meaningful query and key vectors, the similarity score to the query of "it" should be much higher for the key of "robot" than for the other positions' keys. This would cause the attention output vector of "it" to mostly consist of the value vector of the token "robot", with the other positions' value vectors having little impact. Thus data flows to the position of the token "it" mostly from the position of the token "robot", which models the linguistic connection between these words.
+
+It has to be said however that this explanation has been simplified considerably. Transformer models do not operate on words or tokens directly but first transform them into vectors of fixed size that are then fed through the attention mechanism. There are multiple stacked blocks inside a typical transformer model, each consisting of an attention mechanism among other components. A more precise description of the attention mechanism of a realistic transformer model is given in \cref{gpt2_attn}.
 
 \subsection{OpenAI GPT2}
 
