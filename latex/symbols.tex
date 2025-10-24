@@ -2,16 +2,19 @@
 \newcommand{\modOut}{{\mathbf{y}}}
 \newcommand{\modTarget}{{\hat{\mathbf{y}}}}
 \newcommand{\modLayer}{{l}}
-\newcommand{\modHiddenAt}[1]{{\mathbf{h}^{(#1)}}}
-\newcommand{\nPos}{{n_{pos}}}
-\newcommand{\dVocab}{{d_{vocab}}}
-\newcommand{\dHidden}{{d_{hidden}}}
-\newcommand{\nBlocks}{{n_{blocks}}}
-\newcommand{\nHeads}{{n_{heads}}}
-\newcommand{\dHead}{{d_{head}}}
+\newcommand{\modHidden}{{\mathbf{h}}}
+\newcommand{\modHiddenAt}[1]{{\modHidden^{(#1)}}}
+\newcommand{\modHiddenStep}[1]{{\modHidden^{[#1]}}}
+\newcommand{\AtLayer}[1]{{^{(#1)}}}
+\newcommand{\nPos}{{n_\textrm{pos}}}
+\newcommand{\dVocab}{{d_\textrm{vocab}}}
+\newcommand{\dHidden}{{d_\textrm{hidden}}}
+\newcommand{\nBlocks}{{n_\textrm{blocks}}}
+\newcommand{\nHeads}{{n_\textrm{heads}}}
+\newcommand{\dHead}{{d_\textrm{head}}}
 
 
-\newcommand{\embTok}{{\mathbf{E}_{tok}}}
-\newcommand{\embPos}{{\mathbf{E}_{pos}}}
+\newcommand{\embTok}{{\mathbf{E}_\textrm{tok}}}
+\newcommand{\embPos}{{\mathbf{E}_\textrm{pos}}}
 \newcommand{\embTokAt}[1]{{\embTok[#1]}}
 \newcommand{\embPosAt}[1]{{\embPos[#1]}}

@@ -251,18 +251,18 @@ GPT2 uses a "language modeling head" \cite{HuggingFaceGPT2} to convert the outpu
 
 First, a final layer normalization step is performed \citepage{4}{unsupervisedmultitask}, which transforms $\modHiddenAt{\nBlocks}_i$ into $\modHiddenAt{\nBlocks, norm}_i$. The details of this layer normalization step are  the same as the layer normalization steps in each GPT2 block, which are described in \cref{gpt2:layernorm}.
 
-GPT2 then re-uses the same matrix $\embTok$ that was used in the preprocessing stage to convert $\modHiddenAt{\nBlocks, norm}_i$ into a token probability vector $\modOut'_i$ of dimension $\dVocab$, using matrix-vector product, as shown in \cref{eq:postproc}.
+GPT2 then re-uses the same matrix $\embTok$ that was used in the preprocessing stage to convert $\modHiddenAt{\nBlocks, norm}_i$ into a token probability vector $\modOut'_i$ of dimension $\dVocab$, using matrix-vector product, as shown in \cref{eq:postproc} and \cref{eq:postproc_detailed}.
 This tying of the weights in the postprocessing stage to those of the preprocessing stage is done for improving model performance as well as reducing the number of learnable parameters \cite{weightstying}.
 
 Finally, softmax is applied to transform this vector $\modOut'_i$ into a proper probability distribution $\modOut_i$.
 
-\begin{equation}
-	\begin{aligned}
-		\modOut'_i &= \embPos \modHiddenAt{\nBlocks, norm}_i \\
-		(\modOut'_i)_k &= \sum_{j=1}^{\dHidden}{\embPosAt{k,j} (\modHiddenAt{\nBlocks, norm}_i)_j} && 1 \leq k \leq \dVocab
-	\end{aligned}
+\begin{align}
+	\modOut'_i &= \embPos \modHiddenAt{\nBlocks, \textrm{norm}}_i
 	\label{eq:postproc}
-\end{equation}
+	\\
+	(\modOut'_i)_k &= \sum_{j=1}^{\dHidden}{\embPosAt{k,j} (\modHiddenAt{\nBlocks, \textrm{norm}}_i)_j} & 1 \leq k \leq \dVocab
+	\label{eq:postproc_detailed}
+\end{align}
 
 \includediagram{diagrams/gpt2/postproc}{Detailed example of the GPT2 postprocessing stage. $\modHiddenAt{\nBlocks}_i$, the output of the last GPT2 block, is converted into token probabilities.}
 
@@ -307,68 +307,102 @@ A naive stochastic gradient optimizer will not achieve good results when trainin
 
 The GPT2 blocks are the core of the model, where it learns to draw connections between the vectors at different positions, and data can flow between positions.
 Because its structure is somewhat complex, we dedicated this separate section to it.
+A high-level overview of the structure of a GPT2 block is presented in \cref{diagrams/gpt2/block} as well as equations \eqref{eq:gpt2_overview_start} to \eqref{eq:gpt2_overview_end}:
 
-A high-level overview of the structure of a GPT2 block is presented in \cref{diagrams/gpt2/block}.
-The inputs to the block with index $\modLayer$ are the vectors $\modHiddenAt{l-1}_1 \ldots \modHiddenAt{l-1}_n$, which are the outputs of the previous block. For $\modLayer = 1$, the first block, its inputs $\modHiddenAt{0}_1 \ldots \modHiddenAt{0}_n$ are the outputs of the preprocessing stage (\cref{gpt2_preproc}).
+\begin{enumerate}
+	\item \Cref{eq:gpt2_overview_start} shows the input vectors to the block with index $\modLayer$, given as $\modHiddenAt{l, 0}_1 \ldots \modHiddenAt{l, 0}_n$, are the are the outputs of the previous block $\modHiddenAt{l-1}_1 \ldots \modHiddenAt{l-1}_n$. For the first block, its inputs are the outputs of the preprocessing stage (\cref{gpt2_preproc}).
+	
+	\item The first step of each block is a layer normalization stage, described by \cref{eq:gpt2_overview_ln1}. It is explained in more detail in \cref{gpt2:layernorm}.
+	
+	\item After the layer normalization stage the vectors pass through the heart of the block - the attention mechanism. \Cref{eq:gpt2_overview_attn} shows that the attention mechanism, in contrast to the other stages, needs access to the entire vector sequence $\modHiddenAt{l, 1}_1 \ldots \modHiddenAt{l, 1}_n$ as well as the position $i$ for which to compute the attention output. This is necessary because it connects the vectors at the different positions and lets data flow between them. The attention mechanism is explained in detail in \cref{gpt2_attn}.
+	
+	\item After the attention mechanism, there is a residual connection described by \cref{eq:gpt2_overview_res1}, which lets data flow around the layer norm and attention stages as well as through it. The motivation behind this is explained in \cref{gpt2:residual}.
+	
+	\item Then, there is a second layer normalization stage described by \cref{eq:gpt2_overview_ln2}. It works the same as the first layer normalization stage, but with separate learnable parameters. It is followed by the multi-layer perceptron (MLP) stage, described by \cref{eq:gpt2_overview_mlp}. This stage is a basic feed-forward network with one hidden layer, explained in in \cref{gpt2:mlp}.
+	
+	\item Finally, there is a second residual connection, described by \cref{eq:gpt2_overview_res2}, whose outputs as defined by \cref{eq:gpt2_overview_end} are the outputs of the block, $\modHiddenAt{l}_1 \ldots \modHiddenAt{l}_n$.
+\end{enumerate}
 
-Each block starts with layer normalization (\cref{gpt2:layernorm}). This is followed by the attention mechanism (\cref{gpt2_attn}), then a second layer normalization stage, and finally the Multi-layer perceptron (\cref{gpt2:mlp}). There are residual connections that allow data to flow around the block as well as through it (\cref{gpt2:residual}).
+
+The layer normalization, attention and MLP stages all have learnable parameters, with each GPT2 block having a separate set of such learnable parameters. All stages except the attention stage operate on each vector $\modHidden_i$ independently.
+
+
+\begin{align}
+	\modHiddenAt{l, 0}_i &= \modHiddenAt{l-1}_i
+	\label{eq:gpt2_overview_start}
+	\\
+	\modHiddenAt{l, 1}_i &= \mathrm{LN1}\AtLayer{l}(\modHiddenAt{l, 0}_i)
+	\label{eq:gpt2_overview_ln1}
+	\\
+	\modHiddenAt{l, 2}_i &= \mathrm{ATTN}\AtLayer{l}(i, \modHiddenAt{l, 1}_1 \ldots \modHiddenAt{l, 1}_n)
+	\label{eq:gpt2_overview_attn}
+	\\
+	\modHiddenAt{l, 3}_i &= \modHiddenAt{l, 0}_i + \modHiddenAt{l, 2}_i
+	\label{eq:gpt2_overview_res1}
+	\\
+	\modHiddenAt{l, 4}_i &= \mathrm{LN2}\AtLayer{l}(\modHiddenAt{l, 3}_i)
+	\label{eq:gpt2_overview_ln2}
+	\\
+	\modHiddenAt{l, 5}_i &= \mathrm{MLP}\AtLayer{l}(\modHiddenAt{l, 4}_i)
+	\label{eq:gpt2_overview_mlp}
+	\\
+	\modHiddenAt{l, 6}_i &= \modHiddenAt{l, 3}_i + \modHiddenAt{l, 5}_i
+	\label{eq:gpt2_overview_res2}
+	\\
+	\modHiddenAt{l}_i &= \modHiddenAt{l, 6}_i
+	\label{eq:gpt2_overview_end}
+\end{align}
+
+
 
 \includediagram{diagrams/gpt2/block}{Overview of the components of a GPT2 block with index $\modLayer$. This example shows 3 positions $\modHiddenAt{\modLayer}_1 \ldots \modHiddenAt{\modLayer}_3$, but the actual model is flexible regarding sequence length.}
 
+\subsubsection{Notation used}
+\label{gpt2:notation}
 
-
+To keep the diagrams and equations readable when describing the stages of the GPT2 block (layer norm, attention, MLP) next, we define the inputs to the stage simply as $\modHidden_i$ for each position $i$ from 1 to $n$, intermediate results as $\modHiddenStep{1}_i$ and the outputs as $\modHidden'_i$, dropping the block index $l$ and stage index.
+Each block and each stage of the block has separate, independent learnable parameters despite this not being reflected in the notation used below.
 
 \subsubsection{Layer normalization}
 \label{gpt2:layernorm}
 
-Seen in \cref{diagrams/gpt2/layernorm}.
+The two layer normalization stages of the GPT2 block are illustrated \cref{diagrams/gpt2/layernorm} as well as equations \eqref{eq:gpt2:ln_intermediate} to \eqref{eq:gpt2:ln_ln2}.
+
+First, the input vector $\modHidden_i$ is normalized in \cref{eq:gpt2:ln_intermediate} by subtracting its mean $\mu$ and dividing by its standard deviation $\sigma$, with $\epsilon$ being a small positive constant added for numerical stability of the square root.
+
+Then, a gain and bias value is applied per component to the intermediate result $\modHiddenStep{1}_i$. The first layer normalization stage LN1 uses learnable gain and bias vectors $\mathbf{a}_\mathrm{LN1}, \mathbf{b}_\mathrm{LN1} \in \mathbb{R}^\dHidden$ as described in \cref{eq:gpt2:ln_ln1}.
+The second layer normalization stage LN2 uses separate gain and bias vectors $\mathbf{a}_\mathrm{LN2}, \mathbf{b}_\mathrm{LN2} \in \mathbb{R}^\dHidden$ as described in \cref{eq:gpt2:ln_ln2}.
 
 
-$\mu$ and $\sigma^2$ are the mean and variance of a vector, $\epsilon$ is a small positive real constant added for numerical stability, and $a$ and $b$ are learnable gain and bias vectors of dimension $n_{hidden}$.
+\begin{align}
+	(\modHiddenStep{1}_i)_j &= \frac
+		{(\modHidden_i)_j - \mu(\modHidden_i)}
+		{\sqrt {\sigma^2(\modHidden_i)+\epsilon}}
+	\label{eq:gpt2:ln_intermediate}
+	\\
+	(\modHidden'_i)_j &= (\mathbf{a}_{\textrm{LN1}})_j (\modHiddenStep{1}_i)_j + (\mathbf{b}_{\textrm{LN1}})_j
+	\label{eq:gpt2:ln_ln1}
+	\\
+	(\modHidden'_i)_j &= (\mathbf{a}_{\textrm{LN2}})_j (\modHiddenStep{1}_i)_j + (\mathbf{b}_{\textrm{LN2}})_j
+	\label{eq:gpt2:ln_ln2}
+\end{align}
 
-Layer normalization subtracts the mean and divides by the standard deviation among all features of the input vector.
-After this normalization, it applies a learned gain and bias value for each component of the vector.
-This is in contrast to batch normalization, where each individual feature $x_{i_j}$ is normalized along the batch dimension \citepage{1-2}{ba2016layer}.
-Layer normalization has the advantage of not suffering from statistical noise when the batch size is too small.
-
-The normalization happens independently for each vector $x_i$ (i.e. at each position $i$), but the learnable parameters $a$ and $b$ (like all learnable parameters of the model) are the same for each position.
-
-
-\begin{equation}
-	\modHiddenAt{l-1}_i
-	\label{eq:layernorm_in}
-\end{equation}
-
-\begin{equation}
-	(\modHiddenAt{l, ln1'}_i)_j = \frac
-	{(\modHiddenAt{l-1}_i)_j - \mu(\modHiddenAt{l-1}_i)}
-	{\sqrt {\sigma^2(\modHiddenAt{l-1}_i)+\epsilon}}
-	\label{eq:layernorm_mid}
-\end{equation}
-
-\begin{equation}
-	(\modHiddenAt{l, ln1}_i)_j = a^{(l, ln1)}_j (\modHiddenAt{l, ln1'}_i)_j + b^{(l, ln1)}_j
-	\label{eq:layernorm_out}
-\end{equation}
-
-\includediagram{diagrams/gpt2/layernorm}{Detailed view of the layer normalization stage of the GPT2 block.}
+\includediagram{diagrams/gpt2/layernorm}{Detailed view of the layer normalization stages of the GPT2 block. $d=\dHidden$. For the first layer norm LN1, $\mathbf{a}=\mathbf{a}_\mathrm{LN1}, \mathbf{b}=\mathbf{b}_\mathrm{LN1}$. For the second layer norm LN2, $\mathbf{a}=\mathbf{a}_\mathrm{LN2}, \mathbf{b}=\mathbf{b}_\mathrm{LN2}$.}
 
 \subsubsection{Residual connection}
 \label{gpt2:residual}
 
-\begin{samepage}
+A residual connection, as described in \cref{eq:gpt2_res}, works by adding the inputs of some function $f$, like a layer in a machine learning model, back to its outputs \citepage{3}{allyouneed} \cite{residual}.
+When using residual connections, the input data does not need to flow through all computation steps before reaching a given point, instead it can bypass some of them, allowing later computations easier access to earlier data.
+Such connections are found in almost all models having many steps/layers, because they were found to greatly help when training deep models \citepage{1-2}{residual}.
 
-$$y_i = x_i + f(x_i)$$
+\begin{align}
+	\modHidden'_i = \modHidden_i + f(\modHidden_i)
+	\label{eq:gpt2_res}
+\end{align}
 
-as opposed to $y_i = f(x_i)$ without a residual connection \citepage{3}{allyouneed} \cite{residual}.
 
-A residual connection allows the input to "bypass" the learned function of the model, by adding the input to the output vector.
-Such connections are found in almost all models having many steps/layers, because they were found to greatly help when training deep models.
-This is because when using residual connections, the input data does not need to flow through all computation steps before reaching a given point, instead it can bypass some of them, allowing later computations to access earlier data \citepage{1-2}{residual}.
-
-\end{samepage}
-
-\subsubsection{Attention mechanism}
+\subsubsection{Multi-head attention}
 \label{gpt2_attn}
 
 \includediagram{diagrams/gpt2/attention_multihead}{Structure of the Multi-head attention mechanism. This example uses two positions $x_1, x_2$ and two attention heads $h_1, h_2$. The actual model can in theory handle arbitrary sequence lengths and also has more attention heads.}
@@ -437,14 +471,30 @@ Positions after $i$ $(j > i)$ are not considered because of the autoregressive n
 
 \end{itemize}
 
+
+\subsubsection{Scaled Dot-product attention}
+
 \subsubsection{Multi-layer perceptron}
 \label{gpt2:mlp}
 
+
+The multi-layer perceptron stage in the GPT2 block is a simple feed-forward neural network with one hidden layer \citepage{5}{allyouneed}, illustrated in \cref{diagrams/gpt2/mlp}.
+
+In contrast to the original transformer paper, GPT2 uses the Gaussian Error Linear Unit (GELU) activation function \citepage{5}{improvinglu}.
+The GELU function for a real input $z$ is defined in \cref{eq:gpt2:gelu} as $z$ multiplied by the probability that a random variable $Z$ which follows a normal distrbution with mean 0 and variance 1 is less than $z$ \cite{gelu}.
+
+The input vector $\modHidden_i$ is first subjected to a linear transformation with weights $\mathbf{W}_\textrm{MLP1}$ and biases $\mathbf{b}_\textrm{MLP1}$, followed by applying GELU to each component, to get the intermediate $\modHiddenStep{1}_i$, as described by \cref{eq:gpt2:mlp1}. The size of this intermediate vector is dependent on the dimensions of the learnable weight matrices and bias vectors $\mathbf{W}_\textrm{MLP1}, \mathbf{W}_\textrm{MLP2}, \mathbf{b}_\textrm{MLP1}, \mathbf{b}_\textrm{MLP2}$, which are typically configured such that the dimension of $\modHiddenStep{1}_i$ is $4 \cdot \dHidden$ \citepage{5}{allyouneed} \cite[source code]{HuggingFaceGPT2}.
+Then another linear transformation happens in \cref{eq:gpt2:mlp2} with a different set of learnable parameters $\mathbf{W}_\textrm{MLP2}, \mathbf{b}_\textrm{MLP2}$ to get the output $\modHidden'_i$ with dimension $\dHidden$.
+
+\begin{align}
+	\mathrm{GELU}(z) &= z \cdot P(Z<z) & z \in \mathbb{R}
+	\label{eq:gpt2:gelu}
+	\\
+	\modHiddenStep{1}_i &= \mathrm{GELU}(\mathbf{W}_\textrm{MLP1} \modHidden_i + \mathbf{b}_\textrm{MLP1})
+	\label{eq:gpt2:mlp1}
+	\\
+	\modHidden'_i & = \mathbf{W}_\textrm{MLP2} \modHiddenStep{1}_i + \mathbf{b}_\textrm{MLP2}
+	\label{eq:gpt2:mlp2}
+\end{align}
+
 \includediagram{diagrams/gpt2/mlp}{Multi-layer perceptron stage of the GPT2 block. It is a simple feed-forward neural network with two linear steps with bias and an activation function in between.}
-
-This is a simple feed-forward neural network with one hidden layer \citepage{5}{allyouneed}.
-As opposed to the original transformer, GPT2 uses the Gaussian Error Linear Unit (GELU) activation function \citepage{5}{improvinglu}, which is defined as follows \cite{gelu}: $gelu(x) = x \ P(X<x)$ when $X$ follows a normal distrbution with mean 0 and variance 1.
-
-$$x'_i = gelu(W_c x_i + b_c)$$
-$$y_i = W_p x'_i + b_p$$
-
