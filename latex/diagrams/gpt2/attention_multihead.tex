@@ -178,51 +178,32 @@ node distance=15mm and 0mm,
 \draw[arrow style] (cv1h2s) to (cv1h2s|-attn1.south);
 \draw[arrow style] (cv2h2s) to (cv2h2s|-attn1.south);
 
-\node[medium container node, above=of attn1, anchor=west] (ca2h1) {};
-\node[medium container node, above=of attn2, anchor=west] (ca2h2) {};
+\node[medium container node, above=of attn1] (ca2h1) {};
+\node[medium container node, above=of attn2] (ca2h2) {};
 
-%\node [data node] (a1h1) at (ca1h1) {$\mathbf{a}_{1_{ \textcolor{h1color}{1} }}$};
 \node [data node] (a2h1) at (ca2h1) {$\mathbf{a}_{2_{ \textcolor{h1color}{1} }}$};
-%\node [data node] (a1h2) at (ca1h2) {$\mathbf{a}_{1_{ \textcolor{h2color}{2} }}$};
 \node [data node] (a2h2) at (ca2h2) {$\mathbf{a}_{2_{ \textcolor{h2color}{2} }}$};
 
-%\draw[my arrow style] (attn1.north-|ca1h1) to ( ca1h1);
-\draw[my arrow style] (attn1.north-|ca2h1) to ( ca2h1);
-%\draw[my arrow style] (attn1.north-|ca1h2) to ( ca1h2);
-\draw[my arrow style] (attn1.north-|ca2h2) to ( ca2h2);
+\draw[my arrow style] (attn1.north-|ca2h1) to (ca2h1);
+\draw[my arrow style] (attn1.north-|ca2h2) to (ca2h2);
 
-%\node[medium container node, above=of ca1h1] (ca1h1s) {};
-%\node[medium container node, above=of ca1h2] (ca2h1s) {};
-%\node[medium container node, above=of ca2h1] (ca1h2s) {};
-%\node[medium container node, above=of ca2h2] (ca2h2s) {};
+\coordinate (midpoint) at ($(ca2h1)!0.5!(ca2h2)$);
+\node[medium container node, above=of midpoint] (ca2) {};
+\node[data node] (a2) at (ca2) {$\mathbf{a}_2$};
 
+\draw[my arrow style] (ca2h1) to (ca2);
+\draw[my arrow style] (ca2h2) to (ca2);
 
-%\node[medium container node, large gap, above=of ca1h1s.east] (ca1) {};
-%\node[medium container node, large gap, above=of ca2h1s.east] (ca2) {};
+\node[my block node, color 3, above=of ca2] (lproj) {Linear};
 
-%\node[data node] (a1) at (ca1) {$\mathbf{a}_1$};
-%\node[data node] (a2) at (ca2) {$\mathbf{a}_2$};
+\draw[my arrow style] (ca2) to (lproj);
 
-%\draw[my arrow style] (ca1h1s) to (ca1);
-%\draw[my arrow style] (ca1h2s) to (ca1);
-%\draw[my arrow style] (ca2h1) to (ca2);
-%\draw[my arrow style] (ca2h2) to (ca2);
+\node[medium container node, above=of lproj] (cout) {};
+\node[data node] (out) at (cout) {$\modHidden'_2$};
+
+\draw[my arrow style] (lproj) to (out);
 
 
-%\node[my block node, color 3, above=of ca1] (ll1) {Linear};
-%\node[my block node, color 3, above=of ca2] (ll2) {Linear};
-
-%\draw[my arrow style] (ca1) to (ll1);
-%\draw[my arrow style] (ca2) to (ll2);
-
-%\node[medium container node, above=of ll1] (cy1) {};
-%\node[medium container node, above=of ll2] (cy2) {};
-
-%\node[data node] (y1) at (cy1) {$\modHidden'_1$};
-%\node[data node] (y2) at (cy2) {$\modHidden'_2$};
-
-%\draw[my arrow style] (ll1) to (cy1);
-%\draw[my arrow style] (ll2) to (cy2);
 
 \coordinate (dalign) at ($(l1.west) - (2mm, 0mm)$);
 \node[my caption node, anchor=east] at (dalign) {Apply linear transforms $(\mathbf{W}_{q}, \mathbf{b}_{q}), (\mathbf{W}_{k}, \mathbf{b}_{k}), (\mathbf{W}_{v}, \mathbf{b}_{v})$ to each input vector $\modHidden_i$ to get query, key, and value vectors};
@@ -231,8 +212,8 @@ node distance=15mm and 0mm,
 \coordinate (sortmid) at ($(q1h1)!0.5!(q1h1s)$);
 \node[my caption node, anchor=east]  at (dalign|-sortmid) {Group vectors first by head, then type, then position};
 \node[my caption node, anchor=east]  at (dalign|-attn1) {Compute attention outputs for each head using scaled dot-product attention};
-%\coordinate (a1h1mid) at ($(a1h1)!0.5!(a1h1s)$);
-%\node[my caption node, anchor=east]  at (dalign|-a1h1mid) {Group attention outputs first by position, then head};
-%\coordinate (a1h1smid) at ($(a1h1s)!0.5!(a1)$);
-%\node[my caption node, anchor=east]  at (dalign|-a1h1smid) {Concatenate heads for each attention output position};
-%\node[my caption node, anchor=east]  at (dalign|-ll1) {Apply linear transform \\ $(\mathbf{W}_\mathrm{proj}, \mathbf{b}_\mathrm{proj})$};
+
+\coordinate (concatmid) at ($(ca2h1)!0.5!(ca2)$);
+\node[my caption node, anchor=east]  at (dalign|-concatmid) {Concatenate attention outputs of all heads};
+
+\node[my caption node, anchor=east]  at (dalign|-lproj) {Apply linear transform \\ $(\mathbf{W}_\mathrm{proj}, \mathbf{b}_\mathrm{proj})$};
