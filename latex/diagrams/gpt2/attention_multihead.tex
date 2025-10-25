@@ -236,7 +236,7 @@ node distance=15mm and 0mm,
 \draw[my arrow style] (ll2) to (cy2);
 
 \coordinate (dalign) at ($(l1.west) - (2mm, 0mm)$);
-\node[my caption node, anchor=east] at (dalign) {Apply linear transform $c_{attn}$ to each input vector $x_i$ to get query, key, and value vectors};
+\node[my caption node, anchor=east] at (dalign) {Apply linear transform $W_{q}$ to each input vector $x_i$ to get query, key, and value vectors};
 \coordinate (q1mid) at ($(q1)!0.5!(q1h1)$);
 \node[my caption node, anchor=east] at (dalign|-q1mid) {Split vectors into parts ("attention heads") of equal size};
 \coordinate (sortmid) at ($(q1h1)!0.5!(q1h1s)$);
@@ -246,4 +246,4 @@ node distance=15mm and 0mm,
 \node[my caption node, anchor=east]  at (dalign|-a1h1mid) {Group attention outputs first by position, then head};
 \coordinate (a1h1smid) at ($(a1h1s)!0.5!(a1)$);
 \node[my caption node, anchor=east]  at (dalign|-a1h1smid) {Concatenate heads for each attention output position};
-\node[my caption node, anchor=east]  at (dalign|-ll1) {Apply linear transform $c_{proj}$};
+\node[my caption node, anchor=east]  at (dalign|-ll1) {Apply linear transform \\ $\mathbf{W}_\mathrm{proj}, \mathbf{b}_\mathrm{proj}$};

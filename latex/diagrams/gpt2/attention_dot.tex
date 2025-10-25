@@ -37,16 +37,16 @@ node distance=10mm and 0mm,
 \node[container node, right=of k1c] (k2c) {};
 \node[container node, right=of k2c] (k3c) {};
 
-\node[my data node] (k1) at (k1c) {$k_1$};
-\node[my data node] (k2) at (k2c) {$k_2$};
-\node[my data node] (k3) at (k3c) {$k_3$};
+\node[my data node] (k1) at (k1c) {$\mathbf{k}_1$};
+\node[my data node] (k2) at (k2c) {$\mathbf{k}_2$};
+\node[my data node] (k3) at (k3c) {$\mathbf{k}_3$};
 
-\node[my caption node, below=of k1.south west, anchor=north west, align=left] (dk) {\textbf{Key vectors at positions up to} $p$};
-\node[my data node, below=of dk.south west, anchor=north west] {$k_i \in \mathbb{R}^{d_{hidden}}$};
+\node[my caption node, below=of k1.south west, anchor=north west, align=left] (dk) {\textbf{Key vectors at positions} $i' \leq i$};
+\node[my data node, below=of dk.south west, anchor=north west] {$\mathbf{k}_{i'} \in \mathbb{R}^\dHidden$};
 
-\node[my data node, left=5mm of k1c] (q3) {$q_3$};
-\node[my caption node, below=of q3.south east, anchor=north east] (dq) {\textbf{Query vector at position} $p$};
-\node[my data node, below=of dq.south east, anchor=north east] {$q_i \in \mathbb{R}^{d_{hidden}}$};
+\node[my data node, left=5mm of k1c] (q3) {$\mathbf{q}_3$};
+\node[my caption node, below=of q3.south east, anchor=north east] (dq) {\textbf{Query vector at position} $i$};
+\node[my data node, below=of dq.south east, anchor=north east] {$\mathbf{q}_i \in \mathbb{R}^\dHidden$};
 
 \node[my block node, large gap, color 1, above=of k1] (k1dot) {Dot \\ product};
 \node[my block node,  large gap, color 1, above=of k2] (k2dot) {Dot \\ product};
@@ -60,25 +60,19 @@ node distance=10mm and 0mm,
 \draw[arrow style] (k2) to (k2dot);
 \draw[arrow style] (k3) to (k3dot);
 
+\node[my caption node, anchor=east] at (q3.east |- k1dot) (dw) {
+	\textbf{Dot product gives attention weights} \\
+	\mbox{$w_{i'i} \in \mathbb{R}$}
+};
+\node[my data node, below=of dw.south east, anchor=north east] {};
 
-\node[data node, above=of k1dot] (w13) {$w_{13}$};
-\node[data node, above=of k2dot] (w23) {$w_{23}$};
-\node[data node, above=of k3dot] (w33) {$w_{33}$};
+\node[circle math node, above=of k1dot] (s1) {$\cdot \frac{1}{\vphantom{x^{y^z}} \sqrt{\dHead}}$};
+\node[circle math node, above=of k2dot] (s2) {$\cdot \frac{1}{\vphantom{x^{y^z}} \sqrt{\dHead}}$};
+\node[circle math node, above=of k3dot] (s3) {$\cdot \frac{1}{\vphantom{x^{y^z}} \sqrt{\dHead}}$};
 
-\draw[arrow style] (k1dot) to (w13);
-\draw[arrow style] (k2dot) to (w23);
-\draw[arrow style] (k3dot) to (w33);
-
-\node[my caption node, anchor=east] at (q3.east |- w13) (dw) {\textbf{Attention weights}};
-\node[my data node, below=of dw.south east, anchor=north east] {$w_{ij} \in \mathbb{R}$};
-
-\node[circle math node, above=of w13] (s1) {$\cdot \frac{1}{\vphantom{x^{y^z}} \sqrt{d_{head}}}$};
-\node[circle math node, above=of w23] (s2) {$\cdot \frac{1}{\vphantom{x^{y^z}} \sqrt{d_{head}}}$};
-\node[circle math node, above=of w33] (s3) {$\cdot \frac{1}{\vphantom{x^{y^z}} \sqrt{d_{head}}}$};
-
-\draw[arrow style] (w13) to (s1);
-\draw[arrow style] (w23) to (s2);
-\draw[arrow style] (w33) to (s3);
+\draw[arrow style] (k1dot) to (s1);
+\draw[arrow style] (k2dot) to (s2);
+\draw[arrow style] (k3dot) to (s3);
 
 \node[my caption node, anchor=east] at (q3.east |- s1) {\textbf{Apply scaling factor}};
 
@@ -98,15 +92,15 @@ node[my block node, minimum width=\n1, color 3, above=of s2] (soft) {Softmax};
 
 \coordinate (softmid) at ($(soft)!0.5!(mul2)$);
 
-\node[my data node] (v3) at (q3 |- softmid) {$v_3$};
+\node[my data node] (v3) at (q3 |- softmid) {$\mathbf{v}_3$};
 \node[container node] (cv3) at (v3) {};
 \node[container node, left=of cv3] (cv2) {};
 \node[container node, left=of cv2] (cv1) {};
-\node[my data node] (v2) at (cv2) {$v_2$};
-\node[my data node] (v1) at (cv1) {$v_1$};
+\node[my data node] (v2) at (cv2) {$\mathbf{v}_2$};
+\node[my data node] (v1) at (cv1) {$\mathbf{v}_1$};
 
-\node[my caption node, below=of v3.south east, anchor=north east] (capv) {\textbf{Value vectors at positions up to} $p$};
-\node[my data node, below=of capv.south east, anchor=north east] {$v_i \in \mathbb{R}^{d_{hidden}}$};
+\node[my caption node, below=of v3.south east, anchor=north east] (capv) {\textbf{Value vectors at positions} $i' \leq i$};
+\node[my data node, below=of capv.south east, anchor=north east] {$\mathbf{v}_{i'} \in \mathbb{R}^\dHidden$};
 
 \draw[arrow style, red] (v1) to (mul1.south);
 \draw[arrow style, red] (v2) to (mul2.south);
@@ -125,9 +119,9 @@ node[my block node, minimum width=\n1, color 3, above=of s2] (soft) {Softmax};
 \coordinate (mulmid) at ($(mul2)!0.5!(sum)$);
 \node[my caption node, anchor=east, align=right] at (q3.east |- mulmid) (capmul) {\textbf{Blend value vectors using attention weights}};
 
-\node[data node, above=of sum] (a3) {$a_3$};
+\node[data node, above=of sum] (a3) {$\mathbf{a}_3$};
 
 \draw[arrow style] (sum) to (a3);
 
-\node[my caption node, anchor=east] at (q3.east |- a3) (capa) {\textbf{Attention output at position} $p$};
-\node[my data node, below=of capa.south east, anchor=north east] {$a_i \in \mathbb{R}^{d_{hidden}}$};
+\node[my caption node, anchor=east] at (q3.east |- a3) (capa) {\textbf{Attention output at position} $i$};
+\node[my data node, below=of capa.south east, anchor=north east] {$\mathbf{a}_i \in \mathbb{R}^\dHidden$};

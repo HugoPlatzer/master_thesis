@@ -98,7 +98,7 @@ it tells the next token after the given input sequence. \cite{Mao2021Autoregress
 
 This is used to generate one new token at a time (autoregressive decoding). The new token is picked from the distribution either by choosing the most likely token (greedy decoding), random sampling according to the probability distribution, or more sophisticated methods such as top-p sampling (choosing among the most likely tokens whose probability mass equals for example $p=0.95$) and top-k sampling (selecting from the for example $k=10$ most likely tokens) \cite{ippolito2019comparison}.
 
-The newly generated token $\modIn_{n+1}$ is appended to the input sequence and the whole process is repeated, with $n$ growing by one after each step, until a special end-of-sequence token is generated, the maximum length $\nPos$ is reached, or some other stop condition is triggered \cite[sect. "Generation"]{HuggingFaceGPT2}. If generation is not terminated, the model could in theory generate a text of infinite length, although transformer models generally only have a limited window of past tokens they can consider when generating the next token. In addition, generation time and memory requirements generally increase quadratically with sequence length for transformer models (\cref{gpt2_attn}).
+The newly generated token $\modIn_{n+1}$ is appended to the input sequence and the whole process is repeated, with $n$ growing by one after each step, until a special end-of-sequence token is generated, the maximum length $\nPos$ is reached, or some other stop condition is triggered \cite[sect. "Generation"]{HuggingFaceGPT2}. If generation is not terminated, the model could in theory generate a text of infinite length, although transformer models generally only have a limited window of past tokens they can consider when generating the next token. In addition, generation time and memory requirements generally increase quadratically with sequence length for transformer models (\cref{gpt2:attn}).
 
 \subsection{User interaction}
 
@@ -132,6 +132,7 @@ Due to the well-known phenomenon of transfer learning \cite{transferlearning}, t
 This allows a relatively small amount of hand picked fine-tuning examples to make it significantly stronger compared to just training on the question-answer pairs on a freshly initalized model \citepage{8}{improvinglu}.
 
 \subsection{Attention mechanism}
+\label{transformer:attn}
 
 Before transformers, model architectures such as recurrent neural networks (RNN) and Long Short Term Memory (LSTM) were commonly used to handle textual or other sequential data. They ingest the tokenized text one token at a time, keeping one or multiple fixed vectors of model state. Transformers, in contrast, dropped recurrence and handle the entire sequence in parallel \citepage{1}{allyouneed}.
 
@@ -148,7 +149,7 @@ The model's attention mechanism would do the following when handling the token "
 
 Assuming the model has learned to generate meaningful query and key vectors, the similarity score to the query of "it" should be much higher for the key of "robot" than for the other positions' keys. This would cause the attention output vector of "it" to mostly consist of the value vector of the token "robot", with the other positions' value vectors having little impact. Thus data flows to the position of the token "it" mostly from the position of the token "robot", which models the linguistic connection between these words.
 
-It has to be said however that this explanation has been simplified considerably. Transformer models do not operate on words or tokens directly but first transform them into vectors of fixed size that are then fed through the attention mechanism. There are multiple stacked blocks inside a typical transformer model, each consisting of an attention mechanism among other components. A more precise description of the attention mechanism of a realistic transformer model is given in \cref{gpt2_attn}.
+It has to be said however that this explanation has been simplified considerably. Transformer models do not operate on words or tokens directly but first transform them into vectors of fixed size that are then fed through the attention mechanism. There are multiple stacked blocks inside a typical transformer model, each consisting of an attention mechanism among other components. A more precise description of the attention mechanism of a realistic transformer model is given in \cref{gpt2:attn}.
 
 \subsection{OpenAI GPT2}
 
@@ -168,7 +169,7 @@ Creating this token sequence from the input text is done by the tokenizer (\cref
 	We denote the input vectors to block number $\modLayer$ as $\modHiddenAt{\modLayer-1}_i$ and the output vectors of that block as $\modHiddenAt{\modLayer}_i$. Thus for a model with, e.g., 12 blocks, the inputs to the first block are $\modHiddenAt{0}_i$ and the outputs after the last block are $\modHiddenAt{12}_i$.
 	
 	Each block outputs a vector sequence of the same dimensions as its input.
-	The GPT2 block structure is described in detail in \cref{gpt2:block} and consists of multiple layers including normalization, a feed-forward network and the attention mechanism. The attention mechanism (\cref{gpt2_attn}) is special to transformer networks and the only point in the model where vectors are not transformed independently, i.e., the output vector of the attention mechanism at position $i$  depends not just on the input vector at position $i$, but also on the vectors at all previous positions $1 \leq i' < i$.
+	The GPT2 block structure is described in detail in \cref{gpt2:block} and consists of multiple layers including normalization, a feed-forward network and the attention mechanism. The attention mechanism (\cref{gpt2:attn}) is special to transformer networks and the only point in the model where vectors are not transformed independently, i.e., the output vector of the attention mechanism at position $i$  depends not just on the input vector at position $i$, but also on the vectors at all previous positions $1 \leq i' < i$.
 	The job of the block and the attention mechanism in particular is to allow the model to learn how later elements of the training sequences are influenced by previous elements, e.g., capitalized words mostly appearing after points and spaces (ends of sentences) in English training texts.
 	
 	\item After the last block there is the postprocessing stage (\cref{gpt2:postproc}). Its job is to convert each hidden vector $\modHiddenAt{\nBlocks}_i$ into a probability distribution $\modOut_i \in \mathbb{R}^{\dVocab}$. This is also done with a learnable embedding matrix.
@@ -314,7 +315,7 @@ A high-level overview of the structure of a GPT2 block is presented in \cref{dia
 	
 	\item The first step of each block is a layer normalization stage, described by \cref{eq:gpt2_overview_ln1}. It is explained in more detail in \cref{gpt2:layernorm}.
 	
-	\item After the layer normalization stage the vectors pass through the heart of the block - the attention mechanism. \Cref{eq:gpt2_overview_attn} shows that the attention mechanism, in contrast to the other stages, needs access to the entire vector sequence $\modHiddenAt{l, 1}_1 \ldots \modHiddenAt{l, 1}_n$ as well as the position $i$ for which to compute the attention output. This is necessary because it connects the vectors at the different positions and lets data flow between them. The attention mechanism is explained in detail in \cref{gpt2_attn}.
+	\item After the layer normalization stage the vectors pass through the heart of the block - the attention mechanism. \Cref{eq:gpt2_overview_attn} shows that the attention mechanism, in contrast to the other stages, needs access to the entire vector sequence $\modHiddenAt{l, 1}_1 \ldots \modHiddenAt{l, 1}_n$ as well as the position $i$ for which to compute the attention output. This is necessary because it connects the vectors at the different positions and lets data flow between them. The attention mechanism is explained in detail in \cref{gpt2:attn}.
 	
 	\item After the attention mechanism, there is a residual connection described by \cref{eq:gpt2_overview_res1}, which lets data flow around the layer norm and attention stages as well as through it. The motivation behind this is explained in \cref{gpt2:residual}.
 	
@@ -403,76 +404,73 @@ Such connections are found in almost all models having many steps/layers, becaus
 
 
 \subsubsection{Multi-head attention}
-\label{gpt2_attn}
+\label{gpt2:attn}
+
+At its core, GPT2, like previous transformer models \citepage{3}{allyouneed}, uses a mechanism called Multi-Head Attention \citepage{4}{allyouneed}.
+
+The general idea of an attention mechanism (explained on a high level in \cref{transformer:attn}) is to compare the vector at one position $i$ with those at previous positions by generating query, key and value vectors at each position, matching the query at position $i$ with the keys of previous positions $i'$, then blending the value vectors accordingly to generate the output at position $i$ \cite{alammar-transformer} \cite{alammar-gpt2}.
+
+The attention mechanism is the only part of the entire model where the output at a given position also depends on the inputs at different (previous) positions. All other components of the model process each position independently.
+Nonetheless, the learnable parameters of the attention mechanism, which are linear transformations to generate query, key, value vectors and project the output, are independent of position.
+
+To get the attention output $\modHidden'_i$ from the attention inputs $\modHidden_1 \ldots \modHidden_n$ the following steps are performed \citepage{4}{allyouneed} \cite{alammar-transformer} \cite{alammar-gpt2}:
+
+\begin{enumerate}
+\item Three vectors called query, key and value are computed using a linear transformation with bias. Its parameters are learned during model training.
+
+\item The query, key and value vectors $q_i, k_i, v_i$ are split into $n_{heads}$ segments of equal size $d_{head} = \frac{d_{hidden}}{n_{heads}}$. $q_{i_s}, k_{i_s}, v_{i_s} \in \mathbb{R}^{d_{head}}$. The following steps are performed for each segment $s$ $(1 \leq s \leq n_{heads})$. This is called multi-head attention and was found to be beneficial to model performance comparing to just using a single head \citepage{4-5}{allyouneed} \cite{alammar-gpt2}.
+Multi-head attention can also be described as running the Scaled Dot-product attention mechanism $n_{heads}$ times in parallel with each query/key/value vector having the size $d_{head} = \frac{d_{hidden}}{n_{heads}}$ with different learnable parameters for each head, then concatenating and projecting the outputs for all heads at each position \citepage{4-5}{allyouneed}.
+
+\item The output vectors of the segments are concatenated
+
+\item Finally, a linear transformation with bias (the original transformer paper mentions such a transform, but with no bias \citepage{5}{allyouneed}) is applied on the concatenated vector \cite{alammar-gpt2}. Its parameters are learnable.
+\end{enumerate}
+
+
+\begin{align}
+	\mathbf{q}_i &= \mathbf{W}_q \modHidden_i + \mathbf{b}_q \\
+	\mathbf{k}_i &= \mathbf{W}_k x_i + \mathbf{b}_k \\
+	\mathbf{v}_i &= \mathbf{W}_v x_i + \mathbf{b}_v \\
+	o_i &= concat _{1 \leq s \leq n_{heads}} \ o_{i_s} \\
+	y_i &= W_p o_i + b_p
+\end{align}
 
 \includediagram{diagrams/gpt2/attention_multihead}{Structure of the Multi-head attention mechanism. This example uses two positions $x_1, x_2$ and two attention heads $h_1, h_2$. The actual model can in theory handle arbitrary sequence lengths and also has more attention heads.}
 
 
 
-At its core, GPT2, like previous transformer models \citepage{3}{allyouneed}, uses a mechanism called Multi-Head Attention \citepage{4}{allyouneed}.
+\subsubsection{Scaled Dot-product attention}
+\label{gpt2:attn_dot}
+The Scaled Dot-product attention mechanism as outlined in \cref{diagrams/gpt2/attention_dot} and equations \eqref{eq:attn_dot_weight} to \eqref{eq:attn_dot_out} is the core part of Multi-head attention described in \cref{gpt2:attn}.
+Its job is to use the keys to find the positions most relevant to the query and amplify the values at these positions.
+It is run in parallel for each of the $\nHeads$ attention heads. For simplicity, the head index $h$ is not repeated in the diagrams and equations here.
+Note that Scaled Dot-product attention does not have any learnable parameters, the learnable parts like the creation of query key and value vectors and projection after merging heads is done by Multi-head attention.
+The attention mechanism described here is more a less a more detailed explanation of the overview given in \cref{transformer:attn}:
 
-The general idea of an attention mechanism is to compare the vector at one position $i$ with those at previous positions by generating query/key/value vectors at each position, matching the query at position $i$ with the keys of previous positions, then blending the value vectors accordingly to generate the output at position $i$ \cite{alammar-transformer} \cite{alammar-gpt2}.
-
-This is the only part of the entire model where the output at a given position also depends on other (previous) positions. All other components of the model process each position independently.
-Nonetheless, the learnable parameters of the attention mechanism, which are linear transformations to generate query, key, value vectors and project the output, are independent of position.
-
-\includediagram{diagrams/gpt2/attention_dot}{Structure of the Scaled Dot-product attention mechanism. This diagram illustrates the computation of the output position $a_3$. The other output positions $a_i$ are computed in a similar fashion, replacing $q_3$ in the diagram with $q_i$ and considering $k_1 \ldots k_i$ and $v_1 \ldots v_i$, giving the diagram $i$ columns.}
-
-For each position $i$ $(1 \leq i \leq n_{pos})$ the following steps are performed \citepage{4}{allyouneed} \cite{alammar-transformer} \cite{alammar-gpt2}:
-
-
-\begin{itemize}
-
-
-
-\item Three vectors called query, key and value are computed using a linear transformation with bias. Its parameters are learned during model training.
- 
- $$q_i = W_q x_i + b_q$$
- $$k_i = W_k x_i + b_k$$
- $$v_i = W_v x_i + b_v$$
-
-\item The query, key and value vectors $q_i, k_i, v_i$ are split into $n_{heads}$ segments of equal size $d_{head} = \frac{d_{hidden}}{n_{heads}}$. $q_{i_s}, k_{i_s}, v_{i_s} \in \mathbb{R}^{d_{head}}$. The following steps are performed for each segment $s$ $(1 \leq s \leq n_{heads})$. This is called multi-head attention and was found to be beneficial to model performance comparing to just using a single head \citepage{4-5}{allyouneed} \cite{alammar-gpt2}.
-Multi-head attention can also be described as running the Scaled Dot-product attention mechanism $n_{heads}$ times in parallel with each query/key/value vector having the size $d_{head} = \frac{d_{hidden}}{n_{heads}}$ with different learnable parameters for each head, then concatenating and projecting the outputs for all heads at each position \citepage{4-5}{allyouneed}.
-
-
-
-\begin{samepage}
-\begin{itemize}
-
-\item The query vector $q_{i_s}$ is compared with the key vector of each position $j$  $(1 \leq j \leq i)$ using dot product to generate a score value $a_{ij_s}\in \mathbb{R}$.
-
-$$a_{ij_s} = \frac {1} {\sqrt{d_{head}}} \ dot(q_{i_s}, k_{j_s})$$
-
+\begin{enumerate}
+\item The query vector $\mathbf{q}_i$ at position $i$ is compared with the key vector of each position $1 \leq i' \leq i$ using dot product to generate a score value $w_{i'i} \in \mathbb{R}$, as described in \cref{eq:attn_dot_weight}.
 The scaling factor $\frac {1} {\sqrt{d_{head}}}$ helps improve gradient stability \citepage{4}{allyouneed}.
 
-Positions after $i$ $(j > i)$ are not considered because of the autoregressive nature of the model, i.e. the model is going to be used to predict the token at position $i+1$ based on the tokens up to position $i$. While the entire sequence is available during training, allowing for an efficient training process, during evaluation only the tokens up to the current position $i$ will be available so this is what should be learned \citepage{5}{allyouneed}.
+Positions after $i$ $(i' > i)$ are not considered because of the autoregressive nature of the model, i.e. the model is going to be used to predict the token at position $i+1$ based on the tokens up to position $i$. While the entire sequence is available during training, allowing for an efficient training process, during text generation only the tokens up to the current position $i$ will be available so this is what should be learned \citepage{5}{allyouneed}.
 
+\item The scores $w_{i'i}$ are normalized in \cref{eq:attn_dot_softmax} using softmax so their sum is 1, this is required for the next step.
 
-\item The scores $a_{ij_s}$ are normalized using softmax so their sum is 1, this is required for the next step.
-   $$ softmax(a_{ij_s}) = \frac {e^{a_{ij_s}}} {\sum_{1 \leq j' \leq i} {e^{a_{ij'_s}}}} $$
+\item Using the scores from before as weights, the output vector $\mathbf{a}_i$ is "blended together" in \cref{eq:attn_dot_out} from each of the value vectors $v_{i'}$ \cite{alammar-gpt2}:
+\end{enumerate}
 
+\begin{align}
+	w_{i'i} &= \frac{1}{\sqrt{\dHead}} \ \mathbf{k}_{i'} \mathbf{q}_i
+	\label{eq:attn_dot_weight}
+	\\
+	\operatorname{softmax}(w_{i'i}) &= \frac{\mathrm{e}^{w_{i'i}}} {\sum_{1 \leq i'' \leq i} \mathrm{e}^{w_{i''i}} }
+	\label{eq:attn_dot_softmax}
+	\\
+	\mathbf{a}_i &= \sum _{1 \leq i' \leq i} \operatorname{softmax}(w_{i'i}) \mathbf{v}_{i'}
+	\label{eq:attn_dot_out}
+\end{align}
 
-\item Using the scores from before as weights, the output vector $o_{i_s}$ is "blended together" from the value vectors $v_{j_s}$ $(1 \leq j \leq i)$ \cite{alammar-gpt2}:
-    $$o_{i_s} = \sum _{1 \leq j \leq i} softmax(a_{ij_s}) \ v_{j_s}$$
+\includediagram{diagrams/gpt2/attention_dot}{Structure of the Scaled Dot-product attention mechanism. This diagram illustrates the computation of the attention output $\mathbf{a}_3$. The other output positions $\mathbf{a}_i$ are computed in a similar fashion, replacing $\mathbf{q}_3$ in the diagram with $\mathbf{q}_i$ and considering $\mathbf{k}_1 \ldots \mathbf{k}_i$ and $\mathbf{v}_1 \ldots \mathbf{v}_i$, giving the diagram $i$ columns.}
 
-\item This so-called "Scaled Dot-product attention mechanism" is further illustrated in \cref{diagrams/gpt2/attention_dot}.
-
-\end{itemize}
-\end{samepage}
-
-
-\item The output vectors of the segments are concatenated:
-   $$o_i = concat _{1 \leq s \leq n_{heads}} \ o_{i_s}$$
-
-
-
-\item Finally, a linear transformation with bias (the original transformer paper mentions such a transform, but with no bias \citepage{5}{allyouneed}) is applied on the concatenated vector \cite{alammar-gpt2}. Its parameters are learnable.
-   $$y_i = W_p o_i + b_p$$
-
-\end{itemize}
-
-
-\subsubsection{Scaled Dot-product attention}
 
 \subsubsection{Multi-layer perceptron}
 \label{gpt2:mlp}
