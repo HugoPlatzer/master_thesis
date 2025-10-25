@@ -315,7 +315,7 @@ A high-level overview of the structure of a GPT2 block is presented in \cref{dia
 	
 	\item The first step of each block is a layer normalization stage, described by \cref{eq:gpt2_overview_ln1}. It is explained in more detail in \cref{gpt2:layernorm}.
 	
-	\item After the layer normalization stage the vectors pass through the heart of the block - the attention mechanism. \Cref{eq:gpt2_overview_attn} shows that the attention mechanism, in contrast to the other stages, needs access to the entire vector sequence $\modHiddenAt{l, 1}_1 \ldots \modHiddenAt{l, 1}_n$ as well as the position $i$ for which to compute the attention output. This is necessary because it connects the vectors at the different positions and lets data flow between them. The attention mechanism is explained in detail in \cref{gpt2:attn}.
+	\item After the layer normalization stage the vectors pass through the heart of the block - the multi-head attention mechanism. \Cref{eq:gpt2_overview_attn} shows that multi-head attention, in contrast to the other stages, needs access to the entire vector sequence $\modHiddenAt{l, 1}_1 \ldots \modHiddenAt{l, 1}_n$ as well as the position $i$ for which to compute the attention output. This is necessary because it connects the vectors at different positions and lets data flow between them. Multi-head attention is explained in detail in \cref{gpt2:attn}.
 	
 	\item After the attention mechanism, there is a residual connection described by \cref{eq:gpt2_overview_res1}, which lets data flow around the layer norm and attention stages as well as through it. The motivation behind this is explained in \cref{gpt2:residual}.
 	
@@ -406,42 +406,64 @@ Such connections are found in almost all models having many steps/layers, becaus
 \subsubsection{Multi-head attention}
 \label{gpt2:attn}
 
-At its core, GPT2, like previous transformer models \citepage{3}{allyouneed}, uses a mechanism called multi-head attention \citepage{4}{allyouneed}.
+GPT2, just like the original transformer introduced in \cite{allyouneed}, uses a form of attention mechanism called multi-head attention \citepage{4}{unsupervisedmultitask}.\\
+The stages of multi-head attention are presented in \cref{diagrams/gpt2/attention_multihead} and equations \eqref{eq:mha:q} to \eqref{eq:mha:output}.
+At first, query, key and value vectors are computed for each position, which are then split into segments of equal size called attention heads. Then, the actual attention values are computed for each head, which are then merged and finally subjected to a linear projection \citepage{4}{allyouneed}.
 
-The general idea of an attention mechanism (explained on a high level in \cref{transformer:attn}) is to compare the vector at one position $i$ with those at previous positions by generating query, key and value vectors at each position, matching the query at position $i$ with the keys of previous positions $i'$, then blending the value vectors accordingly to generate the output at position $i$ \cite{alammar-transformer} \cite{alammar-gpt2}.
+The reasoning behind introducing multiple attention heads is given in \citepage{5}{allyouneed} as allowing the model to better attend to multiple separate positions $i'$ from some position $i$, each position being highlighted by a separate attention head. When just using a single attention head, blending the value vectors (see \cref{gpt2:attn_dot}) causes this information to become more diluted compared to having each $i'$ focused in a separate attention head's output and then concatenated.
 
-The attention mechanism is the only part of the entire model where the output at a given position also depends on the inputs at different (previous) positions. All other components of the model process each position independently.
-Nonetheless, the learnable parameters of the attention mechanism, which are linear transformations to generate query, key, value vectors and project the output, are independent of position.
-
-To get the attention output $\modHidden'_i$ from the attention inputs $\modHidden_1 \ldots \modHidden_n$ the following steps are performed \citepage{4}{allyouneed} \cite{alammar-transformer} \cite{alammar-gpt2}:
+Based on the input vectors $\modHidden_1 \ldots \modHidden_i$, the multi-head attention output $\modHidden'_i$ is computed as follows: 
 
 \begin{enumerate}
-\item Three vectors called query, key and value are computed using a linear transformation with bias. Its parameters are learned during model training.
-
-\item The query, key and value vectors $\mathbf{q}_i, \mathbf{k}_i, \mathbf{v}_i$ are split into $\nHeads$ segments of equal size $\dHead = \frac{\dHidden}{\nHeads}$. $\mathbf{q}_{i_s}, \mathbf{k}_{i_s}, \mathbf{v}_{i_s} \in \mathbb{R}^\dHead$. The following steps are performed for each head $h$ $(1 \leq h \leq \nHeads)$. This is called multi-head attention and was found to be beneficial to model performance comparing to just using a single head \citepage{4-5}{allyouneed} \cite{alammar-gpt2}.
-Multi-head attention can also be described as running the scaled dot-product attention mechanism $\nHeads$ times in parallel with each query/key/value vector having the size $\dHead = \frac{\dHidden}{\nHeads}$ with different learnable parameters for each head, then concatenating and projecting the outputs for all heads at each position \citepage{4-5}{allyouneed}.
-
-\item The output vectors of the segments are concatenated
-
-\item Finally, a linear transformation with bias (the original transformer paper mentions such a transform, but with no bias \citepage{5}{allyouneed}) is applied on the concatenated vector \cite{alammar-gpt2}. Its parameters are learnable.
+	\item For each position $i' \leq i$, a query vector $\mathbf{q}_{i'}$, a key vector $\mathbf{k}_{i'}$, and a value vector $\mathbf{v}_{i'}$ are generated using linear transforms with learnable parameters $(\mathbf{W}_q, \mathbf{b}_q),(\mathbf{W}_k, \mathbf{b}_k), (\mathbf{W}_v, \mathbf{b}_v)$, as described by equations \eqref{eq:mha:q} to \eqref{eq:mha:v}. Each of these vectors has dimension $\dHidden$, just like $\modHidden_i$.
+	
+	\item These vectors are each split into $\nHeads$ segments of equal size $\dHead$. This splitting including the slicing indices $j_1, j_2$ is described by equations \eqref{eq:mha:qh} to \eqref{eq:mha:vh}. Each slice index $h$ represents an attention head.
+	
+	\item For each attention head $h$, scaled dot-product attention (\cref{gpt2:attn_dot}) is used to compute an attention output $\mathbf{a}_{i_h}$ at position i for that head, as described by \cref{eq:mha:sdpa}. This needs the query, key, and value vectors for that head at each position up to $i$.
+	
+	\item These attention outputs $\mathbf{a}_{i_h}$ are concatenated for all heads, giving a total attention output $\mathbf{a}_i$, as described by \cref{eq:mha:concat}.
+	
+	\item The concatenated attention outputs are passed through a linear transform with learnable parameters $(\mathbf{W}_{\mathrm{proj}}, \mathbf{v}_{\mathrm{proj}})$, as described by \cref{eq:mha:output}. This results in the output of the multi-head attention algorithm, $\modHidden'_i$.
 \end{enumerate}
 
-
-\begin{IEEEeqnarray}{rCl"r}
-\mathbf{q}_i &= &\mathbf{W}_q \modHidden_i + \mathbf{b}_q \\
-\mathbf{k}_i &= &\mathbf{W}_k \modHidden_i + \mathbf{b}_k \\
-\mathbf{v}_i &= &\mathbf{W}_v \modHidden_i + \mathbf{b}_v \\
-\mathbf{q}_{i_h} &= &(\mathbf{q}_i)_{j_1:j_2} \quad 1 \leq h \leq \nHeads, j_1 = (h-1) \cdot \dHead + 1, j_2 = h \cdot \dHead \\
-\mathbf{k}_{i_h} &= &(\mathbf{k}_i)_{j_1:j_2} \quad 1 \leq h \leq \nHeads, j_1 = (h-1) \cdot \dHead + 1, j_2 = h \cdot \dHead \\
-\mathbf{v}_{i_h} &= &(\mathbf{v}_i)_{j_1:j_2} \quad 1 \leq h \leq \nHeads, j_1 = (h-1) \cdot \dHead + 1, j_2 = h \cdot \dHead \\
-\mathbf{a}_{i_h} &= &\operatorname{SDPA}(
-\mathbf{q}_{1_h} \ldots \mathbf{q}_{i_h},
-\mathbf{k}_{1_h} \ldots \mathbf{k}_{i_h},
-\mathbf{v}_{1_h} \ldots \mathbf{v}_{i_h}
-) \\
-\mathbf{a}_i &= &\operatorname{concat}_{1 \leq h \leq \nHeads} \ \mathbf{a}_{i_h} \\
-\modHidden'_i &= &\mathbf{W}_{\mathrm{proj}} \mathbf{a}_i + \mathbf{b}_\mathrm{proj}
-\end{IEEEeqnarray}
+\begin{align}
+\mathbf{q}_{i'} &= \mathbf{W}_q \modHidden_{i'} + \mathbf{b}_q
+\quad 1 \leq i' \leq i
+\label{eq:mha:q}
+\\
+\mathbf{k}_{i'} &= \mathbf{W}_k \modHidden_{i'} + \mathbf{b}_k
+\quad 1 \leq i' \leq i
+\label{eq:mha:k}
+\\
+\mathbf{v}_{i'} &= \mathbf{W}_v \modHidden_{i'} + \mathbf{b}_v
+\quad 1 \leq i' \leq i
+\label{eq:mha:v}
+\\
+\mathbf{q}_{i_h} &= (\mathbf{q}_i)_{j_1:j_2}
+\quad 1 \leq h \leq \nHeads, j_1 = (h-1) \cdot \dHead + 1, j_2 = h \cdot \dHead
+\label{eq:mha:qh}
+\\
+\mathbf{k}_{i_h} &= (\mathbf{k}_i)_{j_1:j_2}
+\quad 1 \leq h \leq \nHeads, j_1 = (h-1) \cdot \dHead + 1, j_2 = h \cdot \dHead
+\label{eq:mha:kh}
+\\
+\mathbf{v}_{i_h} &= (\mathbf{v}_i)_{j_1:j_2}
+\quad 1 \leq h \leq \nHeads, j_1 = (h-1) \cdot \dHead + 1, j_2 = h \cdot \dHead
+\label{eq:mha:vh}
+\\
+\mathbf{a}_{i_h} &= \operatorname{SDPA}(
+	\mathbf{q}_{1_h} \ldots \mathbf{q}_{i_h},
+	\mathbf{k}_{1_h} \ldots \mathbf{k}_{i_h},
+	\mathbf{v}_{1_h} \ldots \mathbf{v}_{i_h}
+)
+\label{eq:mha:sdpa}
+\\
+\mathbf{a}_i &= \operatorname{concat}_{1 \leq h \leq \nHeads} \ \mathbf{a}_{i_h}
+\label{eq:mha:concat}
+\\
+\modHidden'_i &= \mathbf{W}_{\mathrm{proj}} \mathbf{a}_i + \mathbf{b}_\mathrm{proj}
+\label{eq:mha:output}
+\end{align}
 
 \includediagram{diagrams/gpt2/attention_multihead}{Structure of the multi-head attention mechanism. This example uses two positions $\mathbf{h}_1, \mathbf{h}_2$ and two attention heads. The actual model can in theory handle arbitrary sequence lengths and also has more attention heads.}
 
@@ -492,15 +514,15 @@ The GELU function for a real input $z$ is defined in \cref{eq:gpt2:gelu} as $z$ 
 The input vector $\modHidden_i$ is first subjected to a linear transformation with weights $\mathbf{W}_\textrm{MLP1}$ and biases $\mathbf{b}_\textrm{MLP1}$, followed by applying GELU to each component, to get the intermediate $\modHiddenStep{1}_i$, as described by \cref{eq:gpt2:mlp1}. The size of this intermediate vector is dependent on the dimensions of the learnable weight matrices and bias vectors ($\mathbf{W}_\textrm{MLP1}, \mathbf{b}_\textrm{MLP1}), (\mathbf{W}_\textrm{MLP2}, \mathbf{b}_\textrm{MLP2}$), which are typically configured such that the dimension of $\modHiddenStep{1}_i$ is $4 \cdot \dHidden$ \citepage{5}{allyouneed} \cite[source code]{HuggingFaceGPT2}.
 Then another linear transformation happens in \cref{eq:gpt2:mlp2} with a different set of learnable parameters $\mathbf{W}_\textrm{MLP2}, \mathbf{b}_\textrm{MLP2}$ to get the output $\modHidden'_i$ with dimension $\dHidden$.
 
-\begin{IEEEeqnarray}{rCl"r}
-	\mathrm{GELU}(z) &= &z \cdot \mathbb{P}(Z<z) & z \in \mathbb{R}, Z \sim \mathcal{N}(0, 1)
+\begin{align}
+	\mathrm{GELU}(z) &= z \cdot \mathbb{P}(Z<z) & z \in \mathbb{R}, Z \sim \mathcal{N}(0, 1)
 	\label{eq:gpt2:gelu}
 	\\
-	\modHiddenStep{1}_i &= &\mathrm{GELU}(\mathbf{W}_\textrm{MLP1} \modHidden_i + \mathbf{b}_\textrm{MLP1})
+	\modHiddenStep{1}_i &= \mathrm{GELU}(\mathbf{W}_\textrm{MLP1} \modHidden_i + \mathbf{b}_\textrm{MLP1})
 	\label{eq:gpt2:mlp1}
 	\\
-	\modHidden'_i &= &\mathbf{W}_\textrm{MLP2} \modHiddenStep{1}_i + \mathbf{b}_\textrm{MLP2}
+	\modHidden'_i &= \mathbf{W}_\textrm{MLP2} \modHiddenStep{1}_i + \mathbf{b}_\textrm{MLP2}
 	\label{eq:gpt2:mlp2}
-\end{IEEEeqnarray}
+\end{align}
 
 \includediagram{diagrams/gpt2/mlp}{Multi-layer perceptron stage of the GPT2 block. It is a simple feed-forward neural network with two linear steps with bias and an activation function in between.}
