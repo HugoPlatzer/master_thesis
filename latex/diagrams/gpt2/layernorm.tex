@@ -13,7 +13,7 @@ column sep=1mm,
 ] (m) {
 (\modHidden'_i)_1 & (\modHidden'_i)_2 & \cdots & (\modHidden'_i)_d \\
 |[circle math node]| +\mathbf{b}_1 & |[circle math node]| +\mathbf{b}_2 & \cdots & |[circle math node]| +\mathbf{b}_d \\
-|[circle math node]| \cdot \mathbf{a}_1 & |[circle math node]| \cdot \mathbf{a}_2 & \cdots & |[circle math node]| \cdot \mathbf{a}_d \\
+|[circle math node]| \cdot \mathbf{w}_1 & |[circle math node]| \cdot \mathbf{w}_2 & \cdots & |[circle math node]| \cdot \mathbf{w}_d \\
 |[circle math node]| \cdot \frac{1}{\sigma(\modHidden_i)} & |[circle math node]| \cdot \frac{1}{\sigma(\modHidden_i)} & \cdots & |[circle math node]| \cdot \frac{1}{\sigma(\modHidden_i)} \\
 |[circle math node]| -\mu(\modHidden_i) & |[circle math node]| -\mu(\modHidden_i) & \cdots & |[circle math node]| -\mu(\modHidden_i) \\
 (\modHidden_i)_1 & (\modHidden_i)_2 & \cdots & (\modHidden_i)_d \\
@@ -30,7 +30,7 @@ column sep=1mm,
 
 
 \node[caption node, left=of m-2-1 -| dd] {Apply per-component bias $\mathbf{b}_j$};
-\node[caption node, left=of m-3-1 -| dd] {Apply per-component gain $\mathbf{a}_j$};
+\node[caption node, left=of m-3-1 -| dd] {Apply per-component gain $\mathbf{w}_j$};
 \node[caption node, left=of m-4-1 -| dd] {Divide by standard deviation};
 \node[caption node, left=of m-5-1 -| dd] {Subtract average};
 

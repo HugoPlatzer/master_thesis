@@ -45,8 +45,8 @@ node distance=15mm and 0mm,
 \node[large container node] (cx1) {};
 \node[large container node, right=of cx1] (cx2) {};
 
-\node[data node] (x1) at (cx1) {$x_1$};
-\node[data node] (x2) at (cx2) {$x_2$};
+\node[data node] (x1) at (cx1) {$\modHidden_1$};
+\node[data node] (x2) at (cx2) {$\modHidden_2$};
 
 
 \node[medium container node, above=of x1] (c2l1) {};
@@ -66,12 +66,12 @@ node distance=15mm and 0mm,
 \node[medium container node, left=of ck2] (cq2) {};
 \node[medium container node, right=of ck2] (cv2) {};
 
-\node[data node] at (cq1) (q1) {$q_1$};
-\node[data node] at (ck1) (k1) {$k_1$};
-\node[data node] at (cv1) (v1) {$v_1$};
-\node[data node] at (cq2) (q2) {$q_2$};
-\node[data node] at (ck2) (k2) {$k_2$};
-\node[data node] at (cv2) (v2) {$v_2$};
+\node[data node] at (cq1) (q1) {$\mathbf{q}_1$};
+\node[data node] at (ck1) (k1) {$\mathbf{k}_1$};
+\node[data node] at (cv1) (v1) {$\mathbf{v}_1$};
+\node[data node] at (cq2) (q2) {$\mathbf{q}_2$};
+\node[data node] at (ck2) (k2) {$\mathbf{k}_2$};
+\node[data node] at (cv2) (v2) {$\mathbf{v}_2$};
 
 \draw[arrow style] (l1.north-|cq1) to (cq1.south);
 \draw[arrow style] (l1.north-|ck1) to (ck1.south);
@@ -93,18 +93,18 @@ node distance=15mm and 0mm,
 \node[small container node, above=of cv2, anchor=east] (cv2h1) {};
 \node[small container node, above=of cv2, anchor=west] (cv2h2) {};
 
-\node[data node] (q1h1) at (cq1h1) {$q_{1_{ \textcolor{h1color}{h1} }}$};
-\node[data node] (q1h2) at (cq1h2) {$q_{1_{ \textcolor{h2color}{h2} }}$};
-\node[data node] (k1h1) at (ck1h1) {$k_{1_{ \textcolor{h1color}{h1} }}$};
-\node[data node] (k1h2) at (ck1h2) {$k_{1_{ \textcolor{h2color}{h2} }}$};
-\node[data node] (v1h1) at (cv1h1) {$v_{1_{ \textcolor{h1color}{h1} }}$};
-\node[data node] (v1h2) at (cv1h2) {$v_{1_{ \textcolor{h2color}{h2} }}$};
-\node[data node] (q2h1) at (cq2h1) {$q_{2_{ \textcolor{h1color}{h1} }}$};
-\node[data node] (q2h2) at (cq2h2) {$q_{2_{ \textcolor{h2color}{h2} }}$};
-\node[data node] (k2h1) at (ck2h1) {$k_{2_{ \textcolor{h1color}{h1} }}$};
-\node[data node] (k2h2) at (ck2h2) {$k_{2_{ \textcolor{h2color}{h2} }}$};
-\node[data node] (v2h1) at (cv2h1) {$v_{2_{ \textcolor{h1color}{h1} }}$};
-\node[data node] (v2h2) at (cv2h2) {$v_{2_{ \textcolor{h2color}{h2} }}$};
+\node[data node] (q1h1) at (cq1h1) {$\mathbf{q}_{1_{ \textcolor{h1color}{1} }}$};
+\node[data node] (q1h2) at (cq1h2) {$\mathbf{q}_{1_{ \textcolor{h2color}{2} }}$};
+\node[data node] (k1h1) at (ck1h1) {$\mathbf{k}_{1_{ \textcolor{h1color}{1} }}$};
+\node[data node] (k1h2) at (ck1h2) {$\mathbf{k}_{1_{ \textcolor{h2color}{2} }}$};
+\node[data node] (v1h1) at (cv1h1) {$\mathbf{v}_{1_{ \textcolor{h1color}{1} }}$};
+\node[data node] (v1h2) at (cv1h2) {$\mathbf{v}_{1_{ \textcolor{h2color}{2} }}$};
+\node[data node] (q2h1) at (cq2h1) {$\mathbf{q}_{2_{ \textcolor{h1color}{1} }}$};
+\node[data node] (q2h2) at (cq2h2) {$\mathbf{q}_{2_{ \textcolor{h2color}{2} }}$};
+\node[data node] (k2h1) at (ck2h1) {$\mathbf{k}_{2_{ \textcolor{h1color}{1} }}$};
+\node[data node] (k2h2) at (ck2h2) {$\mathbf{k}_{2_{ \textcolor{h2color}{2} }}$};
+\node[data node] (v2h1) at (cv2h1) {$\mathbf{v}_{2_{ \textcolor{h1color}{1} }}$};
+\node[data node] (v2h2) at (cv2h2) {$\mathbf{v}_{2_{ \textcolor{h2color}{2} }}$};
 
 \draw[arrow style] (cq1) to (cq1h1);
 \draw[arrow style] (cq1) to (cq1h2);
@@ -132,18 +132,18 @@ node distance=15mm and 0mm,
 \node[small container node, large gap, above=of cv2h1] (cv1h2s) {};
 \node[small container node, large gap, above=of cv2h2] (cv2h2s) {};
 
-\node[data node, large gap] (q1h1s) at (cq1h1s) {$q_{1_{ \textcolor{h1color}{h1} }}$};
-\node[data node, large gap] (q2h1s) at (cq2h1s) {$q_{2_{ \textcolor{h1color}{h1} }}$};
-\node[data node, large gap] (k1h1s) at (ck1h1s) {$k_{1_{ \textcolor{h1color}{h1} }}$};
-\node[data node, large gap] (k2h1s) at (ck2h1s) {$k_{2_{ \textcolor{h1color}{h1} }}$};
-\node[data node, large gap] (v1h1s) at (cv1h1s) {$v_{1_{ \textcolor{h1color}{h1} }}$};
-\node[data node, large gap] (v2h1s) at (cv2h1s)  {$v_{2_{ \textcolor{h1color}{h1} }}$};
-\node[data node, large gap] (q1h2s) at (cq1h2s)  {$q_{1_{ \textcolor{h2color}{h2} }}$};
-\node[data node, large gap] (q2h2s) at (cq2h2s) {$q_{2_{ \textcolor{h2color}{h2} }}$};
-\node[data node, large gap] (k1h2s) at (ck1h2s) {$k_{1_{ \textcolor{h2color}{h2} }}$};
-\node[data node, large gap] (k2h2s) at (ck2h2s) {$k_{2_{ \textcolor{h2color}{h2} }}$};
-\node[data node, large gap] (v1h2s) at (cv1h2s) {$v_{1_{ \textcolor{h2color}{h2} }}$};
-\node[data node, large gap] (v2h2s) at (cv2h2s) {$v_{2_{ \textcolor{h2color}{h2} }}$};
+\node[data node, large gap] (q1h1s) at (cq1h1s) {$\mathbf{q}_{1_{ \textcolor{h1color}{1} }}$};
+\node[data node, large gap] (q2h1s) at (cq2h1s) {$\mathbf{q}_{2_{ \textcolor{h1color}{1} }}$};
+\node[data node, large gap] (k1h1s) at (ck1h1s) {$\mathbf{k}_{1_{ \textcolor{h1color}{1} }}$};
+\node[data node, large gap] (k2h1s) at (ck2h1s) {$\mathbf{k}_{2_{ \textcolor{h1color}{1} }}$};
+\node[data node, large gap] (v1h1s) at (cv1h1s) {$\mathbf{v}_{1_{ \textcolor{h1color}{1} }}$};
+\node[data node, large gap] (v2h1s) at (cv2h1s) {$\mathbf{v}_{2_{ \textcolor{h1color}{1} }}$};
+\node[data node, large gap] (q1h2s) at (cq1h2s) {$\mathbf{q}_{1_{ \textcolor{h2color}{2} }}$};
+\node[data node, large gap] (q2h2s) at (cq2h2s) {$\mathbf{q}_{2_{ \textcolor{h2color}{2} }}$};
+\node[data node, large gap] (k1h2s) at (ck1h2s) {$\mathbf{k}_{1_{ \textcolor{h2color}{2} }}$};
+\node[data node, large gap] (k2h2s) at (ck2h2s) {$\mathbf{k}_{2_{ \textcolor{h2color}{2} }}$};
+\node[data node, large gap] (v1h2s) at (cv1h2s) {$\mathbf{v}_{1_{ \textcolor{h2color}{2} }}$};
+\node[data node, large gap] (v2h2s) at (cv2h2s) {$\mathbf{v}_{2_{ \textcolor{h2color}{2} }}$};
 
 \draw[arrow style, h1color] (cq1h1.north) to (cq1h1s.south);
 \draw[arrow style, h2color] (cq1h2.north) to (cq1h2s.south);
@@ -178,72 +178,61 @@ node distance=15mm and 0mm,
 \draw[arrow style] (cv1h2s) to (cv1h2s|-attn1.south);
 \draw[arrow style] (cv2h2s) to (cv2h2s|-attn1.south);
 
-\node[medium container node, above=of attn1, anchor=east] (ca1h1) {};
 \node[medium container node, above=of attn1, anchor=west] (ca2h1) {};
-\node[medium container node, above=of attn2, anchor=east] (ca1h2) {};
 \node[medium container node, above=of attn2, anchor=west] (ca2h2) {};
 
-\node [data node] (a1h1) at (ca1h1) {$a_{1_{h1}}$};
-\node [data node] (a2h1) at (ca2h1) {$a_{2_{h1}}$};
-\node [data node] (a1h2) at (ca1h2) {$a_{1_{h2}}$};
-\node [data node] (a2h2) at (ca2h2) {$a_{2_{h2}}$};
+%\node [data node] (a1h1) at (ca1h1) {$\mathbf{a}_{1_{ \textcolor{h1color}{1} }}$};
+\node [data node] (a2h1) at (ca2h1) {$\mathbf{a}_{2_{ \textcolor{h1color}{1} }}$};
+%\node [data node] (a1h2) at (ca1h2) {$\mathbf{a}_{1_{ \textcolor{h2color}{2} }}$};
+\node [data node] (a2h2) at (ca2h2) {$\mathbf{a}_{2_{ \textcolor{h2color}{2} }}$};
 
-\draw[my arrow style] (attn1.north-|ca1h1) to ( ca1h1);
+%\draw[my arrow style] (attn1.north-|ca1h1) to ( ca1h1);
 \draw[my arrow style] (attn1.north-|ca2h1) to ( ca2h1);
-\draw[my arrow style] (attn1.north-|ca1h2) to ( ca1h2);
+%\draw[my arrow style] (attn1.north-|ca1h2) to ( ca1h2);
 \draw[my arrow style] (attn1.north-|ca2h2) to ( ca2h2);
 
-\node[medium container node, above=of ca1h1] (ca1h1s) {};
-\node[medium container node, above=of ca1h2] (ca2h1s) {};
-\node[medium container node, above=of ca2h1] (ca1h2s) {};
-\node[medium container node, above=of ca2h2] (ca2h2s) {};
-
-\node[data node] (a1h1s) at (ca1h1s) {$a_{1_{h1}}$};
-\node[data node] (a1h2s) at (ca1h2s) {$a_{1_{h2}}$};
-\node[data node] (a2h1s) at (ca2h1s) {$a_{2_{h1}}$};
-\node[data node] (a2h2s) at (ca2h2s) {$a_{2_{h2}}$};
-
-\draw[my arrow style] (ca1h1) to (ca1h1s);
-\draw[my arrow style] (ca1h2) to (ca1h2s);
-\draw[my arrow style] (ca2h1) to (ca2h1s);
-\draw[my arrow style] (ca2h2) to (ca2h2s);
-
-\node[medium container node, large gap, above=of ca1h1s.east] (ca1) {};
-\node[medium container node, large gap, above=of ca2h1s.east] (ca2) {};
-
-\node[data node] (a1) at (ca1) {$a_1$};
-\node[data node] (a2) at (ca2) {$a_2$};
-
-\draw[my arrow style] (ca1h1s) to (ca1);
-\draw[my arrow style] (ca1h2s) to (ca1);
-\draw[my arrow style] (ca2h1s) to (ca2);
-\draw[my arrow style] (ca2h2s) to (ca2);
+%\node[medium container node, above=of ca1h1] (ca1h1s) {};
+%\node[medium container node, above=of ca1h2] (ca2h1s) {};
+%\node[medium container node, above=of ca2h1] (ca1h2s) {};
+%\node[medium container node, above=of ca2h2] (ca2h2s) {};
 
 
-\node[my block node, color 3, above=of ca1] (ll1) {Linear};
-\node[my block node, color 3, above=of ca2] (ll2) {Linear};
+%\node[medium container node, large gap, above=of ca1h1s.east] (ca1) {};
+%\node[medium container node, large gap, above=of ca2h1s.east] (ca2) {};
 
-\draw[my arrow style] (ca1) to (ll1);
-\draw[my arrow style] (ca2) to (ll2);
+%\node[data node] (a1) at (ca1) {$\mathbf{a}_1$};
+%\node[data node] (a2) at (ca2) {$\mathbf{a}_2$};
 
-\node[medium container node, above=of ll1] (cy1) {};
-\node[medium container node, above=of ll2] (cy2) {};
+%\draw[my arrow style] (ca1h1s) to (ca1);
+%\draw[my arrow style] (ca1h2s) to (ca1);
+%\draw[my arrow style] (ca2h1) to (ca2);
+%\draw[my arrow style] (ca2h2) to (ca2);
 
-\node[data node] (y1) at (cy1) {$y_1$};
-\node[data node] (y2) at (cy2) {$y_2$};
 
-\draw[my arrow style] (ll1) to (cy1);
-\draw[my arrow style] (ll2) to (cy2);
+%\node[my block node, color 3, above=of ca1] (ll1) {Linear};
+%\node[my block node, color 3, above=of ca2] (ll2) {Linear};
+
+%\draw[my arrow style] (ca1) to (ll1);
+%\draw[my arrow style] (ca2) to (ll2);
+
+%\node[medium container node, above=of ll1] (cy1) {};
+%\node[medium container node, above=of ll2] (cy2) {};
+
+%\node[data node] (y1) at (cy1) {$\modHidden'_1$};
+%\node[data node] (y2) at (cy2) {$\modHidden'_2$};
+
+%\draw[my arrow style] (ll1) to (cy1);
+%\draw[my arrow style] (ll2) to (cy2);
 
 \coordinate (dalign) at ($(l1.west) - (2mm, 0mm)$);
-\node[my caption node, anchor=east] at (dalign) {Apply linear transform $W_{q}$ to each input vector $x_i$ to get query, key, and value vectors};
+\node[my caption node, anchor=east] at (dalign) {Apply linear transforms $(\mathbf{W}_{q}, \mathbf{b}_{q}), (\mathbf{W}_{k}, \mathbf{b}_{k}), (\mathbf{W}_{v}, \mathbf{b}_{v})$ to each input vector $\modHidden_i$ to get query, key, and value vectors};
 \coordinate (q1mid) at ($(q1)!0.5!(q1h1)$);
 \node[my caption node, anchor=east] at (dalign|-q1mid) {Split vectors into parts ("attention heads") of equal size};
 \coordinate (sortmid) at ($(q1h1)!0.5!(q1h1s)$);
 \node[my caption node, anchor=east]  at (dalign|-sortmid) {Group vectors first by head, then type, then position};
-\node[my caption node, anchor=east]  at (dalign|-attn1) {Compute attention outputs for each head using Scaled Dot-product attention};
-\coordinate (a1h1mid) at ($(a1h1)!0.5!(a1h1s)$);
-\node[my caption node, anchor=east]  at (dalign|-a1h1mid) {Group attention outputs first by position, then head};
-\coordinate (a1h1smid) at ($(a1h1s)!0.5!(a1)$);
-\node[my caption node, anchor=east]  at (dalign|-a1h1smid) {Concatenate heads for each attention output position};
-\node[my caption node, anchor=east]  at (dalign|-ll1) {Apply linear transform \\ $\mathbf{W}_\mathrm{proj}, \mathbf{b}_\mathrm{proj}$};
+\node[my caption node, anchor=east]  at (dalign|-attn1) {Compute attention outputs for each head using scaled dot-product attention};
+%\coordinate (a1h1mid) at ($(a1h1)!0.5!(a1h1s)$);
+%\node[my caption node, anchor=east]  at (dalign|-a1h1mid) {Group attention outputs first by position, then head};
+%\coordinate (a1h1smid) at ($(a1h1s)!0.5!(a1)$);
+%\node[my caption node, anchor=east]  at (dalign|-a1h1smid) {Concatenate heads for each attention output position};
+%\node[my caption node, anchor=east]  at (dalign|-ll1) {Apply linear transform \\ $(\mathbf{W}_\mathrm{proj}, \mathbf{b}_\mathrm{proj})$};

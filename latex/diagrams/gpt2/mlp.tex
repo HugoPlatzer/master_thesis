@@ -5,9 +5,9 @@ minimum height=6mm,
 ]
 
 \node[data node] (x_i) {$\modHidden_i$};
-\node[my block node, color 1a, above=of x_i] (l1) {Linear I \\ ($\mathbf{W}_\textrm{MLP1} / \mathbf{b}_\textrm{MLP1}$)};
+\node[my block node, color 1a, above=of x_i] (l1) {Linear I \\ \normalfont ($\mathbf{W}_\textrm{MLP1},  \mathbf{b}_\textrm{MLP1}$)};
 \node[my block node, color 3, above=of l1] (ge) {GELU};
-\node[my block node, color 1b, above=of ge] (l2) {Linear II \\ ($\mathbf{W}_\textrm{MLP2} / \mathbf{b}_\textrm{MLP2}$)};
+\node[my block node, color 1b, above=of ge] (l2) {Linear II \\ \normalfont ($\mathbf{W}_\textrm{MLP2}, \mathbf{b}_\textrm{MLP2}$)};
 \node[data node, above=of l2] (y_i) {$\modHidden'_i$};
 
 \draw[arrow style] (x_i) to (l1);

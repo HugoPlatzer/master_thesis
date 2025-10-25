@@ -335,7 +335,7 @@ The layer normalization, attention and MLP stages all have learnable parameters,
 	\modHiddenAt{l, 1}_i &= \mathrm{LN1}\AtLayer{l}(\modHiddenAt{l, 0}_i)
 	\label{eq:gpt2_overview_ln1}
 	\\
-	\modHiddenAt{l, 2}_i &= \mathrm{ATTN}\AtLayer{l}(i, \modHiddenAt{l, 1}_1 \ldots \modHiddenAt{l, 1}_n)
+	\modHiddenAt{l, 2}_i &= \mathrm{MHA}\AtLayer{l}(\modHiddenAt{l, 1}_1 \ldots \modHiddenAt{l, 1}_i)
 	\label{eq:gpt2_overview_attn}
 	\\
 	\modHiddenAt{l, 3}_i &= \modHiddenAt{l, 0}_i + \modHiddenAt{l, 2}_i
@@ -371,8 +371,8 @@ The two layer normalization stages of the GPT2 block are illustrated \cref{diagr
 
 First, the input vector $\modHidden_i$ is normalized in \cref{eq:gpt2:ln_intermediate} by subtracting its mean $\mu$ and dividing by its standard deviation $\sigma$, with $\epsilon$ being a small positive constant added for numerical stability of the square root.
 
-Then, a gain and bias value is applied per component to the intermediate result $\modHiddenStep{1}_i$. The first layer normalization stage LN1 uses learnable gain and bias vectors $\mathbf{a}_\mathrm{LN1}, \mathbf{b}_\mathrm{LN1} \in \mathbb{R}^\dHidden$ as described in \cref{eq:gpt2:ln_ln1}.
-The second layer normalization stage LN2 uses separate gain and bias vectors $\mathbf{a}_\mathrm{LN2}, \mathbf{b}_\mathrm{LN2} \in \mathbb{R}^\dHidden$ as described in \cref{eq:gpt2:ln_ln2}.
+Then, a gain and bias value is applied per component to the intermediate result $\modHiddenStep{1}_i$. The first layer normalization stage LN1 uses learnable gain and bias vectors $\mathbf{w}_\mathrm{LN1}, \mathbf{b}_\mathrm{LN1} \in \mathbb{R}^\dHidden$ as described in \cref{eq:gpt2:ln_ln1}.
+The second layer normalization stage LN2 uses separate gain and bias vectors $\mathbf{w}_\mathrm{LN2}, \mathbf{b}_\mathrm{LN2} \in \mathbb{R}^\dHidden$ as described in \cref{eq:gpt2:ln_ln2}.
 
 
 \begin{align}
@@ -381,14 +381,14 @@ The second layer normalization stage LN2 uses separate gain and bias vectors $\m
 		{\sqrt {\sigma^2(\modHidden_i)+\epsilon}}
 	\label{eq:gpt2:ln_intermediate}
 	\\
-	(\modHidden'_i)_j &= (\mathbf{a}_{\textrm{LN1}})_j (\modHiddenStep{1}_i)_j + (\mathbf{b}_{\textrm{LN1}})_j
+	(\modHidden'_i)_j &= (\mathbf{w}_{\textrm{LN1}})_j (\modHiddenStep{1}_i)_j + (\mathbf{b}_{\textrm{LN1}})_j
 	\label{eq:gpt2:ln_ln1}
 	\\
-	(\modHidden'_i)_j &= (\mathbf{a}_{\textrm{LN2}})_j (\modHiddenStep{1}_i)_j + (\mathbf{b}_{\textrm{LN2}})_j
+	(\modHidden'_i)_j &= (\mathbf{w}_{\textrm{LN2}})_j (\modHiddenStep{1}_i)_j + (\mathbf{b}_{\textrm{LN2}})_j
 	\label{eq:gpt2:ln_ln2}
 \end{align}
 
-\includediagram{diagrams/gpt2/layernorm}{Detailed view of the layer normalization stages of the GPT2 block. $d=\dHidden$. For the first layer norm LN1, $\mathbf{a}=\mathbf{a}_\mathrm{LN1}, \mathbf{b}=\mathbf{b}_\mathrm{LN1}$. For the second layer norm LN2, $\mathbf{a}=\mathbf{a}_\mathrm{LN2}, \mathbf{b}=\mathbf{b}_\mathrm{LN2}$.}
+\includediagram{diagrams/gpt2/layernorm}{Detailed view of the layer normalization stages of the GPT2 block. $d=\dHidden$. For the first layer norm LN1, $\mathbf{w}=\mathbf{w}_\mathrm{LN1}, \mathbf{b}=\mathbf{b}_\mathrm{LN1}$. For the second layer norm LN2, $\mathbf{w}=\mathbf{w}_\mathrm{LN2}, \mathbf{b}=\mathbf{b}_\mathrm{LN2}$.}
 
 \subsubsection{Residual connection}
 \label{gpt2:residual}
@@ -418,8 +418,8 @@ To get the attention output $\modHidden'_i$ from the attention inputs $\modHidde
 \begin{enumerate}
 \item Three vectors called query, key and value are computed using a linear transformation with bias. Its parameters are learned during model training.
 
-\item The query, key and value vectors $q_i, k_i, v_i$ are split into $n_{heads}$ segments of equal size $d_{head} = \frac{d_{hidden}}{n_{heads}}$. $q_{i_s}, k_{i_s}, v_{i_s} \in \mathbb{R}^{d_{head}}$. The following steps are performed for each segment $s$ $(1 \leq s \leq n_{heads})$. This is called multi-head attention and was found to be beneficial to model performance comparing to just using a single head \citepage{4-5}{allyouneed} \cite{alammar-gpt2}.
-Multi-head attention can also be described as running the scaled dot-product attention mechanism $n_{heads}$ times in parallel with each query/key/value vector having the size $d_{head} = \frac{d_{hidden}}{n_{heads}}$ with different learnable parameters for each head, then concatenating and projecting the outputs for all heads at each position \citepage{4-5}{allyouneed}.
+\item The query, key and value vectors $\mathbf{q}_i, \mathbf{k}_i, \mathbf{v}_i$ are split into $\nHeads$ segments of equal size $\dHead = \frac{\dHidden}{\nHeads}$. $\mathbf{q}_{i_s}, \mathbf{k}_{i_s}, \mathbf{v}_{i_s} \in \mathbb{R}^\dHead$. The following steps are performed for each head $h$ $(1 \leq h \leq \nHeads)$. This is called multi-head attention and was found to be beneficial to model performance comparing to just using a single head \citepage{4-5}{allyouneed} \cite{alammar-gpt2}.
+Multi-head attention can also be described as running the scaled dot-product attention mechanism $\nHeads$ times in parallel with each query/key/value vector having the size $\dHead = \frac{\dHidden}{\nHeads}$ with different learnable parameters for each head, then concatenating and projecting the outputs for all heads at each position \citepage{4-5}{allyouneed}.
 
 \item The output vectors of the segments are concatenated
 
@@ -427,15 +427,23 @@ Multi-head attention can also be described as running the scaled dot-product att
 \end{enumerate}
 
 
-\begin{align}
-	\mathbf{q}_i &= \mathbf{W}_q \modHidden_i + \mathbf{b}_q \\
-	\mathbf{k}_i &= \mathbf{W}_k x_i + \mathbf{b}_k \\
-	\mathbf{v}_i &= \mathbf{W}_v x_i + \mathbf{b}_v \\
-	o_i &= concat _{1 \leq s \leq n_{heads}} \ o_{i_s} \\
-	y_i &= W_p o_i + b_p
-\end{align}
+\begin{IEEEeqnarray}{rCl"r}
+\mathbf{q}_i &= &\mathbf{W}_q \modHidden_i + \mathbf{b}_q \\
+\mathbf{k}_i &= &\mathbf{W}_k \modHidden_i + \mathbf{b}_k \\
+\mathbf{v}_i &= &\mathbf{W}_v \modHidden_i + \mathbf{b}_v \\
+\mathbf{q}_{i_h} &= &(\mathbf{q}_i)_{j_1:j_2} \quad 1 \leq h \leq \nHeads, j_1 = (h-1) \cdot \dHead + 1, j_2 = h \cdot \dHead \\
+\mathbf{k}_{i_h} &= &(\mathbf{k}_i)_{j_1:j_2} \quad 1 \leq h \leq \nHeads, j_1 = (h-1) \cdot \dHead + 1, j_2 = h \cdot \dHead \\
+\mathbf{v}_{i_h} &= &(\mathbf{v}_i)_{j_1:j_2} \quad 1 \leq h \leq \nHeads, j_1 = (h-1) \cdot \dHead + 1, j_2 = h \cdot \dHead \\
+\mathbf{a}_{i_h} &= &\operatorname{SDPA}(
+\mathbf{q}_{1_h} \ldots \mathbf{q}_{i_h},
+\mathbf{k}_{1_h} \ldots \mathbf{k}_{i_h},
+\mathbf{v}_{1_h} \ldots \mathbf{v}_{i_h}
+) \\
+\mathbf{a}_i &= &\operatorname{concat}_{1 \leq h \leq \nHeads} \ \mathbf{a}_{i_h} \\
+\modHidden'_i &= &\mathbf{W}_{\mathrm{proj}} \mathbf{a}_i + \mathbf{b}_\mathrm{proj}
+\end{IEEEeqnarray}
 
-\includediagram{diagrams/gpt2/attention_multihead}{Structure of the multi-head attention mechanism. This example uses two positions $x_1, x_2$ and two attention heads $h_1, h_2$. The actual model can in theory handle arbitrary sequence lengths and also has more attention heads.}
+\includediagram{diagrams/gpt2/attention_multihead}{Structure of the multi-head attention mechanism. This example uses two positions $\mathbf{h}_1, \mathbf{h}_2$ and two attention heads. The actual model can in theory handle arbitrary sequence lengths and also has more attention heads.}
 
 
 
@@ -481,18 +489,18 @@ The multi-layer perceptron stage in the GPT2 block is a simple feed-forward neur
 In contrast to the original transformer paper, GPT2 uses the Gaussian Error Linear Unit (GELU) activation function \citepage{5}{improvinglu}.
 The GELU function for a real input $z$ is defined in \cref{eq:gpt2:gelu} as $z$ multiplied by the probability that a random variable $Z$ which follows a normal distrbution with mean 0 and variance 1 is less than $z$ \cite{gelu}.
 
-The input vector $\modHidden_i$ is first subjected to a linear transformation with weights $\mathbf{W}_\textrm{MLP1}$ and biases $\mathbf{b}_\textrm{MLP1}$, followed by applying GELU to each component, to get the intermediate $\modHiddenStep{1}_i$, as described by \cref{eq:gpt2:mlp1}. The size of this intermediate vector is dependent on the dimensions of the learnable weight matrices and bias vectors $\mathbf{W}_\textrm{MLP1}, \mathbf{W}_\textrm{MLP2}, \mathbf{b}_\textrm{MLP1}, \mathbf{b}_\textrm{MLP2}$, which are typically configured such that the dimension of $\modHiddenStep{1}_i$ is $4 \cdot \dHidden$ \citepage{5}{allyouneed} \cite[source code]{HuggingFaceGPT2}.
+The input vector $\modHidden_i$ is first subjected to a linear transformation with weights $\mathbf{W}_\textrm{MLP1}$ and biases $\mathbf{b}_\textrm{MLP1}$, followed by applying GELU to each component, to get the intermediate $\modHiddenStep{1}_i$, as described by \cref{eq:gpt2:mlp1}. The size of this intermediate vector is dependent on the dimensions of the learnable weight matrices and bias vectors ($\mathbf{W}_\textrm{MLP1}, \mathbf{b}_\textrm{MLP1}), (\mathbf{W}_\textrm{MLP2}, \mathbf{b}_\textrm{MLP2}$), which are typically configured such that the dimension of $\modHiddenStep{1}_i$ is $4 \cdot \dHidden$ \citepage{5}{allyouneed} \cite[source code]{HuggingFaceGPT2}.
 Then another linear transformation happens in \cref{eq:gpt2:mlp2} with a different set of learnable parameters $\mathbf{W}_\textrm{MLP2}, \mathbf{b}_\textrm{MLP2}$ to get the output $\modHidden'_i$ with dimension $\dHidden$.
 
-\begin{align}
-	\mathrm{GELU}(z) &= z \cdot \mathbb{P}(Z<z) & z \in \mathbb{R}, Z \sim \mathcal{N}(0, 1)
+\begin{IEEEeqnarray}{rCl"r}
+	\mathrm{GELU}(z) &= &z \cdot \mathbb{P}(Z<z) & z \in \mathbb{R}, Z \sim \mathcal{N}(0, 1)
 	\label{eq:gpt2:gelu}
 	\\
-	\modHiddenStep{1}_i &= \mathrm{GELU}(\mathbf{W}_\textrm{MLP1} \modHidden_i + \mathbf{b}_\textrm{MLP1})
+	\modHiddenStep{1}_i &= &\mathrm{GELU}(\mathbf{W}_\textrm{MLP1} \modHidden_i + \mathbf{b}_\textrm{MLP1})
 	\label{eq:gpt2:mlp1}
 	\\
-	\modHidden'_i & = \mathbf{W}_\textrm{MLP2} \modHiddenStep{1}_i + \mathbf{b}_\textrm{MLP2}
+	\modHidden'_i &= &\mathbf{W}_\textrm{MLP2} \modHiddenStep{1}_i + \mathbf{b}_\textrm{MLP2}
 	\label{eq:gpt2:mlp2}
-\end{align}
+\end{IEEEeqnarray}
 
 \includediagram{diagrams/gpt2/mlp}{Multi-layer perceptron stage of the GPT2 block. It is a simple feed-forward neural network with two linear steps with bias and an activation function in between.}
