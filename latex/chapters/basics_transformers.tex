@@ -406,7 +406,7 @@ Such connections are found in almost all models having many steps/layers, becaus
 \subsubsection{Multi-head attention}
 \label{gpt2:attn}
 
-At its core, GPT2, like previous transformer models \citepage{3}{allyouneed}, uses a mechanism called Multi-Head Attention \citepage{4}{allyouneed}.
+At its core, GPT2, like previous transformer models \citepage{3}{allyouneed}, uses a mechanism called multi-head attention \citepage{4}{allyouneed}.
 
 The general idea of an attention mechanism (explained on a high level in \cref{transformer:attn}) is to compare the vector at one position $i$ with those at previous positions by generating query, key and value vectors at each position, matching the query at position $i$ with the keys of previous positions $i'$, then blending the value vectors accordingly to generate the output at position $i$ \cite{alammar-transformer} \cite{alammar-gpt2}.
 
@@ -419,7 +419,7 @@ To get the attention output $\modHidden'_i$ from the attention inputs $\modHidde
 \item Three vectors called query, key and value are computed using a linear transformation with bias. Its parameters are learned during model training.
 
 \item The query, key and value vectors $q_i, k_i, v_i$ are split into $n_{heads}$ segments of equal size $d_{head} = \frac{d_{hidden}}{n_{heads}}$. $q_{i_s}, k_{i_s}, v_{i_s} \in \mathbb{R}^{d_{head}}$. The following steps are performed for each segment $s$ $(1 \leq s \leq n_{heads})$. This is called multi-head attention and was found to be beneficial to model performance comparing to just using a single head \citepage{4-5}{allyouneed} \cite{alammar-gpt2}.
-Multi-head attention can also be described as running the Scaled Dot-product attention mechanism $n_{heads}$ times in parallel with each query/key/value vector having the size $d_{head} = \frac{d_{hidden}}{n_{heads}}$ with different learnable parameters for each head, then concatenating and projecting the outputs for all heads at each position \citepage{4-5}{allyouneed}.
+Multi-head attention can also be described as running the scaled dot-product attention mechanism $n_{heads}$ times in parallel with each query/key/value vector having the size $d_{head} = \frac{d_{hidden}}{n_{heads}}$ with different learnable parameters for each head, then concatenating and projecting the outputs for all heads at each position \citepage{4-5}{allyouneed}.
 
 \item The output vectors of the segments are concatenated
 
@@ -435,16 +435,16 @@ Multi-head attention can also be described as running the Scaled Dot-product att
 	y_i &= W_p o_i + b_p
 \end{align}
 
-\includediagram{diagrams/gpt2/attention_multihead}{Structure of the Multi-head attention mechanism. This example uses two positions $x_1, x_2$ and two attention heads $h_1, h_2$. The actual model can in theory handle arbitrary sequence lengths and also has more attention heads.}
+\includediagram{diagrams/gpt2/attention_multihead}{Structure of the multi-head attention mechanism. This example uses two positions $x_1, x_2$ and two attention heads $h_1, h_2$. The actual model can in theory handle arbitrary sequence lengths and also has more attention heads.}
 
 
 
-\subsubsection{Scaled Dot-product attention}
+\subsubsection{Scaled dot-product attention}
 \label{gpt2:attn_dot}
-The Scaled Dot-product attention mechanism as outlined in \cref{diagrams/gpt2/attention_dot} and equations \eqref{eq:attn_dot_weight} to \eqref{eq:attn_dot_out} is the core part of Multi-head attention described in \cref{gpt2:attn}.
+The scaled dot-product attention mechanism as outlined in \cref{diagrams/gpt2/attention_dot} and equations \eqref{eq:attn_dot_weight} to \eqref{eq:attn_dot_out} is the core part of multi-head attention described in \cref{gpt2:attn}.
 Its job is to use the keys to find the positions most relevant to the query and amplify the values at these positions.
 It is run in parallel for each of the $\nHeads$ attention heads. For simplicity, the head index $h$ is not repeated in the diagrams and equations here.
-Note that Scaled Dot-product attention does not have any learnable parameters, the learnable parts like the creation of query key and value vectors and projection after merging heads is done by Multi-head attention.
+Note that scaled dot-product attention does not have any learnable parameters, the learnable parts like the creation of query, key and value vectors and projection after merging heads is done by multi-head attention.
 The attention mechanism described here is more a less a more detailed explanation of the overview given in \cref{transformer:attn}:
 
 \begin{enumerate}
@@ -455,7 +455,7 @@ Positions after $i$ $(i' > i)$ are not considered because of the autoregressive 
 
 \item The scores $w_{i'i}$ are normalized in \cref{eq:attn_dot_softmax} using softmax so their sum is 1, this is required for the next step.
 
-\item Using the scores from before as weights, the output vector $\mathbf{a}_i$ is "blended together" in \cref{eq:attn_dot_out} from each of the value vectors $v_{i'}$ \cite{alammar-gpt2}:
+\item Using the scores from before as weights, the output vector $\mathbf{a}_i$ is "blended together" in \cref{eq:attn_dot_out} from each of the value vectors $\mathbf{v}_{i'}$ \cite{alammar-gpt2}:
 \end{enumerate}
 
 \begin{align}
@@ -469,14 +469,14 @@ Positions after $i$ $(i' > i)$ are not considered because of the autoregressive 
 	\label{eq:attn_dot_out}
 \end{align}
 
-\includediagram{diagrams/gpt2/attention_dot}{Structure of the Scaled Dot-product attention mechanism. This diagram illustrates the computation of the attention output $\mathbf{a}_3$. The other output positions $\mathbf{a}_i$ are computed in a similar fashion, replacing $\mathbf{q}_3$ in the diagram with $\mathbf{q}_i$ and considering $\mathbf{k}_1 \ldots \mathbf{k}_i$ and $\mathbf{v}_1 \ldots \mathbf{v}_i$, giving the diagram $i$ columns.}
+\includediagram{diagrams/gpt2/attention_dot}{Structure of the scaled dot-product attention mechanism. This diagram illustrates the computation of the attention output $\mathbf{a}_3$. The other output positions $\mathbf{a}_i$ are computed in a similar fashion, replacing $\mathbf{q}_3$ in the diagram with $\mathbf{q}_i$ and considering $\mathbf{k}_1 \ldots \mathbf{k}_i$ and $\mathbf{v}_1 \ldots \mathbf{v}_i$, giving the diagram $i$ columns.}
 
 
 \subsubsection{Multi-layer perceptron}
 \label{gpt2:mlp}
 
 
-The multi-layer perceptron stage in the GPT2 block is a simple feed-forward neural network with one hidden layer \citepage{5}{allyouneed}, illustrated in \cref{diagrams/gpt2/mlp}.
+The multi-layer perceptron stage in the GPT2 block is a simple feed-forward neural network with one hidden layer \citepage{5}{allyouneed}, illustrated in \cref{diagrams/gpt2/mlp} and equations \eqref{eq:gpt2:gelu} to \eqref{eq:gpt2:mlp2}.
 
 In contrast to the original transformer paper, GPT2 uses the Gaussian Error Linear Unit (GELU) activation function \citepage{5}{improvinglu}.
 The GELU function for a real input $z$ is defined in \cref{eq:gpt2:gelu} as $z$ multiplied by the probability that a random variable $Z$ which follows a normal distrbution with mean 0 and variance 1 is less than $z$ \cite{gelu}.
@@ -485,7 +485,7 @@ The input vector $\modHidden_i$ is first subjected to a linear transformation wi
 Then another linear transformation happens in \cref{eq:gpt2:mlp2} with a different set of learnable parameters $\mathbf{W}_\textrm{MLP2}, \mathbf{b}_\textrm{MLP2}$ to get the output $\modHidden'_i$ with dimension $\dHidden$.
 
 \begin{align}
-	\mathrm{GELU}(z) &= z \cdot P(Z<z) & z \in \mathbb{R}
+	\mathrm{GELU}(z) &= z \cdot \mathbb{P}(Z<z) & z \in \mathbb{R}, Z \sim \mathcal{N}(0, 1)
 	\label{eq:gpt2:gelu}
 	\\
 	\modHiddenStep{1}_i &= \mathrm{GELU}(\mathbf{W}_\textrm{MLP1} \modHidden_i + \mathbf{b}_\textrm{MLP1})
