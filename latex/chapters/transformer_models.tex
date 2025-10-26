@@ -162,7 +162,7 @@ As described in \cref{transformer:input}, the input to the model is an integer s
 Creating this token sequence from the input text is done by the tokenizer (\cref{transformer:tokenization}, \cref{gpt2:tokenizer}). This tokenizer is considered a component separate from the model and is trained before it. The model is then trained based on the output indices of the chosen tokenizer, therefore the tokenizer cannot be changed for a trained model. The various stages inside the model are as follows:
 
 \begin{enumerate}
-	\item The sequence of token indices is then transformed into a sequence of vectors by the preprocessing stage (\cref{gpt2_preproc}). The preprocessing stage converts each token $\modIn_i \in \mathbb{N}$ into a hidden vector $\modHiddenAt{0}_i \in \mathbb{R}^\dHidden$ based on the token value $x_i$ and token position $i$. For this, it uses learnable embedding matrices.
+	\item The sequence of token indices is then transformed into a sequence of vectors by the preprocessing stage (\cref{gpt2:preproc}). The preprocessing stage converts each token $\modIn_i \in \mathbb{N}$ into a hidden vector $\modHiddenAt{0}_i \in \mathbb{R}^\dHidden$ based on the token value $x_i$ and token position $i$. For this, it uses learnable embedding matrices.
 	The size of each of these hidden vectors, $\dHidden$ is a parameter that can be configured when creating a GPT2 model (\cref{gpt2:parameters}).
 	
 	\item These vectors $\modHiddenAt{0}_i$ are then fed through a number of GPT2 blocks, each being identical except for having its own set of learnable parameters. These GPT2 blocks are indexed by $l$ ($1 \leq l \leq \nBlocks)$, with $\nBlocks$ being the number of GPT2 blocks the model has, which can also be configured at model creation.
@@ -225,7 +225,7 @@ The downside is that token sequences get significantly longer, thus a model with
 
 
 \subsubsection{Preprocessing}
-\label{gpt2_preproc}
+\label{gpt2:preproc}
 
 Transformer networks do not operate on integer token IDs, but on state vectors from $\mathbb{R}^{\dHidden}$. $\dHidden$, the dimension of the state vector at each position, is a parameter fixed at the time of model construction (\cref{gpt2:parameters}).
 This means the token sequence needs to be converted into a sequence of such vectors before feeding it through the model. This happens during the preprocessing stage, which is illustrated in \cref{diagrams/gpt2/preproc}.
@@ -311,7 +311,7 @@ Because its structure is somewhat complex, we dedicated this separate section to
 A high-level overview of the structure of a GPT2 block is presented in \cref{diagrams/gpt2/block} as well as equations \eqref{eq:gpt2_overview_start} to \eqref{eq:gpt2_overview_end}:
 
 \begin{enumerate}
-	\item \Cref{eq:gpt2_overview_start} shows the input vectors to the block with index $\modLayer$, given as $\modHiddenAt{l, 0}_1 \ldots \modHiddenAt{l, 0}_n$, are the are the outputs of the previous block $\modHiddenAt{l-1}_1 \ldots \modHiddenAt{l-1}_n$. For the first block, its inputs are the outputs of the preprocessing stage (\cref{gpt2_preproc}).
+	\item \Cref{eq:gpt2_overview_start} shows the input vectors to the block with index $\modLayer$, given as $\modHiddenAt{l, 0}_1 \ldots \modHiddenAt{l, 0}_n$, are the are the outputs of the previous block $\modHiddenAt{l-1}_1 \ldots \modHiddenAt{l-1}_n$. For the first block, its inputs are the outputs of the preprocessing stage (\cref{gpt2:preproc}).
 	
 	\item The first step of each block is a layer normalization stage, described by \cref{eq:gpt2_overview_ln1}. It is explained in more detail in \cref{gpt2:layernorm}.
 	

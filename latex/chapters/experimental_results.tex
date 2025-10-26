@@ -649,7 +649,7 @@ Due to the augmented training samples, we also change the way we evaluate correc
 }
 
 Augmenting the training samples with the reversed result of the arithmetic operation results in increased sample length (\cref{tbl:reverse_sample_lengths}).
-This means we have to increase the number of positions in the model configuration to handle these longer sequences. This does lead to more model parameters due to each position having a learnable positional embedding vector (\cref{gpt2_preproc}). The increase however is just a minute fraction of the total parameters (e.g., 10.710 million parameters for the 10-digit addition baseline requiring 34 positions, and 10.715 million parameters for 10-digit addition with result reversal requiring 47 positions). This minute increase does not necessitate other changes to the training regime such as reduced batch sizes or fewer epochs - we can keep the default batch size of 256 and epoch limit of 200 (\cref{expsetup:batchsize}, \cref{expsetup:learnrate}).
+This means we have to increase the number of positions in the model configuration to handle these longer sequences. This does lead to more model parameters due to each position having a learnable positional embedding vector (\cref{gpt2:preproc}). The increase however is just a minute fraction of the total parameters (e.g., 10.710 million parameters for the 10-digit addition baseline requiring 34 positions, and 10.715 million parameters for 10-digit addition with result reversal requiring 47 positions). This minute increase does not necessitate other changes to the training regime such as reduced batch sizes or fewer epochs - we can keep the default batch size of 256 and epoch limit of 200 (\cref{expsetup:batchsize}, \cref{expsetup:learnrate}).
 
 \subsubsection{Result reversal: Results}
 
@@ -845,7 +845,7 @@ Each step is separated by \verb!|! characters. The two summand digits, previous 
 The scratchpad is deliberately kept minimal because of the increase in training time with increased sample length.
 
 \label{training_time_growth}
-This increase in training time is not due to an increase in model parameters, but rather due to the model's attention mecachism comparing one position to all previous positions (\cref{gpt2_attn}). This causes training time to increase quadratically with sequence length. Memory requirements also increase quadratically due to the resulting attention matrix when comparing each position with each previous one.
+This increase in training time is not due to an increase in model parameters, but rather due to the model's attention mecachism comparing one position to all previous positions (\cref{gpt2:attn}). This causes training time to increase quadratically with sequence length. Memory requirements also increase quadratically due to the resulting attention matrix when comparing each position with each previous one.
 
 \subsubsection{Scratchpad: Multiplication}
 \label{mul_scratchpad}
@@ -933,7 +933,7 @@ Consider the first step for example:
 
 The current search range is in braces, for this step it is from 0 to 123.
 Then, the midpoint of the search range (61) is squared to 3721.
-We are looking for the integer square root of 123, which is the largest integer whose square is at most 123 ()\cref{isqrt}). Because 3721 is larger than $n=123$, the search range in the next step gets restricted to the lower half, which is from 0 to 61.
+We are looking for the integer square root of 123, which is the largest integer whose square is at most 123 (\cref{isqrt}). Because 3721 is larger than $n=123$, the search range in the next step gets restricted to the lower half, which is from 0 to 61.
 The algorithm ends when the search range consists of at most two integers (11 and 12 in this case), at which point the larger one is tested, as $12*12=144$ is too large, $11$ is the correct integer square root.
 
 
@@ -1142,7 +1142,7 @@ For testing accuracy, we only consider the final result after the scratchpad in 
 	\end{minipage}
 \end{table}
 
-For the addition task  (\cref{tbl:scratchpad_add}) there are clear improvements over the baseline (\cref{tbl:scratchpadd_add_baseline}): For the 1k dataset size, training was more or less successful for all operand sizes (good accuracy but not 100\%), whereas there was no accuracy for the baseline experiments at 1k dataset size.
+For the addition task  (\cref{tbl:scratchpad_add}) there are clear improvements over the baseline (\cref{tbl:scratchpad_add_baseline}): For the 1k dataset size, training was more or less successful for all operand sizes (good accuracy but not 100\%), whereas there was no accuracy for the baseline experiments at 1k dataset size.
 For 10k and 100k dataset sizes, there was perfect accuracy for all operand sizes, whereas in the baseline experiments accuracy was perfect only for 3 digit addition.
 
 \begin{table}[H]
