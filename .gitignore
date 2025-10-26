@@ -9,6 +9,6 @@
 **/*.bin
 **/*.swo
 **/*.swp
-**/*.pdf
+main.pdf
 **/logfile.txt
 **/checkpoint-*/
