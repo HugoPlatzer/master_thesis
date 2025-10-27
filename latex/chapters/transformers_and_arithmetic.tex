@@ -1,4 +1,5 @@
 \section{Methods}
+\label{methods}
 
 Building on the results of \cite{teaching}, we wanted to replicate their good results for a small transformer model learning addition with up to 10 decimal digits \citepage{15}{teaching}.
 We also wanted to focus on the harder task of integer multiplication with up to 10 decimal digits, which was studied in \cite{teaching} only for 2 decimal digit multiplicands.
@@ -7,6 +8,8 @@ Because we achieved no success in training this operation using our baseline set
 \cite{teaching} also studied the square root function, with the output being approximated by its first five decimal digits. We wanted to stick to integer operations and thus included the integer square root function \cref{TODO} to our studied operation to see how hard it is to learn compared to addition and multiplication, and how it would respond to the techniques we tried for improving multiplication performance.
 
 \subsection{Tokenization}
+\label{methods:token}
+
 We stick to a simple tokenization scheme where each character in the string is converted to one token ID based on its ASCII value, meaning our model supports token IDs from 0 to 127. Token ID 0 is reserved to denote the end of the token sequence, it is appended to the ASCII token sequence.
 
 \begin{lstlisting}
@@ -15,6 +18,8 @@ We stick to a simple tokenization scheme where each character in the string is c
 
 
 \subsection{Model choice}
+\label{methods:model}
+
 We use a transformer model with mostly the same GPT2 architecture described in \cref{gpt2}, with parameters $\dVocab=128, \nBlocks=6, \dHidden=384, \nHeads=6, \dHead=64$ (these parameters are explained in \cref{gpt2:parameters}).
 This means we use the same model architecture and configuration parameters as in \cite{teaching} and thus get a model with about 11M parameters \citepage{3}{teaching}. This is considerably smaller than the versions of GPT2 released by OpenAI with about 100M to 1B parameters (\cref{gpt2:parameters}).
 Since our resources in terms of hardware are limited and we train for single-purpose transformer models that can only do one specific arithmetic task, we consider this acceptable.
@@ -24,19 +29,23 @@ The maximum sequence length of the model, $\nPos$, gets adjusted based on the st
 
 
 \subsection{Arithmetic operations}
+\label{methods:ops}
 
 We study the performance of transformer models on three different arithmetic operations: Addition and multiplication are standard arithmetic operations and common building blocks of more complex operations like exponentiation and evaluation of polynomial functions. Their learnability by transformer models has been investigated in \cite{teaching} and \cite{visual} among others. Integer square root, on the other hand, has to our knowledge not been studied before in the context of transformer networks.
 
 \subsubsection{Addition}
+\label{methods:ops:add}
+
 Let $a, b$ be positive integers and let $c=a+b$. The model is then trained on strings of the form $a+b=c$.
 
 
 \subsubsection{Multiplication}
+\label{methods:ops:mul}
 
 Let $a, b$ be positive integers and let $c=a \cdot b$. The model is then trained on sequences of the form $a \cdot b=c$.
 
 \subsubsection{Integer square root}
-\label{isqrt}
+\label{methods:ops:isqrt}
 
 In addition to addition and multiplication, we also study the learnability of the integer square root function. Instead of the regular square root function with irrational values, we use integer square root. This is consistent with the addition and multiplication operations in that it is an integer to integer mapping, with exactly one correct, finite answer for each input number, yet being equivalent to approximating the regular square root function.
 
@@ -55,22 +64,20 @@ A model that can compute the integer square root for integers with a certain num
 We train the model of sequences of the form $x: k$ where $k$ is the integer square root of $x$.
 
 
-
-
-
 \subsection{Sampling methods}
-\label{arith:sampling}
+\label{methods:sampling}
 
 The distribution based on which training samples are picked can have a big impact on the performance of machine learning models. To find out how much of an improvement can be had on the tasks we study just by picking sampling methods, we experimented with multiple sampling methods: Basic sampling, from-zero sampling, uniform digits  sampling and uniform bits sampling.
 
 \subsubsection{Basic sampling}
-\label{arith:sampling:basic}
+\label{methods:sampling:basic}
 
 For the addition and multiplication tasks with $n$ digits, the operands $a$ and $b$ are independently sampled uniformly from the range $[{10}^{n-1}, 10^n - 1]$, which ensures both operands have exactly $n$ decimal digits. We train the models for $n=3$, $n=5$,  and $n=10$ operand digits, giving a sample space of approximate size $10^6$, $10^{10}$, $10^{20}$ respectively.
 
 For the square root operation with $n$ operand digits, we also sample the operand $x$ uniformly from the range $[{10}^{n-1}, 10^n - 1]$. However, because square root is a unary operator, we double the number of decimal digits of the single operand to make sure we have a similarly large space of possible samples. Therefore we train the models for $n=6$, $n=10$,  and $n=20$ operand digits, giving a sample space of approximate size $10^6$, $10^{10}$, $10^{20}$ respectively.
 
 \subsubsection{From-zero sampling}
+\label{methods:sampling:basic}
 
 For the baseline experiments (\cref{TODO}) the limits of sampling were set as $[10^{n-1}, 10^n - 1]$ to include all $n$-digit numbers, where n is the number of operand digits. From-zero sampling instead uses the limits $[0, 10^n - 1]$, to also include operand numbers with fewer decimal digits.
 
@@ -239,7 +246,7 @@ Consider the first step for example:
 
 The current search range is in braces, for this step it is from 0 to 123.
 Then, the midpoint of the search range (61) is squared to 3721.
-We are looking for the integer square root of 123, which is the largest integer whose square is at most 123 (\cref{isqrt}). Because 3721 is larger than $n=123$, the search range in the next step gets restricted to the lower half, which is from 0 to 61.
+We are looking for the integer square root of 123, which is the largest integer whose square is at most 123 (\cref{methods:ops:isqrt}). Because 3721 is larger than $n=123$, the search range in the next step gets restricted to the lower half, which is from 0 to 61.
 The algorithm ends when the search range consists of at most two integers (11 and 12 in this case), at which point the larger one is tested, as $12*12=144$ is too large, $11$ is the correct integer square root.
 
 

@@ -239,24 +239,7 @@ We can see that the errors our model makes follow clear patterns: If the model i
 \subsection{Model size experiments}
 \label{model_size_experiments}
 
-To see whether changing the number of parameters of the model improves accuracy, we tried each of the following changes to model dimensions:
 
-\begin{itemize}
-    \item Change the vector size $n_{embd}$ from 384 to either 192 or 768. This causes a change to the number of learnable model parameters: The model with $n_{embd}=192$ has about 2.7M parameters, the baseline model with $n_{embd}=384$ about 11M parameters, and the model with $n_{embd}=768$ about 43M parameters. Thus doubling $n_{embd}$ roughly quadruples the number of parameters (due to matrices for transformations on vectors twice the size having 4 times as many parameters).
-    \item Change the number of GPT2 blocks $n_{blocks}$ from 6 to either 3 or 12. This also changes the number of parameters, but in a linear fashion: The model with 3 blocks has 5.4M parameters, and the model with 12 blocks has 21M parameters. 
-    \item Change the number of attention heads $n_{heads}$ from 6 to either 3 or 12. This has no effect on the number of model parameters, it only affects the "partitioning" of the parameters inside the model.
-\end{itemize}
-
-We did not try to combine these changes, each experiment only had one parameter of the model architecture changed.
-Due to time/hardware constraints, we limited experiments to the following tasks:
-
-\begin{itemize}
-    \item Addition with 10 operand digits, 100k training dataset.
-    \item Multiplication with 5 operand digits, 100k training dataset.
-\end{itemize}
-
-We picked these two tasks from the baseline experiments because addition with 10 digits could be learned well with the 100k dataset, while still being harder than 3 or 5 digit addition, allowing more chances to see a difference in model performance in terms of how many optimization steps it takes to converge.
-Similarly, multiplication with 5 digits and 100k training dataset was chosen because the baseline model could not learn it and achieved zero accuracy. At the same time, learning 5 digit multiplication seemed somewhat realistic with a more capable model architecture, considering that 3 digit multiplication could be learned at a low but not zero (22\%) accuracy.
 
 \subsubsection{Model size experiments: Addition}
 

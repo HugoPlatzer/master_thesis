@@ -1,6 +1,9 @@
 \section{Experimental setup}
 
+
 \subsection{General setup}
+\label{setup:general}
+
 
 \subsubsection{Libraries / Frameworks}
 
@@ -16,8 +19,6 @@ The experiments were run on Linux machines with NVIDIA GPUs that were rented and
 We use the GPT2LMHeadModel class of the HuggingFace transformers library which implements a GPT2-style decoder-only transformer model.
 We adjust the model configuration so it matches nanoGPT, a basic lightweight GPT2 implementation which was also used for the experiments in REF. 
 The model uses a vector size of 384, 6 attention heads and 6 transformer blocks.
-
-
 
 \subsubsection{Data format}
 
@@ -43,7 +44,8 @@ Based on the sampling and formatting methods described above, we create 3 separa
 \begin{itemize}
 	\item \textbf{Training dataset:} This dataset is used to optimize the model weights during training. Its size varies from 1k to 100k samples as part of the experiment.
 	\item \textbf{Validation dataset:} A separate dataset with 1k samples. Loss on this dataset is used to decide when to stop training (\cref{early_stopping}). Accuracy on this dataset is also tracked.
-	\item \textbf{Test dataset:} Another separate dataset with 1k samples. This dataset is used to compute the reported final accuracy numbers.
+	For some experiments (\cref{expsetup:scratchpad}) we had to lower the size of the validation dataset to avoid accuracy tracking slowing down training too much.
+	\item \textbf{Test dataset:} Another separate dataset with 1k samples. This dataset is used at the end of each training run to compute the final accuracy numbers.
 \end{itemize} 
 
 \subsubsection{Training}
@@ -84,16 +86,16 @@ To generate answers to a prompt string like "1+2=", we use auto-regressive gener
 During the training process, multiple metrics are tracked:
 
 \begin{itemize}
-	\item{Average batch loss}
+	\item \textbf{Average batch loss:}
 	For each training sample, the model outputs a token probability distribution at each position of the sample. This is compared with the correct next token at this position to compute a cross-entropy loss number. This loss is averaged among all positions of a sample and all samples in the current batch. To reduce statistical noise, the HuggingFace trainer class also averages these batch loss numbers among multiple consecutive training steps.
 	
-	\item{Validation loss}
+	\item \textbf{Validation loss:}
 	At the end of each epoch, the average loss over all samples in the validation dataset is computed. This number is used to track training progress and stop training if no more progress is made.
 	
-	\item{Validation accuracy}
+	\item \textbf{Validation accuracy:}
 	For each sample in the validation dataset, the string is split at the "=" character, yielding a prompt and answer string (e.g. prompt "1+2=" and corresponding answer "3"). For the prompt string, the model's answer is generated as described in \cref{model_generation}. This answer is then compared to the correct answer. The ratio of samples where the model's answer matches the correct answer gives the accuracy.
 	
-	\item{Test accuracy}
+	\item \textbf{Test accuracy:}
 	It is evaluated just like validation dataset accuracy, but on the test dataset. This gives the final accuracy numbers reported in the tables below.
 \end{itemize}
 
@@ -102,39 +104,75 @@ During the training process, multiple metrics are tracked:
 
 
 \subsection{Baseline experiments}
+\label{setup:baseline}
 
-To test the ability of transformer networks to learn arithmetic operations, we first run some baseline experiments. These are set up as follows:
+To test the ability of transformer networks to learn arithmetic operations, and to see whether we can replicate the results of \cite{teaching}, we first run some baseline experiments. The tra are set up as follows:
 
-We wanted to compare the performance of the models we trained to the models of other studies on transformers and arithmetic. In addition, we needed to establish baseline performance metrics to compare the effectiveness of various changes to the model, data, and training regime we are going to attempt.
-Based on the experimental setup described above, we thus performed a number of baseline experiments. This means for each of the following configurations we ran 3 experiments, one with a training dataset size of 1k, one with training dataset size 10k and one with training dataset size 100k:
 
 \begin{itemize}
-	\item Addition, 3 digits
-	\item Addition, 5 digits
-	\item Addition, 10 digits
-	\item Multiplication, 3 digits
-	\item Multiplication, 5 digits
-	\item Multiplication, 10 digits
-	\item Integer square root, 6 digits
-	\item Integer square root, 10 digits
-	\item Integer square root, 20 digits
+	\item \textbf{Addition:}
+	\begin{itemize}
+		\item 3, 5, and 10 digit operands
+		\item 1k, 10k, and 100k training samples
+	\end{itemize}
+	\item \textbf{Multiplication:}
+	\begin{itemize}
+		\item 3, 5, and 10 digit operands
+		\item 1k, 10k, and 100k training samples
+	\end{itemize}
+	\item \textbf{Integer square root:}
+	\begin{itemize}
+		\item 6, 10, and 20 digit operands
+		\item 1k, 10k, and 100k training samples
+	\end{itemize}
 \end{itemize}
 
-Thie leads to a total of 27 experiments.
+Thie leads to a total of 27 baseline experiments.
+
 For each experiment, we tracked the development of accuracy on the validation dataset for this experiment (1k samples for each experiment, these samples of course match the operation and operand size of the experiment).
-To get a better idea not just of final accuracy, but of the development of accuracy during training runs, we also generated accuracy curves. plotting model accuracy at each training/optimization step.
+To get a better idea not just of final accuracy, but of the development of accuracy during training runs, we also generated accuracy curves, plotting model accuracy at each training/optimization step.
+
+
+\subsection{Error analysis}
+\label{setup:error}
+
+We wanted to analyze not just the performance of the final models in terms of the percentage of correctly solved tasks, but also take a look at the types of errors the model makes.
+For this, we picked the first few tasks from the test dataset that the model answered incorrectly. If there were no errors in the test dataset, we created an additional error analysis dataset with 100k samples to look for rare errors.
+Error
 
 
 
 \subsection{Model size experiments}
+\label{setup:modelsize}
 
+To see whether changing the number of parameters of the model improves accuracy, we tried each of the following changes to model dimensions:
+
+\begin{itemize}
+	\item Change the vector size $n_{embd}$ from 384 to either 192 or 768. This causes a change to the number of learnable model parameters: The model with $n_{embd}=192$ has about 2.7M parameters, the baseline model with $n_{embd}=384$ about 11M parameters, and the model with $n_{embd}=768$ about 43M parameters. Thus doubling $n_{embd}$ roughly quadruples the number of parameters (due to matrices for transformations on vectors twice the size having 4 times as many parameters).
+	\item Change the number of GPT2 blocks $n_{blocks}$ from 6 to either 3 or 12. This also changes the number of parameters, but in a linear fashion: The model with 3 blocks has 5.4M parameters, and the model with 12 blocks has 21M parameters. 
+	\item Change the number of attention heads $n_{heads}$ from 6 to either 3 or 12. This has no effect on the number of model parameters, it only affects the "partitioning" of the parameters inside the model.
+\end{itemize}
+
+We did not try to combine these changes, each experiment only had one parameter of the model architecture changed.
+Due to time/hardware constraints, we limited experiments to the following tasks:
+
+\begin{itemize}
+	\item Addition with 10 operand digits, 100k training dataset.
+	\item Multiplication with 5 operand digits, 100k training dataset.
+\end{itemize}
+
+We picked these two tasks from the baseline experiments because addition with 10 digits could be learned well with the 100k dataset, while still being harder than 3 or 5 digit addition, allowing more chances to see a difference in model performance in terms of how many optimization steps it takes to converge.
+Similarly, multiplication with 5 digits and 100k training dataset was chosen because the baseline model could not learn it and achieved zero accuracy. At the same time, learning 5 digit multiplication seemed somewhat realistic with a more capable model architecture, considering that 3 digit multiplication could be learned at a low but not zero (22\%) accuracy.
 
 
 \subsection{Sampling strategy experiments}
+\label{setup:sampling}
 
 
 
 \subsection{Result reversal experiments}
+\label{setup:reversal}
+
 \includeTable
 {
 	task; lenNormal; lenReverse\\
@@ -165,7 +203,7 @@ This means we have to increase the number of positions in the model configuratio
 
 
 \subsection{Scratchpad experiments}
-
+\label{setup:scratchpad}
 
 
 \label{scratchpad_changes}
@@ -352,3 +390,6 @@ For testing accuracy, we only consider the final result after the scratchpad in 
 
 
 \subsection{Attention heatmaps}
+\label{setup:heatmap}
+
+We set up the following attention heatmap experiments: ...
