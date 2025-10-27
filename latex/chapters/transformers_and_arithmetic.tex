@@ -1,10 +1,262 @@
-\section{Transformers and arithmetic}
+\section{Methods}
+
+Building on the results of \cite{teaching}, we wanted to replicate their good results for a small transformer model learning addition with up to 10 decimal digits \citepage{15}{teaching}.
+We also wanted to focus on the harder task of integer multiplication with up to 10 decimal digits, which was studied in \cite{teaching} only for 2 decimal digit multiplicands.
+Because we achieved no success in training this operation using our baseline setup (\cref{TODO}), we experimented with a number of approaches that could help and are illustrated in this section: From simpler approaches like changing the distribution of samples in the training dataset (\cref{TODO}), to more elaborate ones like automatically generated scratchpads (description of intermediate steps of a calculation) that augment the training samples.
+
+\cite{teaching} also studied the square root function, with the output being approximated by its first five decimal digits. We wanted to stick to integer operations and thus included the integer square root function \cref{TODO} to our studied operation to see how hard it is to learn compared to addition and multiplication, and how it would respond to the techniques we tried for improving multiplication performance.
+
+\subsection{Tokenization}
+We stick to a simple tokenization scheme where each character in the string is converted to one token ID based on its ASCII value, meaning our model supports token IDs from 0 to 127. Token ID 0 is reserved to denote the end of the token sequence, it is appended to the ASCII token sequence.
+
+\begin{lstlisting}
+"1+2=3" -> [49, 43, 50, 61, 51, 0]
+\end{lstlisting}
+
+
+\subsection{Model choice}
+We use a transformer model with mostly the same GPT2 architecture described in \cref{gpt2}, with parameters $\dVocab=128, \nBlocks=6, \dHidden=384, \nHeads=6, \dHead=64$ (these parameters are explained in \cref{gpt2:parameters}).
+This means we use the same model architecture and configuration parameters as in \cite{teaching} and thus get a model with about 11M parameters \citepage{3}{teaching}. This is considerably smaller than the versions of GPT2 released by OpenAI with about 100M to 1B parameters (\cref{gpt2:parameters}).
+Since our resources in terms of hardware are limited and we train for single-purpose transformer models that can only do one specific arithmetic task, we consider this acceptable.
+We do however briefly experiment with larger model sizes in \cref{TODO}.
+
+The maximum sequence length of the model, $\nPos$, gets adjusted based on the string lengths of the training data for that particular experiment.
+
+
+\subsection{Arithmetic operations}
+
+We study the performance of transformer models on three different arithmetic operations: Addition and multiplication are standard arithmetic operations and common building blocks of more complex operations like exponentiation and evaluation of polynomial functions. Their learnability by transformer models has been investigated in \cite{teaching} and \cite{visual} among others. Integer square root, on the other hand, has to our knowledge not been studied before in the context of transformer networks.
+
+\subsubsection{Addition}
+Let $a, b$ be positive integers and let $c=a+b$. The model is then trained on strings of the form $a+b=c$.
+
+
+\subsubsection{Multiplication}
+
+Let $a, b$ be positive integers and let $c=a \cdot b$. The model is then trained on sequences of the form $a \cdot b=c$.
+
+\subsubsection{Integer square root}
+\label{isqrt}
+
+In addition to addition and multiplication, we also study the learnability of the integer square root function. Instead of the regular square root function with irrational values, we use integer square root. This is consistent with the addition and multiplication operations in that it is an integer to integer mapping, with exactly one correct, finite answer for each input number, yet being equivalent to approximating the regular square root function.
+
+The integer square root function $\lfloor \sqrt{x} \rfloor$ can be defined as $\max(\{ k \in \mathbb{N} | k^2 \leq x \})$.
+
+A model that can compute the integer square root for integers with a certain number of decimal digits can also approximate the regular square root function:
+
+\begin{itemize}
+	\item $\sqrt{\frac{1}{2}} \approx 0.7071067811$.
+	\item $\sqrt{\frac{1}{2}} = \sqrt{0.5} = 10^{-5} \sqrt{10^{10} \cdot 0.5}
+	= 10^{-5} \sqrt{5 \cdot 10^9}$.
+	\item $\lfloor \sqrt{5 \cdot 10^9} \rfloor = 70710$.
+	\item $\sqrt{\frac{1}{2}} \approx 0.70710$.
+\end{itemize}
+
+We train the model of sequences of the form $x: k$ where $k$ is the integer square root of $x$.
+
+
+
+
+
+\subsection{Sampling methods}
+\label{arith:sampling}
+
+The distribution based on which training samples are picked can have a big impact on the performance of machine learning models. To find out how much of an improvement can be had on the tasks we study just by picking sampling methods, we experimented with multiple sampling methods: Basic sampling, from-zero sampling, uniform digits  sampling and uniform bits sampling.
+
+\subsubsection{Basic sampling}
+\label{arith:sampling:basic}
+
+For the addition and multiplication tasks with $n$ digits, the operands $a$ and $b$ are independently sampled uniformly from the range $[{10}^{n-1}, 10^n - 1]$, which ensures both operands have exactly $n$ decimal digits. We train the models for $n=3$, $n=5$,  and $n=10$ operand digits, giving a sample space of approximate size $10^6$, $10^{10}$, $10^{20}$ respectively.
+
+For the square root operation with $n$ operand digits, we also sample the operand $x$ uniformly from the range $[{10}^{n-1}, 10^n - 1]$. However, because square root is a unary operator, we double the number of decimal digits of the single operand to make sure we have a similarly large space of possible samples. Therefore we train the models for $n=6$, $n=10$,  and $n=20$ operand digits, giving a sample space of approximate size $10^6$, $10^{10}$, $10^{20}$ respectively.
+
+\subsubsection{From-zero sampling}
+
+For the baseline experiments (\cref{TODO}) the limits of sampling were set as $[10^{n-1}, 10^n - 1]$ to include all $n$-digit numbers, where n is the number of operand digits. From-zero sampling instead uses the limits $[0, 10^n - 1]$, to also include operand numbers with fewer decimal digits.
+
+\subsubsection{Uniform digits sampling}
+
+For this sampling method, first a number of decimal digits $k$ is picked uniformly at random from $[1, n]$. Then the operands are picked uniformly at random from $[10^{k-1}, 10^k - 1]$, to ensure they are $k$-decimal digit integers.
+
+\subsubsection{Uniform bits sampling}
+
+Let $p$ be the smallest integer so that $2^p \geq {10}^n$. This ensures all numbers with $n$ decimal digits are covered by the range $[1, 2^p]$.
+A number of bits $k$ is picked uniformly at random from $[1, p]$. Then the operands are picked uniformly at random from $[2^{k-1}, 2^k - 1]$ to ensure they are $k$-bit integers.
+
+
+
 
 \subsection{Result reversal}
 \label{arith:reversal}
 
+Providing some intermediate steps how to arrive at the result within each training sample as opposed to just input/output pairs can make a substantial improvement to final accuracy when transformer models learn addition, especially with more operand digits (\citepage{15}{teaching}).
+Similar to \cite{teaching}, we tested two different strategies: Reversing the digits of the result, and detailing a step-by step arithmetic process to compute the result, similar to doing addition or multiplication on paper or in an algorithm. This we refer to as a "scratchpad". We expanded the experiments in \cite{teaching} beyond addition to multiplication and integer square root with varying operand sizes, testing whether result reversal or scratchpad could also help with learnability for these harder operations.
+
+When computing a sum or product by hand, one starts from the right, computing the least significant digits of the result before moving left to the more significant digits. However, in the baseline experiments, the model needs to predict the most significant digit first and the least significant last.
+
+To accurately predict the most significant digit of a sum, one generally needs to have the exact result of the sum computed already (think about operands where the sum is close to wrapping on the most-significant digit, i.e., small changes in the operand can cause a change in the most significant digit of the sum).
+
+In contrast, knowing the least significant digits of the operands is sufficient to compute the least significant digit of the sum. Thus, it seems reasonable to assume that computing a sum "backwards" would be easier for a model than computing it in normal digit order.
+
+
+To allow the model to first write down the reversed sum before "committing" to the actual result, we modify the training samples: After the = sign, which is the point from which the model is asked to predict the rest of the training sample (which is the sum that we want to know to test addition capability), we put the reversed digits of the sum in brackets before the normal sum.
+For example, the training sample
+
+\begin{lstlisting}
+	456+789=1245
+\end{lstlisting}
+
+\noindent
+would be transformed into:
+
+\begin{lstlisting}
+	456+789=[5421]1245
+\end{lstlisting}
+
+For the multiplication and square root tasks, the digits of the product or integer square root are reversed in the same fashion - first writing the reversed result in brackets before writing the actual result.
+
+\noindent
+Due to the augmented training samples, we also change the way we evaluate correctness when evaluating model performance: For the baseline experiments, we compared the whole output after the = sign. For the result reversal experiments, we first strip the part in brackets (the reversed result) and then only compare what comes after it (the actual result).
+
+
+
+
+
 \subsection{Scratchpads}
 \label{arith:scratchpad}
 
-\subsection{Heatmaps}
+
+Compared to augmenting the training sample with the reversed result, which is a simple process that does not tell the model in detail how to arrive at the result, a scratchpad is a detailed, step-by-step, digit-by-digit walkthrough of a basic algorithm solving the task, decomposing it into small intermediate chunks.
+
+Similar to result reversal, we put the scratchpad (the intermediate steps) in brackets before the correct result. The model then, when prompted, outputs this scratchpad for the task at hand, thus executing the algorithm, then in the ideal case arrives at the correct output after the brackets.
+
+\subsubsection{Scratchpad: Addition}
+\label{add_scratchpad}
+
+For the addition task, the scratchpad illustrates basic digit-by digit addition of two integers: Add two digits of operands plus carry from the previous step, separate ones and tens, take ones as a digit of the sum, keep tens as carry. Move one digit to the left and repeat until the operands have been fully processed. For the training sample
+
+\begin{lstlisting}
+	456+789=1245
+\end{lstlisting}
+
+\noindent
+the sample with scratchpad looks like this:
+
+\begin{lstlisting}
+	456+789=[69051|58141|47121]1245
+\end{lstlisting}
+
+\noindent
+Each step is separated by \verb!|! characters. The two summand digits, previous carry, sum digit, and new carry are written for each step.
+The scratchpad is deliberately kept minimal because of the increase in training time with increased sample length.
+
+\label{training_time_growth}
+This increase in training time is not due to an increase in model parameters, but rather due to the model's attention mecachism comparing one position to all previous positions (\cref{gpt2:attn}). This causes training time to increase quadratically with sequence length. Memory requirements also increase quadratically due to the resulting attention matrix when comparing each position with each previous one.
+
+\subsubsection{Scratchpad: Multiplication}
+\label{mul_scratchpad}
+
+Basic multiplication works by doing single-digit multiplication between the multiplicand and all digits of the multiplier, then adding an appropriate amount of zero digits to each intermediate product, then computing the sum of all the intermediate products. This process forms the basis for our multiplication scratchpad. For example, the multiplication task
+
+\begin{lstlisting}
+	67*89=5963
+\end{lstlisting}
+
+\noindent
+is transformed into
+
+\begin{lstlisting}
+	67*89=[
+	*80{78065,68535}5360,
+	*9{79036,69606}603
+	|
+	{03,0,3,0;60,0,6,0;36,0,9,0;5,0,5,0}
+	]5963
+\end{lstlisting}
+
+\noindent
+The multiplication scratchpad is divided by \verb!|! into the part computing the digit products and the part doing the final addition.
+Each digit product has its own scratchpad enclosed in \verb!{}!.
+
+The computation of the digit products happens like this (example for the multiplication $67 \cdot 80$):
+
+\begin{lstlisting}
+	*80{78065,68535}5360
+\end{lstlisting}
+
+First comes the multiplier (80 in this case), then the multiplication steps in curly braces, then the result of the digit multiplication.
+For each multiplication step, we list five digits: First, the corresponding digit of the multiplicand (first 7, then 6 for 67), then the digit of the multiplier (always 8 for 80), then the previous carry, then the output digit, then the current carry.
+
+The final addition happens like this ($5360+603$ for our example):
+
+\begin{lstlisting}
+	{03,0,3,0;60,0,6,0;36,0,9,0;5,0,5,0}
+\end{lstlisting}
+
+Each addition step is separated by semicolons. The parts of each addition step are separated by commas. For each addition step, we first list the corresponding digits of the summands (e.g., 0 and 3 for the first step of $5360+603$). Then we list the previous carry, then the output digit, and finally, the current carry.
+
+\subsubsection{Scratchpad: Square root}
+\label{sqrt_scratchpad}
+
+A straightforward way to compute the integer square root of an integer $n$ is by using a binary search algorithm, which is illustrated by the following pseudocode:
+
+\begin{lstlisting}
+	low, high = 0, n
+	while high - low > 1:
+	mid = floor((low + high) / 2)
+	if mid*mid <= n:
+	low, high = mid, high
+	else:
+	low, high = low, mid 
+	if high * high <= n:
+	return high
+	else:
+	return low
+\end{lstlisting}
+
+\noindent
+The integer square root scratchpad we use follows the steps of this algorithm, illustrated on the training sample \verb|123:11| :
+
+\begin{lstlisting}
+	123:[
+	{0,123} 61*61=3721| 
+	{0,61} 30*30=900|
+	{0,30} 15*15=225|
+	{0,15} 7*7=49|
+	{7,15} 11*11=121|
+	{11,15} 13*13=169|
+	{11,13} 12*12=144|
+	{11,12}
+	]11
+\end{lstlisting}
+
+The steps of the binary search algorithm are in brackets, separated by pipes.
+Consider the first step for example:
+
+\begin{lstlisting}
+	{0,123} 61*61=3721
+\end{lstlisting}
+
+The current search range is in braces, for this step it is from 0 to 123.
+Then, the midpoint of the search range (61) is squared to 3721.
+We are looking for the integer square root of 123, which is the largest integer whose square is at most 123 (\cref{isqrt}). Because 3721 is larger than $n=123$, the search range in the next step gets restricted to the lower half, which is from 0 to 61.
+The algorithm ends when the search range consists of at most two integers (11 and 12 in this case), at which point the larger one is tested, as $12*12=144$ is too large, $11$ is the correct integer square root.
+
+
+It would have been nice to include the multiplication scratchpad from \cref{mul_scratchpad} for the square operations of this algorithm, however to keep training feasible we have to keep the samples below a few thousand characters. Considering the fact that we want to compute square roots of 6, 10, and 20 digit integers as in the baseline experiments, this is not possible.
+Thus we simply include the square operations without their own scratchpads and hope this illustration of binary search still provides improved accuracy compared to the baseline.
+
+
+
+
+\subsection{Attention heatmaps}
 \label{arith:heatmap}
+
+To get some degree of insight into how the trained model computes the results for the arithmetic tasks presented to it, we generated 2D heatmaps showing activation of the attention mechanism for various input sequences. This roughly follows the attention heatmaps presented in \cref{label}.
+
+Our model consists of a pre-processing stage, a number of GPT2 blocks and finally a post-processing stage (\cref{diagrams/gpt2/overview}). Inside the GPT2 blocks, the core part is the attention mechanism: The input vector at each position is transformed into a query, a key and a value vector. The query vector at one position is then compared with the key vectors at every position, to generate an attention score from 0 to 1 at each position, which is then used to blend the value vectors together to get the output at this position (\cref{diagrams/gpt2/attention_dot}).
+Before running the attention mechanism, the input vector is split into multiple attention heads, on each of which a separate attention mechanism is run, whose outputs are then combined (\cref{diagrams/gpt2/attention_multihead}).
+
+We can thus generate, for a given token sequence,
+a diagram that, for each GPT2 block and each attention head inside that block, contains a 2D heatmap that shows which token / position attends to which (previous) position.
+

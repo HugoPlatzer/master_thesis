@@ -152,6 +152,7 @@ Assuming the model has learned to generate meaningful query and key vectors, the
 It has to be said however that this explanation has been simplified considerably. Transformer models do not operate on words or tokens directly but first transform them into vectors of fixed size that are then fed through the attention mechanism. There are multiple stacked blocks inside a typical transformer model, each consisting of an attention mechanism among other components. A more precise description of the attention mechanism of a realistic transformer model is given in \cref{gpt2:attn}.
 
 \subsection{OpenAI GPT2}
+\label{gpt2}
 
 A good example of a successful decoder model is OpenAI's GPT2 \cite{unsupervisedmultitask} \cite{OpenAI2019BetterLM} \cite[source code]{HuggingFaceGPT2}. It was released in 2019 and demonstrated the ability to write realistic articles based on a given starting prompt. This model is useful for explaining the details of the transformer architecture, because the model weights and code were released, its proven effectiveness in generating meaningful text, and due to the fact that its even more powerful successors have not experienced significant architectural changes \cite{OpenGenus2023GPTComparison}.
 
