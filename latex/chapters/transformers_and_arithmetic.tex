@@ -151,7 +151,7 @@ Each step is separated by \verb!|! characters. The two summand digits, previous 
 The scratchpad is deliberately kept minimal because of the increase in training time with increased sample length.
 
 \label{training_time_growth}
-This increase in training time is not due to an increase in model parameters, but rather due to the model's attention mecachism comparing one position to all previous positions (\cref{gpt2:attn}). This causes training time to increase quadratically with sequence length. Memory requirements also increase quadratically due to the resulting attention matrix when comparing each position with each previous one.
+This increase in training time is not due to an increase in model parameters, but rather due to the model's attention mechanism comparing one position to all previous positions (\cref{gpt2:attn}). This causes training time to increase quadratically with sequence length. Memory requirements also increase quadratically due to the resulting attention matrix when comparing each position with each previous one.
 
 \subsubsection{Scratchpad: Multiplication}
 \label{mul_scratchpad}

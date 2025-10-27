@@ -12,7 +12,7 @@ The second strategy was augmenting each training sample with a scratchpad of int
 Finally, we created heatmaps of model attention to get some insight into how the model processes input strings (\cref{heatmap}).
 
 \subsection{Results}
-When doing the baseline experiments (\cref{baseline}), we found out that addition was generally easily learned as long as the training dataset size was at least 10k (\cref{fig:baseline_add}), with accuracy of at least 99\% for 3, 5 and 10 digit addition when usng a 100k training dataset. These results are in line with \cite{teaching}.
+When doing the baseline experiments (\cref{baseline}), we found out that addition was generally easily learned as long as the training dataset size was at least 10k (\cref{fig:baseline_add}), with accuracy of at least 99\% for 3, 5 and 10 digit addition when using a 100k training dataset. These results are in line with \cite{teaching}.
 
 Multiplication proved much tougher, with only about 20\% accuracy achieved for 3-digit multiplication and zero accuracy for 5 and 10 digits (\cref{fig:baseline_mul}).
 
@@ -25,11 +25,11 @@ Changing the model size did result in a model with bigger vectors or more layers
 
 Changing the digit sampling from uniform across the whole sample space to bit-uniform or digit-uniform provided little improvement either. This stands in contrast to \cite{positionmatters} where both uniform-digit sampling and result reversal provided some improvement in model accuracy.
 
-Result reversal did improve accuracy for additon when using a 100k training dataset: from 98-99\% to 100\% (\cref{tbl:reverse_add}). While it did increase reliability for addition, it did not help with making large multiplication or integer square root learnable.
+Result reversal did improve accuracy for addition when using a 100k training dataset: from 98-99\% to 100\% (\cref{tbl:reverse_add}). While it did increase reliability for addition, it did not help with making large multiplication or integer square root learnable.
 
 Scratchpads led to big improvements for addition and multiplication: Addition could be learned perfectly with a 10k and 100k training dataset, and even for a 1k training dataset, accuracies ranged between 85\% and 99\% (\cref{tbl:scratchpad_add}). For multiplication, accuracies of 94\% for 3-digit multiplication, 63\% for 5-digit multiplication, and 22\% for 10-digit multiplication could be achieved. Interestingly, these numbers were obtained with a 10k training dataset, with slightly lower numbers achieved for the 100k training dataset. For integer square root, scratchpad performed worse than baseline (\cref{tbl:scratchpad_sqrt}) - this could be due to our square root scratchpad not containing each and every intermediate step due to size constraints.
 
-When looking at the heatmaps for model attention, we could see some meaningful relationships between input and output digits in the first layer, especially for addition, corresponding to how addition would be done by hand (\cref{fig:heatmap_add_full}, \cref{fig:heatmap_add_simple1}). What happened in later layers was not obvious in the visualization. When using result reversal and scratchpad, there was a clear connection between input digits and these same digits in the intemediate steps of the computation, but no clear pattern of the rest of the computation (\cref{fig:heatmap_add_rev}, \cref{fig:heatmap_add_scratch}).
+When looking at the heatmaps for model attention, we could see some meaningful relationships between input and output digits in the first layer, especially for addition, corresponding to how addition would be done by hand (\cref{fig:heatmap_add_full}, \cref{fig:heatmap_add_simple1}). What happened in later layers was not obvious in the visualization. When using result reversal and scratchpad, there was a clear connection between input digits and these same digits in the intermediate steps of the computation, but no clear pattern of the rest of the computation (\cref{fig:heatmap_add_rev}, \cref{fig:heatmap_add_scratch}).
 
 In summary, the best results we could achieve for the arithmetic functions we studied were 100\% accuracy for 3, 5 and 10 digit addition, 94\% for 3-digit multiplication, 63\% for 5-digit multiplication, 22\% for 10-digit multiplication, 98\% for 6-digit integer square root, 64\% for 10-digit integer square root and 0\% for 20-digit integer square root.
 For addition and multiplication, these results were obtained when using scratchpads, for integer square root, they are from the baseline model.
@@ -59,4 +59,4 @@ Using a simpler, more straightforward scratchpad for multiplication as in \cite{
 
 At the same time, a better scratchpad for integer square root should be devised. It must be reasonably short, yet not leave big chunks like the computation of squares without intermediate steps.
 
-The inner mechanisms of the model could be explored further - our heatmaps show some clear, logical relationships between input and output in the first layer already - but it does not explain the whole "algorithm" learned by the model. Anaylsis would have to focus on the more opaque patterns in later layers of the model.
+The inner mechanisms of the model could be explored further - our heatmaps show some clear, logical relationships between input and output in the first layer already - but it does not explain the whole "algorithm" learned by the model. Analysis would have to focus on the more opaque patterns in later layers of the model.

@@ -26,7 +26,7 @@ OpenAI's release of the ChatGPT web service in late 2022 \cite{openai_chatgpt_20
 
 While the details of the architecture of ChatGPT have not been released \cite{openai_chatgpt_2022} \cite{openai2023gpt4}, it is assumed that it is based on a transformer decoder architecture very similar to that of GPT2, which was released by OpenAI in 2019, with the main differences being that ChatGPT is based on a bigger model with more learnable parameters as well as a larger training dataset \cite{OpenGenus2023GPTComparison}.
 
-Even though transformer models are very strong at learning the patterns of human language, they do have limitations in other areas such as performing arithmetics.
+Even though transformer models are very strong at learning the patterns of human language, they do have limitations in other areas such as performing arithmetic.
 For example, ChatGPT is unable to correctly multiply numbers with 4 or more decimal digits. It does however seem capable of adding numbers of arbitrary size \cite{openai2023gpt4} \citepage{9}{nocalculator}.  This work seeks to explore the limits on what transformer-style models are able to learn in terms of integer arithmetic.
 
 \subsection{Neural networks and arithmetic}
@@ -41,7 +41,7 @@ The main inspiration for our work was an experiment \cite{teaching}  to teach ar
 
 A much larger transformer network with about 7 billion parameters is trained in \cite{goat}. They try to train on addition and multiplication up to 16 digits while using step by step thinking (including intermediate results of each computation into the training sample, similar to doing addition / multiplication by hand). Accuracy was near-perfect on addition but they failed to learn multiplication.
 
-Training transformer models on binary addition and multiplication was attempted in \cite{memtocomp}. This stands in contrast to the base 10 digits used in the papers mentioned before. They train on operands of only 7 bits and use almost all possible $2^7 \cdot 2^7 = 2^{14}$ addition or multiplication examples in the training set, with the remaining few reserved for the test set. Training eventually achieved perfect accuracy for addition and multiplication, although the operand sizes were small for this stody.
+Training transformer models on binary addition and multiplication was attempted in \cite{memtocomp}. This stands in contrast to the base 10 digits used in the papers mentioned before. They train on operands of only 7 bits and use almost all possible $2^7 \cdot 2^7 = 2^{14}$ addition or multiplication examples in the training set, with the remaining few reserved for the test set. Training eventually achieved perfect accuracy for addition and multiplication, although the operand sizes were small for this study.
 
  Length generalization is the capability of the model to work on operand lengths larger than the ones seen in training. This is the focus of \cite{rightembeddings}. They use a large training dataset of 20 million samples of mixed operand lengths. Using some tweaks to the model's embeddings, they achieve near perfect accuracy for addition and multiplication, as well as some degree of length generalization for addition.
 

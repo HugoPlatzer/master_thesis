@@ -1,7 +1,7 @@
 \section{Transformer models}
 
-Machine translation, which is the automated translation from one natural language to another, was an important challenge since the beginning for the field of artifical intelligence and machine learning.
-The input and output texts are usualy modeled as sequences of integers from a limited range, with each integer representing a phrase, word, or part of a word.
+Machine translation, which is the automated translation from one natural language to another, was an important challenge since the beginning for the field of artificial intelligence and machine learning.
+The input and output texts are usually modeled as sequences of integers from a limited range, with each integer representing a phrase, word, or part of a word.
 Classical dense/feed-forward neural networks are a poor fit for such tasks, as the sequence lengths of even a short text combined with the many possible choices for each position make for a dense network with far too many parameters.
 
 Thus researchers started using approaches like recurrent neural networks (RNN) \cite{phrasereps}, convolutional neural networks (CNN) \cite{convseq} and long short-term memory (LSTM) \cite{seq2seq}.
@@ -128,8 +128,8 @@ In the pre-training stage the model is first trained on a large corpus of text i
 
 After sufficient pre-training, the model is then fine-tuned on question-answer pairs of the specific task the model should be able to solve, like the examples presented in \cref{transformer:examples} or even human-assistant chats on a wide range of topics.
 
-Due to the well-known phenomenon of transfer learning \cite{transferlearning}, the pre-trained model will have already internalized the structure of natural language, source code and maths. 
-This allows a relatively small amount of hand picked fine-tuning examples to make it significantly stronger compared to just training on the question-answer pairs on a freshly initalized model \citepage{8}{improvinglu}.
+Due to the well-known phenomenon of transfer learning \cite{transferlearning}, the pre-trained model will have already internalized the structure of natural language, source code and math. 
+This allows a relatively small amount of hand picked fine-tuning examples to make it significantly stronger compared to just training on the question-answer pairs on a freshly initialized model \citepage{8}{improvinglu}.
 
 \subsection{Attention mechanism}
 \label{transformer:attn}
@@ -142,7 +142,7 @@ The model's attention mechanism would do the following when handling the token "
 	\item Generate a query vector $\mathbf{q}_{\mathrm{it}} = f_q("\mathrm{it}")$ for the token "it" using a function $f_q$ that depends on learned parameters of the model (often a linear transformation).
 	\item Generate key vectors $\mathbf{k}_t$ for all the tokens $t$ of the sentence, using another learned function $f_k$: $\mathbf{k}_{\mathrm{a}} = f_k(\mathrm{"a"})$, $\mathbf{k}_{\mathrm{robot}} = f_k(\mathrm{"robot"})$, \ldots, $\mathbf{k}_{\mathrm{it}} = f_k(\mathrm{"it")}$.
 	\item Compute numeric similarity scores $s$ between the query vector and each key vector, using a measure like dot product: $s_{\mathrm{a}} = \mathbf{\mathbf{q}}_{\mathrm{it}} \cdot \mathbf{k}_{\mathrm{a}}$, $s_{\mathrm{robot}} = \mathbf{q}_{\mathrm{it}} \cdot \mathbf{k}_{\mathrm{robot}}$, \ldots, $s_{\mathrm{it}} = \mathbf{q}_{\mathrm{it}} \cdot \mathbf{k}_{\mathrm{it}}$.
-	\item Normalize the similarity scores $s$ using Softmax to get the normalized scores $s'_t$ for each token $t$. This ensures that $\sum_t s'_t = 1$.
+	\item Normalize the similarity scores $s$ using softmax to get the normalized scores $s'_t$ for each token $t$. This ensures that $\sum_t s'_t = 1$.
 	\item Generate value vectors $\mathbf{v}_t$ for all the tokens $t$ of the sentence, using another learned function $f_v$: $\mathbf{v}_{\mathrm{a}} = f_v(\mathrm{"a"})$, $\mathbf{v}_{\mathrm{robot}} = f_v(\mathrm{"robot"})$, \ldots, $\mathbf{v}_{\mathrm{it}} = f_v(\mathrm{"it")}$.
 	\item Using the normalized similarity scores, blend the value vectors together to get the attention output vector for "it": $\mathbf{a}_{\mathrm{it}} = \sum_t s'_t \mathbf{v}_t$. 
 \end{enumerate}

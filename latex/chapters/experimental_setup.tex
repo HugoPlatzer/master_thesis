@@ -85,7 +85,7 @@ During the training process, multiple metrics are tracked:
 
 \begin{itemize}
 	\item{Average batch loss}
-	For each sample in tre training, batch, the model outputs a token probability distribution at each position of the sample. This is compared with the correct next token at this position to compute a cross-entropy loss number. This loss is averaged among all positions of a sample and all samples in the current batch. To reduce statistical noise, the HuggingFace trainer class also averages these batch loss numbers among multiple consecutive training steps.
+	For each training sample, the model outputs a token probability distribution at each position of the sample. This is compared with the correct next token at this position to compute a cross-entropy loss number. This loss is averaged among all positions of a sample and all samples in the current batch. To reduce statistical noise, the HuggingFace trainer class also averages these batch loss numbers among multiple consecutive training steps.
 	
 	\item{Validation loss}
 	At the end of each epoch, the average loss over all samples in the validation dataset is computed. This number is used to track training progress and stop training if no more progress is made.
@@ -99,6 +99,8 @@ During the training process, multiple metrics are tracked:
 
 
 
+
+
 \subsection{Baseline experiments}
 
 To test the ability of transformer networks to learn arithmetic operations, we first run some baseline experiments. These are set up as follows:
@@ -108,7 +110,7 @@ Based on the experimental setup described above, we thus performed a number of b
 
 \begin{itemize}
 	\item Addition, 3 digits
-	\item Addition, 5digits
+	\item Addition, 5 digits
 	\item Addition, 10 digits
 	\item Multiplication, 3 digits
 	\item Multiplication, 5 digits
@@ -122,9 +124,15 @@ Thie leads to a total of 27 experiments.
 For each experiment, we tracked the development of accuracy on the validation dataset for this experiment (1k samples for each experiment, these samples of course match the operation and operand size of the experiment).
 To get a better idea not just of final accuracy, but of the development of accuracy during training runs, we also generated accuracy curves. plotting model accuracy at each training/optimization step.
 
+
+
 \subsection{Model size experiments}
 
+
+
 \subsection{Sampling strategy experiments}
+
+
 
 \subsection{Result reversal experiments}
 \includeTable
@@ -152,6 +160,9 @@ To get a better idea not just of final accuracy, but of the development of accur
 
 Augmenting the training samples with the reversed result of the arithmetic operation results in increased sample length (\cref{tbl:reverse_sample_lengths}).
 This means we have to increase the number of positions in the model configuration to handle these longer sequences. This does lead to more model parameters due to each position having a learnable positional embedding vector (\cref{gpt2:preproc}). The increase however is just a minute fraction of the total parameters (e.g., 10.710 million parameters for the 10-digit addition baseline requiring 34 positions, and 10.715 million parameters for 10-digit addition with result reversal requiring 47 positions). This minute increase does not necessitate other changes to the training regime such as reduced batch sizes or fewer epochs - we can keep the default batch size of 256 and epoch limit of 200 (\cref{expsetup:batchsize}, \cref{expsetup:learnrate}).
+
+
+
 
 \subsection{Scratchpad experiments}
 
@@ -337,5 +348,7 @@ For the square root operation (\cref{tbl:scratchpad_training_sqrt}), due to time
 
 In addition to the experiment-specific changes mentioned above, we also reduced the size of the validation dataset from 1000 to 10 elements and perform accuracy evaluations not once every 100 steps during logging but only at the end of each epoch. This gives a less detailed report of accuracy development during training but saves significant evaluation time. Accuracy on the test dataset, which is unchanged at 1000 elements, is performed only at the end of the experiment, same as for the baseline, thus final accuracy numbers in the results table do not suffer in precision.
 For testing accuracy, we only consider the final result after the scratchpad in brackets, i.e. the correctness of the intermediate steps is not verified.
+
+
 
 \subsection{Attention heatmaps}
