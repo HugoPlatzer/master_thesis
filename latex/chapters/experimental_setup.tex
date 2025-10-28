@@ -100,15 +100,21 @@ During the training process, multiple metrics are tracked:
 \end{itemize}
 
 
+\subsubsection{Error analysis}
+\label{setup:error}
 
+We wanted to analyze not just the performance of the final models in terms of the percentage of correctly solved tasks, but also take a look at the types of errors the model makes.
+For this, we picked the first few tasks from the test dataset that the model answered incorrectly. If there were no errors in the test dataset, we created an additional error analysis dataset with 100k samples to look for rare errors.
+Error
 
 
 \subsection{Baseline experiments}
 \label{setup:baseline}
 
-To test the ability of transformer networks to learn arithmetic operations, and to see whether we can replicate the results of \cite{teaching}, we first run some baseline experiments. The tra are set up as follows:
+To test the ability of transformer networks to learn arithmetic operations, and to see whether we can replicate the results of \cite{teaching}, we first run some baseline experiments. The general setup is as described in \cref{setup:general} and the training samples for the studied operations were created as described in \cref{methods:ops}.
 
-
+We run a total of 27 baseline experiments, comparing 3 operations, 3 operand sizes per operation, and 3 training dataset sizes:
+ 
 \begin{itemize}
 	\item \textbf{Addition:}
 	\begin{itemize}
@@ -127,18 +133,10 @@ To test the ability of transformer networks to learn arithmetic operations, and 
 	\end{itemize}
 \end{itemize}
 
-This leads to a total of 27 baseline experiments.
-
-For each experiment, we tracked the development of accuracy on the validation dataset for this experiment (1k samples for each experiment, these samples of course match the operation and operand size of the experiment).
-To get a better idea not just of final accuracy, but of the development of accuracy during training runs, we also generated accuracy curves, plotting model accuracy at each training/optimization step.
 
 
-\subsection{Error analysis}
-\label{setup:error}
 
-We wanted to analyze not just the performance of the final models in terms of the percentage of correctly solved tasks, but also take a look at the types of errors the model makes.
-For this, we picked the first few tasks from the test dataset that the model answered incorrectly. If there were no errors in the test dataset, we created an additional error analysis dataset with 100k samples to look for rare errors.
-Error
+
 
 
 
@@ -148,9 +146,9 @@ Error
 To see whether changing the number of parameters of the model improves accuracy, we tried each of the following changes to model dimensions:
 
 \begin{itemize}
-	\item Change the vector size $n_{embd}$ from 384 to either 192 or 768. This causes a change to the number of learnable model parameters: The model with $n_{embd}=192$ has about 2.7M parameters, the baseline model with $n_{embd}=384$ about 11M parameters, and the model with $n_{embd}=768$ about 43M parameters. Thus doubling $n_{embd}$ roughly quadruples the number of parameters (due to matrices for transformations on vectors twice the size having 4 times as many parameters).
-	\item Change the number of GPT2 blocks $n_{blocks}$ from 6 to either 3 or 12. This also changes the number of parameters, but in a linear fashion: The model with 3 blocks has 5.4M parameters, and the model with 12 blocks has 21M parameters. 
-	\item Change the number of attention heads $n_{heads}$ from 6 to either 3 or 12. This has no effect on the number of model parameters, it only affects the "partitioning" of the parameters inside the model.
+	\item Change the hidden vector size $\dHidden$ from 384 to either 192 or 768. This causes a substantial change to the number of learnable model parameters: The model with $\dHidden=192$ has about 2.7M parameters, the baseline model with $\dHidden=384$ about 11M parameters, and the model with $\dHidden=768$ about 43M parameters. Thus doubling $\dHidden$ roughly quadruples the number of parameters (due to matrices for transformations on vectors twice the size having 4 times as many parameters).
+	\item Change the number of GPT2 blocks $\nBlocks$ from 6 to either 3 or 12. This also changes the number of parameters, but in a linear fashion: The model with 3 blocks has 5.4M parameters, and the model with 12 blocks has 21M parameters. 
+	\item Change the number of attention heads $\nHeads$ from 6 to either 3 or 12. This has no effect on the number of model parameters, it only affects the "partitioning" of the parameters inside the model.
 \end{itemize}
 
 We did not try to combine these changes, each experiment only had one parameter of the model architecture changed.
@@ -164,14 +162,27 @@ Due to time/hardware constraints, we limited experiments to the following tasks:
 We picked these two tasks from the baseline experiments because addition with 10 digits could be learned well with the 100k dataset, while still being harder than 3 or 5 digit addition, allowing more chances to see a difference in model performance in terms of how many optimization steps it takes to converge.
 Similarly, multiplication with 5 digits and 100k training dataset was chosen because the baseline model could not learn it and achieved zero accuracy. At the same time, learning 5 digit multiplication seemed somewhat realistic with a more capable model architecture, considering that 3 digit multiplication could be learned at a low but not zero (22\%) accuracy.
 
+In summary, we run these 12 experiments with 6 different model changes attempted on two operations and fixed operand digits and dataset size per operation:
+
+\begin{itemize}
+	\item \textbf{Addition:} 10 operand digits, 100k training dataset, baseline model but with one of these changes: $\dHidden=192, \dHidden=768, \nBlocks=3, \nBlocks=12, \nHeads=3$ or $\nHeads=12$.
+	\item \textbf{Multiplication:} 5 operand digits, 100k training dataset, baseline model but with one of these changes: $\dHidden=192, \dHidden=768, \nBlocks=3, \nBlocks=12, \nHeads=3$ or $\nHeads=12$.
+\end{itemize}
+
 
 \subsection{Sampling strategy experiments}
 \label{setup:sampling}
 
-
+The timing needed.
 
 \subsection{Result reversal experiments}
 \label{setup:reversal}
+
+
+
+Augmenting the training samples with the reversed result of the arithmetic operation results in increased sample length (\cref{tbl:reverse_sample_lengths}).
+This means we have to increase the number of positions in the model configuration to handle these longer sequences. This does lead to more model parameters due to each position having a learnable positional embedding vector (\cref{gpt2:preproc}). The increase however is just a minute fraction of the total parameters (e.g., 10.710 million parameters for the 10-digit addition baseline requiring 34 positions, and 10.715 million parameters for 10-digit addition with result reversal requiring 47 positions). This minute increase does not necessitate other changes to the training regime such as reduced batch sizes or fewer epochs - we can keep the default batch size of 256 and epoch limit of 200 (\cref{expsetup:batchsize}, \cref{expsetup:learnrate}).
+
 
 \includeTable
 {
@@ -196,17 +207,31 @@ Similarly, multiplication with 5 digits and 100k training dataset was chosen bec
 	columns/lenReverse/.style={column name={\begin{tabular}{c} Sequence length \\ (result reversal) \\ \end{tabular}}}
 }
 
-Augmenting the training samples with the reversed result of the arithmetic operation results in increased sample length (\cref{tbl:reverse_sample_lengths}).
-This means we have to increase the number of positions in the model configuration to handle these longer sequences. This does lead to more model parameters due to each position having a learnable positional embedding vector (\cref{gpt2:preproc}). The increase however is just a minute fraction of the total parameters (e.g., 10.710 million parameters for the 10-digit addition baseline requiring 34 positions, and 10.715 million parameters for 10-digit addition with result reversal requiring 47 positions). This minute increase does not necessitate other changes to the training regime such as reduced batch sizes or fewer epochs - we can keep the default batch size of 256 and epoch limit of 200 (\cref{expsetup:batchsize}, \cref{expsetup:learnrate}).
-
-
-
-
 \subsection{Scratchpad experiments}
 \label{setup:scratchpad}
 
 
-\label{scratchpad_changes}
+
+Augmenting the training samples with a scratchpad that details the steps of the arithmetic operation to be performed results in a large increase in sequence length (\cref{tbl:scratchpad_sample_lengths}). This increase is especially noticeable for the multiplication operation (which is composed of several single-digit multiplications followed by a large addition) and the square root operation (which is done by binary search with squaring at every step).
+
+These large sequences of sometimes well beyond 1000 characters necessitate some changes to the training regime. Based on the available hardware, we need to make training batches and the intermediate results during forward/backward pass fit into GPU memory (\cref{expsetup:hardware}). The smaller batches in turn mean more optimization steps per epoch, thus taking more time to do training for a given number of epochs. At the same time, a training batch with longer sequences results in larger matrices during optimization, thus taking more time per batch than the same batch size with shorter sequences.
+Time for evaluating the model (generating answers for the samples in the test/validation dataset to test accuracy) also rises proportionally to the lengths of the sequences being generated, meaning it can become a significant part of training time when sequences are long due to an elaborate scratchpad being trained on.
+
+We want to keep the duration for a single experiment (e.g., square root, using scratchpad, 20 digits, 100k dataset) below 24 hours on the available hardware (\cref{expsetup:hardware}).
+We still want to run all experiments, even those with the largest dataset size of 100k, thus we made the compromise of reducing the maximum number of training epochs for the experiments that would take too much time otherwise. This does have the downside of the models being undertrained (unless early stopping would have halted training before the epoch limit) but it seems like the best choice given the time and hardware constraints.
+
+
+
+For the addition operation (\cref{tbl:scratchpad_training_add}) the only change that needed to be made was reducing the maximum epochs from 200 to 20 for experiments with the large 100k training dataset.
+
+For the multiplication operation (\cref{tbl:scratchpad_training_mul}) the batch sizes needed to be reduced depending on the sequence length. Also the number of epochs needed to be reduced for the experiments with 10k and 100k datasets.
+
+For the square root operation (\cref{tbl:scratchpad_training_sqrt}), due to time and memory constraints (see \cref{training_time_growth}), the batch sizes and epoch counts needed to be cut even more, even down to a batch size of 1 and epoch count of 1 for the task with 20 operand digits and 100k dataset. Even though this results in much less training than the comparable baseline task, we still think it is better trying to at least get a glimpse of training results for this task instead of not including it at all.
+
+In addition to the experiment-specific changes mentioned above, we also reduced the size of the validation dataset from 1000 to 10 elements and perform accuracy evaluations not once every 100 steps during logging but only at the end of each epoch. This gives a less detailed report of accuracy development during training but saves significant evaluation time. Accuracy on the test dataset, which is unchanged at 1000 elements, is performed only at the end of the experiment, same as for the baseline, thus final accuracy numbers in the results table do not suffer in precision.
+For testing accuracy, we only consider the final result after the scratchpad in brackets, i.e. the correctness of the intermediate steps is not verified.
+
+
 
 \includeTable
 {
@@ -231,13 +256,7 @@ This means we have to increase the number of positions in the model configuratio
 	columns/lenScratch/.style={column name={\begin{tabular}{c} Sequence length \\ (scratchpad) \\ \end{tabular}}}
 }
 
-Augmenting the training samples with a scratchpad that details the steps of the arithmetic operation to be performed results in a large increase in sequence length (\cref{tbl:scratchpad_sample_lengths}). This increase is especially noticeable for the multiplication operation (which is composed of several single-digit multiplications followed by a large addition) and the square root operation (which is done by binary search with squaring at every step).
 
-These large sequences of sometimes well beyond 1000 characters necessitate some changes to the training regime. Based on the available hardware, we need to make training batches and the intermediate results during forward/backward pass fit into GPU memory (\cref{expsetup:hardware}). The smaller batches in turn mean more optimization steps per epoch, thus taking more time to do training for a given number of epochs. At the same time, a training batch with longer sequences results in larger matrices during optimization, thus taking more time per batch than the same batch size with shorter sequences.
-Time for evaluating the model (generating answers for the samples in the test/validation dataset to test accuracy) also rises proportionally to the lengths of the sequences being generated, meaning it can become a significant part of training time when sequences are long due to an elaborate scratchpad being trained on.
-
-We want to keep the duration for a single experiment (e.g., square root, using scratchpad, 20 digits, 100k dataset) below 24 hours on the available hardware (\cref{expsetup:hardware}).
-We still want to run all experiments, even those with the largest dataset size of 100k, thus we made the compromise of reducing the maximum number of training epochs for the experiments that would take too much time otherwise. This does have the downside of the models being undertrained (unless early stopping would have halted training before the epoch limit) but it seems like the best choice given the time and hardware constraints.
 
 \includeTable
 {
@@ -285,8 +304,6 @@ We still want to run all experiments, even those with the largest dataset size o
 	\end{tabular}}}
 }
 
-For the addition operation (\cref{tbl:scratchpad_training_add}) the only change that needed to be made was reducing the maximum epochs from 200 to 20 for experiments with the large 100k training dataset.
-
 \includeTable
 {
 	digits; batch; batchScratch; epochs; epochsScratch\\
@@ -332,8 +349,6 @@ For the addition operation (\cref{tbl:scratchpad_training_add}) the only change 
 				(scratchpad)
 	\end{tabular}}}
 }
-
-For the multiplication operation (\cref{tbl:scratchpad_training_mul}) the batch sizes needed to be reduced depending on the sequence length. Also the number of epochs needed to be reduced for the experiments with 10k and 100k datasets.
 
 \includeTable
 {
@@ -381,11 +396,7 @@ For the multiplication operation (\cref{tbl:scratchpad_training_mul}) the batch 
 	\end{tabular}}}
 }
 
-For the square root operation (\cref{tbl:scratchpad_training_sqrt}), due to time and memory constraints (see \cref{training_time_growth}), the batch sizes and epoch counts needed to be cut even more, even down to a batch size of 1 and epoch count of 1 for the task with 20 operand digits and 100k dataset. Even though this results in much less training than the comparable baseline task, we still think it is better trying to at least get a glimpse of training results for this task instead of not including it at all.
 
-
-In addition to the experiment-specific changes mentioned above, we also reduced the size of the validation dataset from 1000 to 10 elements and perform accuracy evaluations not once every 100 steps during logging but only at the end of each epoch. This gives a less detailed report of accuracy development during training but saves significant evaluation time. Accuracy on the test dataset, which is unchanged at 1000 elements, is performed only at the end of the experiment, same as for the baseline, thus final accuracy numbers in the results table do not suffer in precision.
-For testing accuracy, we only consider the final result after the scratchpad in brackets, i.e. the correctness of the intermediate steps is not verified.
 
 
 
