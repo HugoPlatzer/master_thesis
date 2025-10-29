@@ -94,7 +94,7 @@ A number of bits $k$ is picked uniformly at random from $[1, p]$. Then the opera
 
 
 \subsection{Result reversal}
-\label{arith:reversal}
+\label{methods:reversal}
 
 Providing some intermediate steps how to arrive at the result within each training sample as opposed to just input/output pairs can make a substantial improvement to final accuracy when transformer models learn addition, especially with more operand digits (\citepage{15}{teaching}).
 Similar to \cite{teaching}, we tested two different strategies: Reversing the digits of the result, and detailing a step-by step arithmetic process to compute the result, similar to doing addition or multiplication on paper or in an algorithm. This we refer to as a "scratchpad". We expanded the experiments in \cite{teaching} beyond addition to multiplication and integer square root with varying operand sizes, testing whether result reversal or scratchpad could also help with learnability for these harder operations.
@@ -257,7 +257,7 @@ Thus we simply include the square operations without their own scratchpads and h
 
 
 \subsection{Attention heatmaps}
-\label{arith:heatmap}
+\label{methods:heatmap}
 
 To get some degree of insight into how the trained model computes the results for the arithmetic tasks presented to it, we generated 2D heatmaps showing activation of the attention mechanism for various input sequences. This roughly follows the attention heatmaps presented in \cref{label}.
 

@@ -100,7 +100,7 @@ During the training process, multiple metrics are tracked:
 \end{itemize}
 
 
-\subsubsection{Error analysis}
+\subsection{Error analysis}
 \label{setup:error}
 
 We wanted to analyze not just the performance of the final models in terms of the percentage of correctly solved tasks, but also take a look at the types of errors the model makes.
@@ -113,30 +113,18 @@ Error
 
 To test the ability of transformer networks to learn arithmetic operations, and to see whether we can replicate the results of \cite{teaching}, we first run some baseline experiments. The general setup is as described in \cref{setup:general} and the training samples for the studied operations were created as described in \cref{methods:ops}.
 
-We run a total of 27 baseline experiments, comparing 3 operations, 3 operand sizes per operation, and 3 training dataset sizes:
+
+
+We run a total of 3*3*3=27 baseline experiments, comparing 3 operations, 3 operand sizes per operation, and 3 training dataset sizes:
  
 \begin{itemize}
-	\item \textbf{Addition:}
-	\begin{itemize}
-		\item 3, 5, and 10 digit operands
-		\item 1k, 10k, and 100k training samples
-	\end{itemize}
-	\item \textbf{Multiplication:}
-	\begin{itemize}
-		\item 3, 5, and 10 digit operands
-		\item 1k, 10k, and 100k training samples
-	\end{itemize}
-	\item \textbf{Integer square root:}
-	\begin{itemize}
-		\item 6, 10, and 20 digit operands
-		\item 1k, 10k, and 100k training samples
-	\end{itemize}
+	\item \textbf{Addition:} 3, 5, or 10 operand digits, 1k, 10k, or 100k training dataset.
+	\item \textbf{Multiplication:} 3, 5, or 10 operand digits, 1k, 10k, or 100k training dataset.
+	\item \textbf{Integer square root:} 6, 10, or 20 operand digits, 1k, 10k, or 100k training dataset.
 \end{itemize}
 
 
-
-
-
+Because integer square root is a unary operation, we double the number of operand digits compared to addition or multiplication.
 
 
 
@@ -173,15 +161,23 @@ In summary, we run these 12 experiments with 6 different model changes attempted
 \subsection{Sampling strategy experiments}
 \label{setup:sampling}
 
-The timing needed.
+Changing the sampling method / distribution of training samples does not change the length of the training sequences. We can thus run the same 27 baseline experiments (\cref{setup:baseline}) with each of the four sampling methods outlined in \cref{setup:sampling} except "Basic sampling" which was used for the baseline experiments. Thus we run 27*3=81 additional experiments to evaluate sampling strategies:
+
+\begin{itemize}
+	\item \textbf{Addition:} 3, 5, or 10 operand digits, 1k, 10k, or 100k training dataset, from-zero, uniform-digits or uniform-bits sampling.
+	\item \textbf{Multiplication:} 3, 5, or 10 operand digits, 1k, 10k, or 100k training dataset, from-zero, uniform-digits or uniform-bits sampling.
+	\item \textbf{Integer square root:} 6, 10, or 20 operand digits, 1k, 10k, or 100k training dataset, from-zero, uniform-digits or uniform-bits sampling.
+\end{itemize}
+
+
 
 \subsection{Result reversal experiments}
 \label{setup:reversal}
 
+We wanted to find out whether reversing the digits of the result of the arithmetic tasks in the training samples can improve model performance. For this we augmented the training samples with the reversed digits of the result, as described in \cref{methods:reversal}.
 
 
-Augmenting the training samples with the reversed result of the arithmetic operation results in increased sample length (\cref{tbl:reverse_sample_lengths}).
-This means we have to increase the number of positions in the model configuration to handle these longer sequences. This does lead to more model parameters due to each position having a learnable positional embedding vector (\cref{gpt2:preproc}). The increase however is just a minute fraction of the total parameters (e.g., 10.710 million parameters for the 10-digit addition baseline requiring 34 positions, and 10.715 million parameters for 10-digit addition with result reversal requiring 47 positions). This minute increase does not necessitate other changes to the training regime such as reduced batch sizes or fewer epochs - we can keep the default batch size of 256 and epoch limit of 200 (\cref{expsetup:batchsize}, \cref{expsetup:learnrate}).
+This results in increased sample length (\cref{tbl:reverse_sample_lengths}) which means we have to increase the number of positions in the model configuration ($\nPos$) to handle these longer sequences. This does lead to more model parameters due to each position having a learnable positional embedding vector (\cref{gpt2:preproc}). The increase however is just a minute fraction of the total parameters (e.g., 10.710 million parameters for the 10-digit addition baseline requiring 34 positions, and 10.715 million parameters for 10-digit addition with result reversal requiring 47 positions). This minute increase does not necessitate other changes to the training regime such as reduced batch sizes or fewer epochs - we can keep the default batch size of 256 and epoch limit of 200 (\cref{expsetup:batchsize}, \cref{expsetup:learnrate}).
 
 
 \includeTable
@@ -207,10 +203,21 @@ This means we have to increase the number of positions in the model configuratio
 	columns/lenReverse/.style={column name={\begin{tabular}{c} Sequence length \\ (result reversal) \\ \end{tabular}}}
 }
 
+
+
+We can thus repeat the panel of 27 baseline experiments at the same settings (\cref{setup:baseline}), with the training samples augmented with result reversal:
+
+
+\begin{itemize}
+	\item \textbf{Addition:} 3, 5, or 10 operand digits, 1k, 10k, or 100k training dataset, using result reversal.
+	\item \textbf{Multiplication:} 3, 5, or 10 operand digits, 1k, 10k, or 100k training dataset, using result reversal.
+	\item \textbf{Integer square root:} 6, 10, or 20 operand digits, 1k, 10k, or 100k training dataset, using result reversal.
+\end{itemize}
+
 \subsection{Scratchpad experiments}
 \label{setup:scratchpad}
 
-
+Since scratchpads (including intermediate steps of the computation in the training sample) did show promise in \cite{teaching} and \cite{goat}, we also wanted to test this for our panel of operations and operand sizes.
 
 Augmenting the training samples with a scratchpad that details the steps of the arithmetic operation to be performed results in a large increase in sequence length (\cref{tbl:scratchpad_sample_lengths}). This increase is especially noticeable for the multiplication operation (which is composed of several single-digit multiplications followed by a large addition) and the square root operation (which is done by binary search with squaring at every step).
 
@@ -221,7 +228,6 @@ We want to keep the duration for a single experiment (e.g., square root, using s
 We still want to run all experiments, even those with the largest dataset size of 100k, thus we made the compromise of reducing the maximum number of training epochs for the experiments that would take too much time otherwise. This does have the downside of the models being undertrained (unless early stopping would have halted training before the epoch limit) but it seems like the best choice given the time and hardware constraints.
 
 
-
 For the addition operation (\cref{tbl:scratchpad_training_add}) the only change that needed to be made was reducing the maximum epochs from 200 to 20 for experiments with the large 100k training dataset.
 
 For the multiplication operation (\cref{tbl:scratchpad_training_mul}) the batch sizes needed to be reduced depending on the sequence length. Also the number of epochs needed to be reduced for the experiments with 10k and 100k datasets.
@@ -230,8 +236,6 @@ For the square root operation (\cref{tbl:scratchpad_training_sqrt}), due to time
 
 In addition to the experiment-specific changes mentioned above, we also reduced the size of the validation dataset from 1000 to 10 elements and perform accuracy evaluations not once every 100 steps during logging but only at the end of each epoch. This gives a less detailed report of accuracy development during training but saves significant evaluation time. Accuracy on the test dataset, which is unchanged at 1000 elements, is performed only at the end of the experiment, same as for the baseline, thus final accuracy numbers in the results table do not suffer in precision.
 For testing accuracy, we only consider the final result after the scratchpad in brackets, i.e. the correctness of the intermediate steps is not verified.
-
-
 
 \includeTable
 {
@@ -397,10 +401,30 @@ For testing accuracy, we only consider the final result after the scratchpad in 
 }
 
 
+We thus run the following experiments to test model performance when using scratchpads:
 
+\begin{itemize}
+	\item \textbf{Addition:} 3, 5, or 10 operand digits, 1k, 10k, or 100k training dataset, using scratchpad, with modifications to training regime described in \cref{tbl:scratchpad_training_add}.
+	\item \textbf{Multiplication:} 3, 5, or 10 operand digits, 1k, 10k, or 100k training dataset, using scratchpad, with modifications to training regime described in \cref{tbl:scratchpad_training_mul}.
+	\item \textbf{Integer square root:} 6, 10, or 20 operand digits, 1k, 10k, or 100k training dataset, using scratchpad, with modifications to training regime described in \cref{tbl:scratchpad_training_sqrt}.
+\end{itemize}
 
 
 \subsection{Attention heatmaps}
 \label{setup:heatmap}
 
-We set up the following attention heatmap experiments: ...
+We generate diagrams illustrating attention activation between positions (attention heatmap diagrams) based on the methods outlined in \cref{methods:heatmap}. All diagrams consider only the first GPT2 block and are averaged across all attention heads, except for the baseline "123+456" example, where a detailed diagram across all blocks and attention heads is also provided. Diagrams were generated for the following models handling the following example inputs:
+
+\begin{itemize}
+	\item \textbf{Addition:} 
+	\begin{itemize}
+		\item Baseline model trained on 3 digits, 100k training dataset on these examples: "123+456" (both detailed heatmap and averaged heatmap) and "999+001"
+		\item Model trained using result reversal on 3 digits, 100k training dataset on this example (this includes the model generating the result reversal part): "123+456" 
+		\item Model trained using scratchpad on 3 digits, 100k training dataset on this example (this includes the model generating the scratchpad part): "123+456"
+		\item Baseline model trained on 5 digits, 100k training dataset on this example: "12345+67890"
+		
+	\end{itemize}
+	
+	\item \textbf{Multiplication:}  Baseline model trained on 3 digits, 100k training dataset on this example: "123*456"
+	\item \textbf{Integer square root:}  Baseline model trained on 6 digits, 100k training dataset on this example: "123456:"
+\end{itemize}

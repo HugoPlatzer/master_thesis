@@ -1183,7 +1183,7 @@ When switching to a model trained for 5-digit addition and the addition task "12
 
 For 3-digit addition using result reversal (\cref{fig:heatmap_add_rev}), we can see a very clear pattern of the final output digits attending to the corresponding digits of the reversed result. There however is not such a clear pattern for the reversed addition that happens before, with the output digits "9750" not having a strong connection to the matching input digits as was seen before for normal addition.
 
-\includePDFPlot{experiment_results/heatmaps/add_scratch_1.pdf}{fig:heatmap_add_scratch}{First block attention heatmap for the addition task "123+456", using result reversal, averaged over all 6 heads.}
+\includePDFPlot{experiment_results/heatmaps/add_scratch_1.pdf}{fig:heatmap_add_scratch}{First block attention heatmap for the addition task "123+456", using scratchpad, averaged over all 6 heads.}
 
 For the addition task using the scratchpad (\cref{fig:heatmap_add_scratch}), we can also see some patterns: For the individual addition steps, the input digits are fetched as the first two digits of each step. We can also see that the old carry value (third digit of each step) to some degree attends to the fifth digit of the previous step, which is the output carry value of that previous step.
 
