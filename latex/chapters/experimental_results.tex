@@ -613,8 +613,8 @@ For 10k and 100k dataset sizes, there was perfect accuracy for all operand sizes
 \end{table}
 
 
-For the multiplication task (\cref{tbl:scratchpad_mul}), there were even more significant improvements made by providing the scratchpad: For the baseline experiments (\cref{tbl:scratchpad_mul_baseline}) only 3 digits, 10k dataset and 3 digits, 100k dataset provided above-zero accuracy, and even there it was only about 20\%. When using the scratchpad, accuracy is good for 
-3 digits, 10k and 100k dataset sizes. Even for 5 and 10 digit multiplication, there is some degree of accuracy obtained, whereas it was a flat zero in the baseline experiments.
+For the multiplication task (\cref{tbl:scratchpad_mul}), there were even more significant improvements made by providing the scratchpad: For the baseline experiments (\cref{tbl:scratchpad_mul_baseline}) only 3 digits, 10k dataset and 3 digits, 100k dataset provided above-zero accuracy, and even there it was only about 20\%. When using the scratchpad, accuracy is good for 3 digits, 10k and 100k dataset sizes.
+Even for 5 and 10 digit multiplication, there is some degree of accuracy obtained, whereas it was a flat zero in the baseline experiments.
 
 Because the accuracy numbers for 5 and 10 digits are somewhat "in the middle", showing the model is able to do a significant portion of multiplications correctly, but still making some errors, it is not unreasonable to assume training for longer would have made the model able to perform 5 and 10 digit multiplications with high accuracy. In contrast to the baseline, we had to limit training epochs for the multiplication scratchpad experiments to keep training times reasonable (\cref{tbl:scratchpad_training_mul}).
 
@@ -1139,7 +1139,7 @@ For 10 operand digits, scratchpad actually failed to converge, as opposed to bas
 
 
 \subsection{Attention heatmaps}
-\label{heatmap}
+\label{results:heatmap}
 
 
 \subsubsection{How to interpret the diagrams}
