@@ -82,6 +82,7 @@ To generate answers to a prompt string like "1+2=", we use auto-regressive gener
 
 
 \subsubsection{Evaluation}
+\label{setup:eval}
 
 During the training process, multiple metrics are tracked:
 
@@ -180,6 +181,7 @@ We wanted to find out whether reversing the digits of the result of the arithmet
 
 This results in increased sample length (\cref{tbl:reverse_sample_lengths}) which means we have to increase the number of positions in the model configuration ($\nPos$) to handle these longer sequences. This does lead to more model parameters due to each position having a learnable positional embedding vector (\cref{gpt2:preproc}). The increase however is just a minute fraction of the total parameters (e.g., 10.710 million parameters for the 10-digit addition baseline requiring 34 positions, and 10.715 million parameters for 10-digit addition with result reversal requiring 47 positions). This minute increase does not necessitate other changes to the training regime such as reduced batch sizes or fewer epochs - we can keep the default batch size of 256 and epoch limit of 200 (\cref{setup:batchsize}, \cref{setup:learnrate}).
 
+For the result reversal experiments, to evaluate accuracy as described in \cref{setup:eval} we do not consider the entire generated output of the model (the reversed result in brackets and the final result), but instead strip the reversed part before only comparing the actual result.
 
 \includeTable
 {
@@ -236,7 +238,8 @@ For the multiplication operation (\cref{tbl:scratchpad_training_mul}) the batch 
 For the square root operation (\cref{tbl:scratchpad_training_sqrt}), due to time and memory constraints (see \cref{training_time_growth}), the batch sizes and epoch counts needed to be cut even more, even down to a batch size of 1 and epoch count of 1 for the task with 20 operand digits and 100k dataset. Even though this results in much less training than the comparable baseline task, we still think it is better trying to at least get a glimpse of training results for this task instead of not including it at all.
 
 In addition to the experiment-specific changes mentioned above, we also reduced the size of the validation dataset from 1000 to 10 elements and perform accuracy evaluations not once every 100 steps during logging but only at the end of each epoch. This gives a less detailed report of accuracy development during training but saves significant evaluation time. Accuracy on the test dataset, which is unchanged at 1000 elements, is performed only at the end of the experiment, same as for the baseline, thus final accuracy numbers in the results table do not suffer in precision.
-For testing accuracy, we only consider the final result after the scratchpad in brackets, i.e. the correctness of the intermediate steps is not verified.
+
+Similar to the result reversal experiments,  we do not consider the entire generated output of the model (the scratchpad and the final result) for evaluating accuracy, but instead strip the scratchpad before only comparing the result.
 
 \includeTable
 {
