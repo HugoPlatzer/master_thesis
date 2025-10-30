@@ -244,9 +244,21 @@
 \include{chapters/discussion}
 
 
-\printbibliography[nottype=online]
+
+
+\defbibfilter{references}{
+	type=article or
+	type=inproceedings or
+	type=incollection
+}
+
+
+\printbibliography[filter=references, title={References}]
 
 \clearpage
-\printbibliography[type=online, title={Links}]
+\printbibliography[type=misc, title={Preprints}]
+
+\clearpage
+\printbibliography[type=online, title={Other Links}]
 
 \end{document}
