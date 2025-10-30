@@ -1,6 +1,9 @@
 \section{Experimental results}
 
-
+In this section we present the result of running each of the experiments outlined in \cref{setup:baseline} to \cref{setup:heatmap}. Results are presented in the form of colored accuracy tables outlining final model accuracy on the test dataset per experiment.
+For some experiments, we also plot curves illustrating the development of accuracy during model training.
+We also sample errors of the trained models for some experiments and compare them to expected results side by side.
+Finally, this section contains diagrams illustrating attention patterns in the trained models in \cref{results:heatmap}.
 
 \subsection{Baseline experiments}
 \label{results:baseline}
@@ -31,11 +34,11 @@ When looking at the accuracy curves in \cref{fig:baseline_sqrt}, we can see curv
 \includeAccuracyTable{experiment_results/baseline_final_accuracy/sqrt.csv}{tbl:baseline_sqrt}{Final model accuracy on the test dataset for the square root operation for the given training dataset sizes and operand digits.}{}
 
 
-\includePDFPlot{experiment_results/baseline_accuracy/add.pdf}{fig:baseline_add}{Development of accuracy on the validation dataset when training for the addition task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
+\includePDFPlotSmall{experiment_results/baseline_accuracy/add.pdf}{fig:baseline_add}{Development of accuracy on the validation dataset when training for the addition task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
 
-\includePDFPlot{experiment_results/baseline_accuracy/mul.pdf}{fig:baseline_mul}{Development of accuracy on the validation dataset when training for the multiplication task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
+\includePDFPlotSmall{experiment_results/baseline_accuracy/mul.pdf}{fig:baseline_mul}{Development of accuracy on the validation dataset when training for the multiplication task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
 
-\includePDFPlot{experiment_results/baseline_accuracy/sqrt.pdf}{fig:baseline_sqrt}{Development of accuracy on the validation dataset when training for the square root task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
+\includePDFPlotSmall{experiment_results/baseline_accuracy/sqrt.pdf}{fig:baseline_sqrt}{Development of accuracy on the validation dataset when training for the square root task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
 
 
 \FloatBarrier
@@ -271,9 +274,9 @@ For the multiplication task with 5 operand digits, we can see in \cref{tbl:model
 	columns/mul_5digits_100k/.style={column name={\makecell[r]{mul\\(5 digits, 100k)}}},
 }
 
-\includePDFPlot{experiment_results/model_size_accuracy/add.pdf}{fig:model_size_add}{Development of accuracy on the validation dataset when training for the addition task (10 digits, 100k dataset) for different changes in model configuration.}
+\includePDFPlotSmall{experiment_results/model_size_accuracy/add.pdf}{fig:model_size_add}{Development of accuracy on the validation dataset when training for the addition task (10 digits, 100k dataset) for different changes in model configuration.}
 
-\includePDFPlot{experiment_results/model_size_accuracy/mul.pdf}{fig:model_size_mul}{Development of accuracy on the validation dataset when training for the multiplication task (5 digits, 100k dataset) for different changes in model configuration.}
+\includePDFPlotSmall{experiment_results/model_size_accuracy/mul.pdf}{fig:model_size_mul}{Development of accuracy on the validation dataset when training for the multiplication task (5 digits, 100k dataset) for different changes in model configuration.}
 
 
 
@@ -652,11 +655,11 @@ For 10 operand digits, scratchpad actually failed to converge, as opposed to bas
 
 
 
-\includePDFPlot{experiment_results/intermediate_steps_accuracy/add.pdf}{fig:intermediate_steps_accuracy_add}{Development of accuracy on the validation dataset, when training the addition task using a 100k dataset using various training methods and operand digits.}
+\includePDFPlotSmall{experiment_results/intermediate_steps_accuracy/add.pdf}{fig:intermediate_steps_accuracy_add}{Development of accuracy on the validation dataset, when training the addition task using a 100k dataset using various training methods and operand digits.}
 
-\includePDFPlot{experiment_results/intermediate_steps_accuracy/mul.pdf}{fig:intermediate_steps_accuracy_mul}{Development of accuracy on the validation dataset, when training the multiplication task using a 100k dataset using various training methods and operand digits.}
+\includePDFPlotSmall{experiment_results/intermediate_steps_accuracy/mul.pdf}{fig:intermediate_steps_accuracy_mul}{Development of accuracy on the validation dataset, when training the multiplication task using a 100k dataset using various training methods and operand digits.}
 
-\includePDFPlot{experiment_results/intermediate_steps_accuracy/sqrt.pdf}{fig:intermediate_steps_accuracy_sqrt}{Development of accuracy on the validation dataset, when training the square root task using a 100k dataset using various training methods and operand digits.}
+\includePDFPlotSmall{experiment_results/intermediate_steps_accuracy/sqrt.pdf}{fig:intermediate_steps_accuracy_sqrt}{Development of accuracy on the validation dataset, when training the square root task using a 100k dataset using various training methods and operand digits.}
 
 
 
