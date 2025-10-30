@@ -18,20 +18,35 @@ While the other strategies brought no dramatic improvement, scratchpads showed p
 
 In 2017, the influential paper "Attention Is All You Need" \cite{allyouneed} was published. It showed that a new language model architecture, which they called the "Transformer", outperformed all previous models on English-French and English-German translation tasks, while also having lower training cost \citepage{8}{allyouneed}. Soon thereafter, variations of the transformer architecture described in this paper became the state of the art in most natural language processing tasks. They were also found to be competitive with established neural network architectures in other domains such as image classification \citepage{6}{worth16words}.
 
-OpenAI's release of the ChatGPT web service in late 2022 \cite{openai_chatgpt_2022} made Transformer networks a topic of relevance for the general public. This AI chat assistant gave natural and helpful answers, mimicking human dialogue to a degree not seen before; while showing strong skills in a wide array of domains such as computer science, history and creative writing \cite{Savelka_2023} \citepage{5}{openai2023gpt4}.
+OpenAI's release of the original ChatGPT web service in late 2022 based on GPT3.5 \cite{openai_chatgpt_2022} made Transformer networks a topic of relevance for the general public. This AI chat assistant gave natural and helpful answers, mimicking human dialogue to a degree not seen before; while showing strong skills in a wide array of domains such as computer science, history and creative writing \cite{Savelka_2023} \citepage{5}{openai2023gpt4}.
 
-While the details of the architecture of ChatGPT have not been released \cite{openai_chatgpt_2022} \cite{openai2023gpt4}, it is assumed that it is based on a transformer decoder architecture very similar to that of GPT2, which was released by OpenAI in 2019, with the main differences being that ChatGPT is based on a bigger model with more learnable parameters as well as a larger training dataset \cite{OpenGenus2023GPTComparison}.
+While the details of the architecture of GPT3.5 have not been released \cite{openai_chatgpt_2022} \cite{openai2023gpt4}, it is assumed that it is based on a transformer decoder architecture very similar to that of GPT2, which was released by OpenAI in 2019, with the main differences being that GPT3.5 is based on a bigger model with more learnable parameters as well as a larger training dataset \cite{OpenGenus2023GPTComparison}.
 
 Even though transformer models are very strong at learning the patterns of human language, they do have limitations in other areas such as performing arithmetic.
-For example, ChatGPT is unable to correctly multiply numbers with 4 or more decimal digits. It does however seem capable of adding numbers of arbitrary size \cite{openai2023gpt4} \citepage{9}{nocalculator}.  This work seeks to explore the limits on what transformer-style models are able to learn in terms of integer arithmetic.
+For example, GPT3.5 and GPT4 are unable to correctly multiply numbers with 4 or more decimal digits. It does however seem capable of adding numbers of arbitrary size \cite{openai2023gpt4} \citepage{9}{nocalculator}.  This work seeks to explore the limits on what transformer-style models are able to learn in terms of integer arithmetic.
 
-\subsection{Neural networks and arithmetic}
+
+\subsection{Natural language vs. arithmetic}
+
+From a theoretical standpoint, one could argue both that natural language is harder to learn than arithmetic or vice versa:
+Natural language does not always follow strict logic but is more based on established conventions of its speakers, it covers a wide range of topics and can have multiple layers of meaning and nuance.
+Arithmetic on the other hand has strict rules with often only one correct result. Computational complexity can be high for some arithmetic tasks.
+
+Traditionally, computers excelled at arithmetic (due to the fact that it is easy to program them to handle it) but failed at natural language.
+Only recently, after a few generations of transformer networks and roughly at the point in time ChatGPT was launched in late 2022, have computers managed to handle natural language reasonably well \cite{tippingpoint}.
+One might think that an advanced system that is competent at handling natural language would be able to handle arithmetic tasks even better. But that is not necessarily the case.´
+
+From a theoretical standpoint, \cite{theoreticallimits} showed that transformer networks cannot handle some fairly basic tasks like PARITY (testing whether the number of 1s in a bitstring is even) no matter their weights or depth. This however assumes handling the language in a general sense, with unbounded string length. For inputs with limited length, they can in fact learn such languages.
+
+In practice,\cite{openai2023gpt4} and \citepage{9}{nocalculator} showed that GPT-3.5 and GPT-4, which were among the most advanced models for natural language understanding at the time of release, struggle with multiplication of integers with 4 or more decimal digits. They did, however, observe good performance on adding large integers, highlighting that multiplication is not only harder from a computational complexity standpoint but also a greater challenge for transformer models.
+
+\subsection{Neural networks learning arithmetic}
 
  Basic feed-forward networks can do addition of binary numbers (each input / output neuron representing one bit) with one hidden layer and binary multiplication with two hidden layers with perfect accuracy \cite{solving}. They did not train a network, but instead showed this is possible by constructing a feed-forward neural network including weight and bias matrices and proving its output always matches the sum or product of the input numbers.
 
 \cite{visual} trained feed-forward neural networks on integer addition and multiplication, experimenting both with one-hot decimal digit vectors as well as 2D binary images of the written numbers as inputs and outputs. For addition, input integers were limited so the sum fits in 7 digits. For multiplication operands were limited so the product fits in 7 digits, thus allowing operands in the range $[0, 3162]$. Error rates achieved were low for addition ($\approx 2\%$ for both for vector and image inputs), but high for multiplication ($\approx 38\%$ for vector inputs and $\approx 72\%$ for image inputs).
 
-\subsection{Transformer networks and arithmetic}
+\subsection{Transformer networks learning arithmetic}
 
 The main inspiration for our work was an experiment \cite{teaching}  to teach arithmetic to small transformer networks ("nanoGPT" with about 10 million parameters). First, they train for 3-digit integer addition and compare final model performance when they used various training dataset sizes. They then experiment with techniques like result reversal (reversing the order of output digits so the least significant digit comes first, this matches order of computing digits when adding by hand) and step-by-step thinking (not just having inputs and their sum in each training sample, but also intermediate steps of the computation, like intermediate sums and carry amounts, similar to adding or multiplying by hand) to improve performance when training with larger operands. They also experiment with 2-digit multiplication and approximating the square root of decimal numbers in the range $[0,10]$.
 
@@ -39,7 +54,7 @@ A much larger transformer network with about 7 billion parameters is trained in 
 
 Training transformer models on binary addition and multiplication was attempted in \cite{memtocomp}. This stands in contrast to the base 10 digits used in the papers mentioned before. They train on operands of only 7 bits and use almost all possible $2^7 \cdot 2^7 = 2^{14}$ addition or multiplication examples in the training set, with the remaining few reserved for the test set. Training eventually achieved perfect accuracy for addition and multiplication, although the operand sizes were small for this study.
 
- Length generalization is the capability of the model to work on operand lengths larger than the ones seen in training. This is the focus of \cite{rightembeddings}. They use a large training dataset of 20 million samples of mixed operand lengths. Using some tweaks to the model's embeddings, they achieve near perfect accuracy for addition and multiplication, as well as some degree of length generalization for addition.
+Length generalization is the capability of the model to work on operand lengths larger than the ones seen in training. This is the focus of \cite{rightembeddings}. They use a large training dataset of 20 million samples of mixed operand lengths. Using some tweaks to the model's embeddings, they achieve near perfect accuracy for addition and multiplication, as well as some degree of length generalization for addition.
 
 Various transformer models from 10M to 2B parameters are trained on arithmetic tasks in \cite{nocalculator}. They divide training into two phases, with the first phase containing operations with operands up to 5 digits and the second phase containing operations with operands up to 12 digits. They achieve over 99\% accuracy for 3 and 5 digit addition for all model sizes. For 3 digit multiplication, accuracy obtained is between 78\% (10M parameters model) and 98\% (2B parameters model), with larger models achieving better results.
 For 5 digit multiplication, accuracy obtained is between 42\% (10M parameters model) and 90\% (2B parameters model), with larger models achieving better results.
