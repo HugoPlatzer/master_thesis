@@ -2,16 +2,12 @@
 
 \section*{Abstract}
 
-Transformer networks have proven to be successful in a number of domains, such as natural language translation, coding, and general question answering. Arithmetic tasks can be challenging for them however.
+Transformer networks have proven to be successful in a number of domains such as natural language translation, coding, and general question answering. Arithmetic tasks can be challenging for them however.
+We study the performance of small (around 10M parameter) transformer networks with a similar architecture to OpenAI GPT2 on addition (3 to 10 digits), multiplication (3 to 10 digits), and integer square root (6 to 20 digits). Training dataset sizes range from 1k to 100k arithmetic examples, with character-level tokenization based on ASCII character values.
+We observe good performance on addition and poor performance on multiplication, with the latter not being learnable at all with 5 or more operand digits, with integer square root being somewhere in the middle.
+A number of strategies are attempted to address the issues with multiplication and integer square root performance: Adjusting the size of the model, different strategies for sampling the operands, reversing the digits of the result, and including a scratchpad with detailed intermediate steps in each training sample.
+While the other strategies brought no dramatic improvement, scratchpads showed promise in making otherwise unlearnable tasks learnable.
 
-nanoGPT is a small transformer network which allows for efficient training. This is true because...
-We train a small (around 10M parameters) transformer decoder model on integer arithmetic tasks such as addition, multiplication, and integer square root for various operand lengths and evaluate accuracy.
-
-Training samples are generated using ...
-
-Performance is measured using ...
-
-Error samples are studied for patterns, then a number of different strategies for improving performance such as different sampling distributions, reversing digits, and step-by-step reasoning are tried. The internal workings of the model are inspected for patterns using attention heatmaps.
 
 \clearpage
 
