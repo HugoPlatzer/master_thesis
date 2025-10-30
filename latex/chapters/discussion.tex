@@ -1,18 +1,18 @@
 \section{Summary}
 
-As a baseline, we trained a small transformer network on addition, multiplication and integer square root tasks, with different numbers of operand digits and training dataset sizes (\cref{baseline}).
+As a baseline, we trained a small transformer network on addition, multiplication and integer square root tasks, with different numbers of operand digits and training dataset sizes (\cref{results:baseline}).
 
 We wanted to improve performance, in particular for the multiplication and integer square root tasks and thus attempted a number of changes to the model and dataset.
 
-First, we explored whether changing the model size (number of layers, hidden vector sizes etc.) improved model performance (\cref{model_size_experiments}).
-After that, we tried changing the sampling function for the training dataset to see whether prioritizing certain training samples improved performance (\cref{sampling methods}).
-Then, we went on to change the actual training samples themselves (\cref{stepbystep}). For this, we tried two different strategies:
-The first strategy was reversing the digits of the result for each training sample (\cref{resultreversal}).
-The second strategy was augmenting each training sample with a scratchpad of intermediate steps of the arithmetic computation of that sample (\cref{scratchpad}).
-Finally, we created heatmaps of model attention to get some insight into how the model processes input strings (\cref{heatmap}).
+First, we explored whether changing the model size (number of layers, hidden vector sizes etc.) improved model performance (\cref{results:modelsize}).
+After that, we tried changing the sampling function for the training dataset to see whether prioritizing certain training samples improved performance (\cref{results:sampling}).
+Then, we went on to change the actual training samples themselves. For this, we tried two different strategies:
+The first strategy was reversing the digits of the result for each training sample (\cref{results:reversal}).
+The second strategy was augmenting each training sample with a scratchpad of intermediate steps of the arithmetic computation of that sample (\cref{results:scratchpad}).
+Finally, we created heatmaps of model attention to get some insight into how the model processes input strings (\cref{results:heatmap}).
 
 \subsection{Results}
-When doing the baseline experiments (\cref{baseline}), we found out that addition was generally easily learned as long as the training dataset size was at least 10k (\cref{fig:baseline_add}), with accuracy of at least 99\% for 3, 5 and 10 digit addition when using a 100k training dataset. These results are in line with \cite{teaching}.
+When doing the baseline experiments (\cref{results:baseline}), we found out that addition was generally easily learned as long as the training dataset size was at least 10k (\cref{fig:baseline_add}), with accuracy of at least 99\% for 3, 5 and 10 digit addition when using a 100k training dataset. These results are in line with \cite{teaching}.
 
 Multiplication proved much tougher, with only about 20\% accuracy achieved for 3-digit multiplication and zero accuracy for 5 and 10 digits (\cref{fig:baseline_mul}).
 

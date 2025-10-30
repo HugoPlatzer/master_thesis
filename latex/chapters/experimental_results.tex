@@ -11,7 +11,7 @@ Finally, this section contains diagrams illustrating attention patterns in the t
 For the addition operation, we can see in \cref{tbl:baseline_add} that addition up to 10 digits can be learned, as long as the training dataset has at least 10k samples. Accuracy numbers are high, but short of 100\% for 5 and 10 digit addition, meaning there are quite a few errors left in the validation dataset. Only 3 digit addition achieved perfect accuracy.
 Considering the development of accuracy during training, we can see in \cref{fig:baseline_add} that accuracy flatlines until a few hundred to a few thousand optimization steps are performed. More operand digits mean more optimization steps to reach the point of accuracy leaving zero. Interestingly, larger dataset sizes also require slightly more optimization steps to leave zero accuracy.
 After leaving zero, accuracy quickly jumps to about 80\%, then slowly keeps climbing to close to 100\%.
-Based on these accuracy curves, it does not seem unreasonable that training for longer that early stopping permits (\cref{early_stopping}) would have resulted in even better accuracy. Investigating the type and parameters of our early stopping criterion could be worthwhile.
+Based on these accuracy curves, it does not seem unreasonable that training for longer that early stopping permits (\cref{setup:early_stopping}) would have resulted in even better accuracy. Investigating the type and parameters of our early stopping criterion could be worthwhile.
 
 
 For the multiplication task, we can see, in \cref{tbl:baseline_mul}, a very different picture to the addition task. Accuracy never gets above zero, except for the 3 digits, 10k dataset experiment, where it reaches about 1\%, and the 3 digits, 100k dataset experiment, where it reaches about 22\%.
@@ -461,6 +461,7 @@ We also generated accuracy development plots for the result reversal experiments
 
 \FloatBarrier
 \subsubsection{Error analysis}
+\label{results:reversal:error}
 
 We wanted to investigate whether there was any difference in the error patterns between the baseline models and the ones trained using result reversal. To do this, we used the same tasks as for the baseline error analysis (\cref{error_analysis}): addition with 5 and 10 digits (100k dataset), multiplication with 3 and 5 digits (100k dataset) and square root with 6 and 20 digits (100k dataset).
 
@@ -648,7 +649,7 @@ Using a scratchpad leads to much faster convergence, where 3 digit addition alre
 
 For the multiplication task (\cref{fig:intermediate_steps_accuracy_mul}), we can see that only scratchpad with 3 digit multiplication converged to 100\%. For the same task, baseline and result reversal had similar curves, starting to leave zero at about 3000 steps, and ending at around 20\% accuracy after about 40000 steps.
 For 5 and 10 digit multiplication, only scratchpad-based training achieved above-zero accuracy, while still remaining at around 20\% accuracy and taking between 3000 and 20000 steps to start converging.
-It might however converge all the way to 100\% given continued training, but resource constraints made us limit the number of training epochs (\cref{tbl:scrachpad_training_mul}).
+It might however converge all the way to 100\% given continued training, but resource constraints made us limit the number of training epochs (\cref{tbl:scratchpad_training_mul}).
 
 For the square root task with 6 operand digits (\cref{fig:intermediate_steps_accuracy_sqrt}), baseline and result reversal performed very similar while the scratchpad took longer to start converging but then quickly converged, matching the other two training methods.
 For 10 operand digits, scratchpad actually failed to converge, as opposed to baseline and result reversal. This happened despite taking more optimization steps until training was stopped. It would thus be reasonable to assume that the form of scratchpad we used here, which does not further elaborate on the squaring step, is not helpful for model training, as opposed to the successful addition and multiplication scratchpads.
@@ -672,7 +673,7 @@ We only looked at 3 errors per task due to the longer output size when using the
 
 % Add errors
 
-For the addition tasks with 5 and 10 digits and 100k training dataset, there were no errors in the 100k error analysis dataset, similar to training for addition using result reversal (\cref{resutl_reversal_error_add}).
+For the addition tasks with 5 and 10 digits and 100k training dataset, there were no errors in the 100k error analysis dataset, similar to training for addition using result reversal (\cref{results:reversal:error}).
 Thus both result reversal and scratchpads allow for training a model that has a very low error probability for addition tasks up to 10 digits.
 
 % 3 digit mul errors
