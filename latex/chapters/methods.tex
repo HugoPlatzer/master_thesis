@@ -110,20 +110,9 @@ In contrast, knowing the least significant digits of the operands is sufficient 
 
 To allow the model to first write down the reversed sum before "committing" to the actual result, we modify the training samples: After the = sign, which is the point from which the model is asked to predict the rest of the training sample (which is the sum that we want to know to test addition capability), we put the reversed digits of the sum in brackets before the normal sum.
 For example, the training sample \verb!456+789=1245!
-would be transformed into:
-
-\begin{lstlisting}[
-	float,
-	caption={Result reversal training sample for the addition task 456+789=1245.},
-	label={lst:reversal}
-	]
-	456+789=[5421]1245
-\end{lstlisting}
+would be transformed into \verb!456+789=[5421]1245!:
 
 For the multiplication and square root tasks, the digits of the product or integer square root are reversed in the same fashion - first writing the reversed result in brackets before writing the actual result.
-
-\noindent
-Due to the augmented training samples, we also change the way we evaluate correctness when evaluating model performance: For the baseline experiments, we compared the whole output after the = sign. For the result reversal experiments, we first strip the part in brackets (the reversed result) and then only compare what comes after it (the actual result).
 
 
 
@@ -140,14 +129,14 @@ Similar to result reversal, we put the scratchpad (the intermediate steps) in br
 \subsubsection{Scratchpad: Addition}
 \label{add_scratchpad}
 
-For the addition task, the scratchpad illustrates basic digit-by digit addition of two integers: Add two digits of operands plus carry from the previous step, separate ones and tens, take ones as a digit of the sum, keep tens as carry. Move one digit to the left and repeat until the operands have been fully processed. For the training sample \verb!456+789=1245! the sample with scratchpad looks like \cref{lst:scratchpad_add}.
+For the addition task, the scratchpad illustrates basic digit-by digit addition of two integers: Add two digits of operands plus carry from the previous step, separate ones and tens, take ones as a digit of the sum, keep tens as carry. Move one digit to the left and repeat until the operands have been fully processed. For the training sample \verb!456+789=1245! the sample with scratchpad is as described in \cref{lst:scratchpad_add}.
 
 \begin{lstlisting}[
-	float,
+	style=floating,
 	caption={Example scratchpad for the addition task 456+789=1245.},
 	label={lst:scratchpad_add}
 	]
-	456+789=[69051|58141|47121]1245
+456+789=[69051|58141|47121]1245
 \end{lstlisting}
 
 Each step is separated by \verb!|! characters. The two summand digits, previous carry, sum digit, and new carry are written for each step.
@@ -164,16 +153,16 @@ Basic multiplication works by doing single-digit multiplication between the mult
 is transformed into the scratchpad-augmented form seen in \cref{lst:scratchpad_mul}.
 
 \begin{lstlisting}[
-	float,
+	style=floating,
 	caption={Example scratchpad for the multiplication task 67*89=5963.},
 	label={lst:scratchpad_mul}
 	]
-	67*89=[
-	*80{78065,68535}5360,
-	*9{79036,69606}603
-	|
-	{03,0,3,0;60,0,6,0;36,0,9,0;5,0,5,0}
-	]5963
+67*89=[
+*80{78065,68535}5360,
+*9{79036,69606}603
+|
+{03,0,3,0;60,0,6,0;36,0,9,0;5,0,5,0}
+]5963
 \end{lstlisting}
 
 \noindent
@@ -201,7 +190,7 @@ Each addition step is separated by semicolons. The parts of each addition step a
 \subsubsection{Scratchpad: Square root}
 \label{sqrt_scratchpad}
 
-A straightforward way to compute the integer square root of an integer $n$ is by using a binary search algorithm is illustrated by \cref{lst:binarysearch}.
+A straightforward way to compute the integer square root of an integer $n$ is by using a binary search algorithm is illustrated in \cref{lst:binarysearch}.
 The integer square root scratchpad we use follows the steps of this algorithm, illustrated on the training sample \verb|123:11| in \cref{lst:binarysearchexample}.
 
 The steps of the binary search algorithm are in brackets, separated by pipes.
@@ -220,7 +209,7 @@ Thus we simply include the square operations without their own scratchpads and h
 
 
 \begin{lstlisting}[
-	float,
+	style=floating,
 	caption={Binary search algorithm for computing the integer square root.},
 	label={lst:binarysearch}
 ]
@@ -240,7 +229,7 @@ else:
 
 
 \begin{lstlisting}[
-	float,
+	style=floating,
 	caption={Scratchpad example for computing the integer square root of 123.},
 	label={lst:binarysearchexample}
 	]

@@ -24,6 +24,7 @@
 \usepackage{cleveref}
 \usepackage{tikz}
 \usepackage{listings}
+\usepackage{varwidth}
 \usepackage[
     style=numeric,
     backend=biber,
@@ -72,8 +73,14 @@
     basicstyle=\ttfamily,
     moredelim=[is][\highlightbox{red!20}]{!}{!},
     columns=fullflexible,
-    keepspaces,
-    captionpos=b
+    keepspaces
+}
+
+\lstdefinestyle{floating}
+{
+	float=!htbp,
+	captionpos=b,
+	xleftmargin=5mm
 }
 
 \crefname{lstlisting}{listing}{listings}
