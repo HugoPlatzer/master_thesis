@@ -97,7 +97,7 @@
 \newcommand{\citepage}[2]{\cite[p.~#1]{#2}}
 
 \newcommand{\includediagram}[2]{
-    \begin{figure}[H]
+    \begin{figure}[!htbp]
     \centering
     
     \begin{tikzpicture}[framed]
@@ -111,7 +111,7 @@
 
 % arguments: table content, label, caption, additional styling options
 \newcommand{\includeTable}[4]{
-    \begin{table}[H]
+    \begin{table}[!htbp]
         \centering
         \pgfplotstabletypeset[
             string type,
@@ -164,7 +164,7 @@
 
 % arguments: csv file, label, caption, additional styling options
 \newcommand{\includeAccuracyTable}[4]{
-    \begin{table}[H]
+    \begin{table}[!htbp]
         \centering
         \includeAccuracyTableCore{#1}{#4}
         \caption{#3}
@@ -176,35 +176,45 @@
 
 \newcommand{\ErrorAnalysisTableBegin}
 {
-    \begin{table}[H]
-    \centering
-    \begin{tabular}{ll}
-    \toprule
-    \textbf{Model output} & \textbf{Correct output} \\ \midrule
+	\begin{table}[!htbp]
+	\centering
+	\begin{tabular}{ll}
+	\toprule
+	\textbf{Model output} & \textbf{Correct output} \\ \midrule
 }
 
 \newcommand{\ErrorAnalysisTableRule}{\midrule}
 
 \newcommand{\ErrorAnalysisTableEnd}[2]
 {
-\bottomrule
-\end{tabular}
-\caption{#2}
-\label{#1}
-\end{table}
+	\bottomrule
+	\end{tabular}
+	\caption{#2}
+	\label{#1}
+	\end{table}
 }
 
 
 
 
 % arguments: pdf file, label, caption
+\newcommand{\includePDFPlotSmall}[3]{
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[scale=0.75]{#1}%
+    \caption{#3}
+    \label{#2}
+\end{figure}
+}
+
+% arguments: pdf file, label, caption
 \newcommand{\includePDFPlot}[3]{
-    \begin{figure}[H]
-        \centering
-        \includegraphics{#1}
-        \caption{#3}
-        \label{#2}
-    \end{figure}
+	\begin{figure}[!htbp]
+		\centering
+		\includegraphics[scale=0.9]{#1}%
+		\caption{#3}
+		\label{#2}
+	\end{figure}
 }
 
 %%% document content
@@ -218,13 +228,13 @@
 
 \include{chapters/transformer_models}
 
-\include{chapters/transformers_and_arithmetic}
+\include{chapters/methods}
 
 \include{chapters/experimental_setup}
 
-%\include{chapters/experimental_results}
+\include{chapters/experimental_results}
 
-%\include{chapters/discussion}
+\include{chapters/discussion}
 
 
 \printbibliography[nottype=online]
