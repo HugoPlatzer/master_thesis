@@ -13,9 +13,7 @@ Finally, we created heatmaps of model attention to get some insight into how the
 
 \subsection{Results}
 When doing the baseline experiments (\cref{results:baseline}), we found out that addition was generally easily learned as long as the training dataset size was at least 10k (\cref{fig:baseline_add}), with accuracy of at least 99\% for 3, 5 and 10 digit addition when using a 100k training dataset. These results are in line with \cite{teaching}.
-
 Multiplication proved much tougher, with only about 20\% accuracy achieved for 3-digit multiplication and zero accuracy for 5 and 10 digits (\cref{fig:baseline_mul}).
-
 Integer square root, for a comparable operand size (single operand with twice as many digits as the two operands of addition or multiplication) proved to be somewhat in the middle in terms of difficulty. A 100k training dataset achieved 98\% accuracy for 6 digit integer square root and 64\% accuracy for 10 digit integer square root, with zero accuracy for 20 digit integer square root (\cref{fig:baseline_sqrt}).
 
 Errors for addition and multiplication were generally single/multiple digits being off in the middle of the sum/product (\cref{error_analysis}). This matches the error patterns observed in \citepage{7}{lengthgen}, which shows digits in the middle of the result taking longer to converge and finishing at lower accuracy.
@@ -41,22 +39,16 @@ On the other hand, using scratchpads also requires knowledge of meaningful inter
 
 \subsection{Future work}
 
-Some future areas of research that might be worth exploring are:
-
-It is unclear whether the stopping condition we used does lead to premature termination of training - looking at accuracy curves suggests this might be a possibility. Focusing not only on loss but also accuracy might ensure training does not stop before the model reaches maximum accuracy.
-
-In the same way, training when using scratchpad in our case was limited by resources available to us, training for more epochs would allow to see the actual limitations of scratchpad training for multiplication on our model better.
+Adding to the results of our work could start by running training on the scratchpad experiments for longer, until an actual plateau is reached. Training using scratchpad was limited by resources available to us. Training for more epochs would allow to see the actual limitations of scratchpad training for multiplication on our model better.
+It is also unclear whether the stopping condition we used does lead to premature termination of training - looking at accuracy curves suggests this might be a possibility. Focusing not only on loss but also accuracy might ensure training does not stop before the model reaches maximum accuracy.
 
 We did not analyze variance between multiple training runs as even a single training run took substantial resources. It would however be interesting to see if a task that normally fails to converge occasionally does converge or vice versa.
-
-It would be interesting to see whether a second model could learn to predict where the main model makes a mistake and try to correct it, especially for longer scratchpads
-
-It would be worth combining result reversal with uniform-digit sampling to try and replicate the good  results for multiplication in \cite{positionmatters}.
+It would be worth combining result reversal with uniform-digit sampling to try and replicate the good results for multiplication in \cite{positionmatters}.
+It would also be interesting to see whether a second model could learn to predict where the main model makes a mistake and try to correct it, especially for longer scratchpads
 
 The good results of basic feed-forward networks in \cite{visual} would make it worthwhile to explore their limits, especially with regards to longer scratchpad sequences. It would be worth finding out at which point transformers start having an advantage over older, more basic networks. Other structures like 1-dimensional CNNs or recurrent networks could be compared too.
 
 Using a simpler, more straightforward scratchpad for multiplication as in \cite{implicit} would reduce sequence length and thus accelerate training. Performance between such a bare-bones scratchpad and the more elaborate one we are using should be compared.
+At the same time, a better scratchpad for integer square root should be devised. It must be reasonably short, yet not leave big chunks without intermediate steps, like ours does for squaring integers.
 
-At the same time, a better scratchpad for integer square root should be devised. It must be reasonably short, yet not leave big chunks like the computation of squares without intermediate steps.
-
-The inner mechanisms of the model could be explored further - our heatmaps show some clear, logical relationships between input and output in the first layer already - but it does not explain the whole "algorithm" learned by the model. Analysis would have to focus on the more opaque patterns in later layers of the model.
+Finally, the inner mechanisms of the model could be explored further. Our heatmaps show clear, logical relationships between input and output in the first layer already - but it does not explain the whole "algorithm" learned by the model. Analysis would have to focus on the more opaque patterns in later layers of the model.
