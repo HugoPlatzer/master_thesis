@@ -292,7 +292,7 @@ There were, however, some less significant but still noticeable differences when
 
 As expected, the multiplication task (\cref{tbl:sampling_strategies_mul_basic} to \cref{tbl:sampling_strategies_mul_uniformbits}) is much harder to learn, with most combinations of operand size and dataset size leaving the final model at zero accuracy. This does not change significantly based on the sampling method used, however uniform digits and uniform bits sampling do lead to a  slight increase in accuracy for the 100k-dataset, 3-digits case, which given the limited sample space and large number of samples, is the easiest case as expected.
 
-The integer square root task (\cref{tbl:sampling_strategies_sqrt_basic} to \cref{tbl:sampling_strategies_sqrt_uniformbits}) is somewhat in between addition and multiplication  for learning difficulty. The accuracy tables for basic and from-zero sampling also look very similar for this task.  Uniform digits and uniform bits sampling lead to slightly worse accuracy numbers, but the general characteristic is the same: The accuracy numbers mostly depend on the operation learned (addition vs multiplication vs square root) and only slightly change based on the sampling method.
+The integer square root task (\cref{tbl:sampling_strategies_sqrt_basic} to \cref{tbl:sampling_strategies_sqrt_uniformbits}) is somewhat in between addition and multiplication  for learning difficulty. The accuracy tables for basic and from-zero sampling also look very similar for this task.  Uniform digits and uniform bits sampling lead to slightly worse accuracy numbers, but the general characteristic is the same: The accuracy numbers mostly depend on the operation learned (addition versus multiplication versus square root) and only slightly change based on the sampling method.
 
 
 \begin{table}[!htbp]
@@ -397,14 +397,14 @@ The integer square root task (\cref{tbl:sampling_strategies_sqrt_basic} to \cref
 \label{results:reversal}
 
 
-For the addition task (\cref{tbl:reverse_add}), when compared to the baseline experiments (\cref{tbl:reverse_add_baseline}), result reversal led to somewhat successful training (71\% accurracy) for the 3 digits, 1k dataset scenario, which could not be learned in baseline. However, training failed for the 10 digits, 10k dataset scenario.
+For the addition task (\cref{tbl:reverse_add}), when compared to the baseline experiments (\cref{tbl:reverse_add_baseline}), result reversal led to somewhat successful training (71\% accuracy) for the 3 digits, 1k dataset scenario, which could not be learned in baseline. However, training failed for the 10 digits, 10k dataset scenario.
 To us it is not clear whether this is due to a true difference in the learnability between the two training sample structures, or simply due to variance between training runs. Similar differences observed in the sampling strategy experiments (\cref{results:sampling}) might point towards the latter.
 
 It is also worth noting that for result reversal, 5 of the 9 scenarios, including all operand sizes for the 100k dataset size, led to perfect test accuracy (all 1000 samples correct), while for the baseline addition experiments accuracy was not quite perfect for the experiments with 5 and 10 operand digits.
 
 For the multiplication task (\cref{tbl:reverse_mul}), results were in general very similar to those obtained without result reversal (\cref{tbl:reverse_mul_baseline}). This operation thus remained the hardest of the three studied and could not be made easier for the model by first presenting the digit-reversed product in the training samples.
 
-For the integer square root task (\cref{tbl:reverse_sqrt}), the results were also very similar to the baseline task without result reversal (\cref{tbl:reverse_sqrt_baseline}), without significant differences in which scenarios could be learned and  the final accuracies obtained.
+For the integer square root task (\cref{tbl:reverse_sqrt}), the results were also very similar to the baseline task without result reversal (\cref{tbl:reverse_sqrt_baseline}), without significant differences in which scenarios could be learned and  the final accuracy numbers obtained.
 
 \begin{table}[!htbp]
 	\begin{minipage}[t]{0.47\linewidth}
@@ -578,7 +578,7 @@ Even for 5 and 10 digit multiplication, there is some degree of accuracy obtaine
 
 Because the accuracy numbers for 5 and 10 digits are somewhat "in the middle", showing the model is able to do a significant portion of multiplications correctly, but still making some errors, it is not unreasonable to assume training for longer would have made the model able to perform 5 and 10 digit multiplications with high accuracy. In contrast to the baseline, we had to limit training epochs for the multiplication scratchpad experiments to keep training times reasonable (\cref{setup:scratchpad}, \cref{tbl:scratchpad_training_add}).
 
-It is also an interesting observation that accuracies obtained on the 100k training dataset were lower than those on the 10k dataset. Training was limited to 50 epochs for the 10k dataset and 5 epochs for the 100k dataset (\cref{tbl:scratchpad_training_mul}). However, the total amount of training batches / optimization steps is the same for both scenarios, but the variety of training samples is lower in the 10k dataset scenario, increasing the risk of overfitting.
+It is also an interesting observation that accuracy numbers obtained on the 100k training dataset were lower than those on the 10k dataset. Training was limited to 50 epochs for the 10k dataset and 5 epochs for the 100k dataset (\cref{tbl:scratchpad_training_mul}). However, the total amount of training batches / optimization steps is the same for both scenarios, but the variety of training samples is lower in the 10k dataset scenario, increasing the risk of overfitting.
 We would thus have expected better scores for the 100k dataset despite the lower epoch count.
 
 For the integer square root task (\cref{tbl:scratchpad_sqrt}) the results were, interestingly, generally worse than baseline (\cref{tbl:scratchpad_sqrt_baseline}). This might be for a number of reasons:
