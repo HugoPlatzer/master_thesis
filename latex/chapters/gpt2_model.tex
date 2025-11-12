@@ -1,0 +1,376 @@
+\section{OpenAI GPT2}
+\label{gpt2}
+
+A good example of a successful decoder model is OpenAI's GPT2 \cite{unsupervisedmultitask} \cite{OpenAI2019BetterLM} \cite[source code]{HuggingFaceGPT2}. It was released in 2019 and demonstrated the ability to write realistic articles based on a given starting prompt. This model is useful for explaining the details of the transformer architecture, because the model weights and code were released, its proven effectiveness in generating meaningful text, and due to the fact that its even more powerful successors have not experienced significant architectural changes \cite{OpenGenus2023GPTComparison}.
+
+\subsection{Achitecture}
+
+A general overview of the architecture of GPT2 is presented in \cref{diagrams/gpt2/overview}.
+As described in \cref{transformer:input}, the input to the model is an integer sequence, with each integer representing an element of the token vocabulary.
+Creating this token sequence from the input text is done by the tokenizer (\cref{transformer:tokenization}, \cref{gpt2:tokenizer}). This tokenizer is considered a component separate from the model and is trained before it. The model is then trained based on the output indices of the chosen tokenizer, therefore the tokenizer cannot be changed for a trained model. The various stages inside the model are as follows:
+
+\begin{enumerate}
+	\item The sequence of token indices is then transformed into a sequence of vectors by the preprocessing stage (\cref{gpt2:preproc}). The preprocessing stage converts each token $\modIn_i \in \mathbb{N}$ into a hidden vector $\modHiddenAt{0}_i \in \mathbb{R}^\dHidden$ based on the token value $x_i$ and token position $i$. For this, it uses learnable embedding matrices.
+	The size of each of these hidden vectors, $\dHidden$ is a parameter that can be configured when creating a GPT2 model (\cref{gpt2:parameters}).
+	
+	\item These vectors $\modHiddenAt{0}_i$ are then fed through a number of GPT2 blocks, each being identical except for having its own set of learnable parameters. These GPT2 blocks are indexed by $l$ ($1 \leq l \leq \nBlocks)$, with $\nBlocks$ being the number of GPT2 blocks the model has, which can also be configured at model creation.
+	We denote the input vectors to block number $\modLayer$ as $\modHiddenAt{\modLayer-1}_i$ and the output vectors of that block as $\modHiddenAt{\modLayer}_i$. Thus for a model with, e.g., 12 blocks, the inputs to the first block are $\modHiddenAt{0}_i$ and the outputs after the last block are $\modHiddenAt{12}_i$.
+	
+	Each block outputs a vector sequence of the same dimensions as its input.
+	The GPT2 block structure is described in detail in \cref{gpt2:block} and consists of multiple layers including normalization, a feed-forward network and the attention mechanism. The attention mechanism (\cref{gpt2:attn}) is special to transformer networks and the only point in the model where vectors are not transformed independently, i.e., the output vector of the attention mechanism at position $i$  depends not just on the input vector at position $i$, but also on the vectors at all previous positions $1 \leq i' < i$.
+	The job of the block and the attention mechanism in particular is to allow the model to learn how later elements of the training sequences are influenced by previous elements, e.g., capitalized words mostly appearing after points and spaces (ends of sentences) in English training texts.
+	
+	\item After the last block there is the postprocessing stage (\cref{gpt2:postproc}). Its job is to convert each hidden vector $\modHiddenAt{\nBlocks}_i$ into a probability distribution $\modOut_i \in \mathbb{R}^{\dVocab}$. This is also done with a learnable embedding matrix.
+	
+	During training (\cref{gpt2:training}), the model parameters are optimized so that every $\modOut_i$ correctly predicts the next token in the training sequence, $\modIn_{i+1}$.
+	During inference (\cref{gpt2:textgen}), only the last distribution, $\modOut_n$, is used to sample a predicted token $\modIn_{n+1}$, which then is appended to the input sequence for the next generation step.
+\end{enumerate}
+
+\includediagram{diagrams/gpt2/overview}{Overview of a GPT2 model. This example uses a model with $\nBlocks=12$ blocks, $\dHidden=768$ hidden vector size. The model is processing a sequence of length 3. Models can also process longer sequences than shown in this example, up to their positional limit $\nPos$ which is configurable at model creation time as is the number of blocks and hidden vector size.}
+
+
+
+\subsection{Model size variants}
+
+\label{gpt2:parameters}
+
+To make the model bigger (needing more memory and computation time, but allowing for more accurate generation) or smaller (faster, but lower quality output), two hyperparameters can be adjusted \citepage{4}{unsupervisedmultitask} \citepage{5}{improvinglu}: The vector size for each position can be changed just like the number of transformer blocks. The number of attention heads is usually adapted so that the size of each head remains around 64 \citepage{4}{unsupervisedmultitask} \cite{hfpretrained}.
+OpenAI GPT2 was released in four versions with different parameter counts:
+
+\includeTable
+{
+	name; n_params; n_blocks; d_hidden; n_heads; d_head\\
+	gpt2-small; 117M; 12; 768; 12; 64 \\
+	gpt2-medium; 345M; 24; 1024; 16; 64 \\
+	gpt2-large; 774M; 36; 1280; 20; 64 \\
+	gpt2-xl; 1558M; 48; 1600; 25; 64 \\
+}
+{tab:gpt2-sizesX}
+{
+	Versions of GPT2 released with different parameter counts \cite{hfpretrained}: $\nBlocks$ is the number of GPT2 blocks, $\dHidden$ is the vector size at each position, $\nHeads$ is the number of attention heads and $\dHead$ is the size of each attention head.
+}
+{%
+	columns/name/.style={column name={Model variant}},
+	columns/n_params/.style={column name={No. of parameters}},
+	columns/n_blocks/.style={column name={$\nBlocks$}},
+	columns/d_hidden/.style={column name={$\dHidden$}},
+	columns/n_heads/.style={column name={$\nHeads$}},
+	columns/d_head/.style={column name={$\dHead$}}
+}
+
+
+\subsection{Tokenization}
+
+\label{gpt2:tokenizer}
+
+The GPT2 models as released by OpenAI were trained using a Byte-pair encoding (BPE) tokenizer (\cref{transformer:tokenization}) with a vocabulary of 50257 tokens \citepage{4}{unsupervisedmultitask} \cite{HuggingFaceGPT2}. The tokenizer was itself trained on a natural language corpus separately before training the actual models. The models were then configured with $\dVocab=50257$ and the training texts were processed using this tokenizer before being fed into the model. Thus, when using these models with the weights as released by OpenAI, the same tokenizer must be used for text generation during inference time as well. An example on how the tokenizer that was released with OpenAI GPT2 handles a sentence can be seen in \cref{diagrams/gpt2/tokenizer}.
+
+It is also possible to train a GPT2 model with a different tokenizer with, e.g., a smaller vocabulary. Instead of a proper tokenizer that was trained to efficiently chunk text in some natural language, other GPT2 implementations like nanoGPT \cite{nanogpt} use a simpler approach: Each ASCII character in the training text is mapped to one token, with the token value equal to the ASCII character value.
+This makes for a simpler overall implementation that keeps all the processing outside the tokenizer and inside the actual model.
+The downside is that token sequences get significantly longer, thus a model with the same $\nPos$ and ASCII tokenization can only handle significantly shorter texts than one with a trained tokenizer that recognizes, e.g., frequent words and groups all their characters into a single token.
+
+\includediagram{diagrams/gpt2/tokenizer}{Operation of the GPT2 tokenizer on an example sentence.}
+
+
+\subsection{Preprocessing}
+\label{gpt2:preproc}
+
+Transformer networks do not operate on integer token IDs, but on state vectors from $\mathbb{R}^{\dHidden}$. $\dHidden$, the dimension of the state vector at each position, is a parameter fixed at the time of model construction (\cref{gpt2:parameters}).
+This means the token sequence needs to be converted into a sequence of such vectors before feeding it through the model. This happens during the preprocessing stage, which is illustrated in \cref{diagrams/gpt2/preproc}.
+For converting the token IDs $\modIn_i$ into initial state vectors $\modHiddenAt{0}_i$, GPT2 has a learnable token embedding matrix $\embTok \in \mathbb{R}^{\dVocab \times \dHidden}$. Each row of this matrix stores the learnable initial state vector for the corresponding token ID.
+
+
+Because the blocks of the GPT2 have no positional awareness (their learnable parameters do not depend on the sequence position $i$), information about the position of a token within the sequence needs to be included as well \citepage{6}{allyouneed}.
+In GPT2, this is done by a learnable embedding matrix $\embPos \in \mathbb{R}^{\dVocab \times \dHidden}$ storing a learnable vector for each position up to the sequence length limit $\nPos$.
+
+The starting vector $\modHiddenAt{0}_i \in \mathbb{R}^\dHidden$ for a token value $\modIn_i$ at position $i$ is then given in \cref{eq:gpt2_preproc} as the sum of the token and positional embedding vectors \citepage{3}{allyouneed}:
+
+\begin{equation}
+	\modHiddenAt{0}_i = \embTokAt{\modIn_i, :} + \embPosAt{i, :}
+	\label{eq:gpt2_preproc}
+\end{equation}
+
+\includediagram{diagrams/gpt2/preproc}{GPT2 preprocessing stage on an example token sequence. Based on the token position and value, embedding vectors are summed to give the starting vector at this position.}
+
+
+\subsection{Postprocessing}
+\label{gpt2:postproc}
+
+GPT2 uses a "language modeling head" \cite{HuggingFaceGPT2} to convert the outputs of the last block $\modHiddenAt{\nBlocks}_i$ into token probabilities $\modOut_i$, the steps of which are illustrated in \cref{diagrams/gpt2/postproc}.
+
+First, a final layer normalization step is performed \citepage{4}{unsupervisedmultitask}, which transforms $\modHiddenAt{\nBlocks}_i$ into $\modHiddenAt{\nBlocks, norm}_i$. The details of this layer normalization step are  the same as the layer normalization steps in each GPT2 block, which are described in \cref{gpt2:layernorm}.
+
+GPT2 then re-uses the same matrix $\embTok$ that was used in the preprocessing stage to convert $\modHiddenAt{\nBlocks, norm}_i$ into a token probability vector $\modOut'_i$ of dimension $\dVocab$, using matrix-vector product, as shown in \cref{eq:postproc} and \cref{eq:postproc_detailed}.
+This tying of the weights in the postprocessing stage to those of the preprocessing stage is done for improving model performance as well as reducing the number of learnable parameters \cite{weightstying}.
+
+Finally, softmax is applied to transform this vector $\modOut'_i$ into a proper probability distribution $\modOut_i$.
+
+\begin{align}
+	\modOut'_i &= \embPos \modHiddenAt{\nBlocks, \textrm{norm}}_i
+	\label{eq:postproc}
+	\\
+	(\modOut'_i)_k &= \sum_{j=1}^{\dHidden}{\embPosAt{k,j} (\modHiddenAt{\nBlocks, \textrm{norm}}_i)_j} & 1 \leq k \leq \dVocab
+	\label{eq:postproc_detailed}
+\end{align}
+
+\includediagram{diagrams/gpt2/postproc}{Detailed example of the GPT2 postprocessing stage. $\modHiddenAt{\nBlocks}_i$, the output of the last GPT2 block, is converted into token probabilities.}
+
+
+\subsection{Text generation}
+\label{gpt2:textgen}
+
+Generating output text using a trained GPT2 model follows the general process for transformer networks outlined in \cref{transformer:textgen}.
+The generation process is visualized in \cref{diagrams/gpt2/generation}. It always starts with some existing starting text that is transformed into a sequence of $n$ tokens $\modIn_1 \ldots \modIn_n$. These tokens are fed through the model to get the output probability distributions $\modOut_1 \ldots \modOut_n$. The last distribution $\modOut_n$ is sampled using one of the sampling methods outlined in \cref{transformer:textgen}. The token that results from this sampling becomes $\modIn_{n+1}$ and is appended to the sequence $\modIn_1 \ldots \modIn_n$. The process outlined above is then repeated, now sampling $\modOut_{n+1}$ to get the next token $\modIn_{n+2}$ and so on.
+
+Depending on what texts / token sequences the model was trained on, it will at some point cause a special stop token ID to be sampled, which tells the sampling process that the generated text is now complete and sampling should be stopped.
+In other cases, a fixed number of tokens defined by the user might be sampled, which is possible as long as the total token sequence length does not exceed $\nPos$.
+
+Due to the limited dimensions of the positional embedding matrix $\embPos$, GPT2 as described here does not support generating texts of unlimited length. Other variants of GPT2 or similar transformer models use different positional embeddings not based on a matrix of fixed dimension. Those models could support unlimited generation, although it is limited in practice by computational complexity and limited coherence in the generated text (\cref{transformer:textgen}).
+
+\includediagram{diagrams/gpt2/generation}{Text generation using the GPT2 model for the example starting text "where is". The rightmost probability distribution is used to pick the next token, after which the data, augmented with this new token, is fed through the model again.}
+
+\subsection{Training}
+\label{gpt2:training}
+
+GPT2 uses a training objective similar to \citepage{3}{improvinglu} where a large text corpus is used to make the model predict the next token based on the tokens up to this point.
+In \cite{improvinglu} this is called "unsupervised pre-training", however other authors refer to similar automated labeling techniques as "self-supervised learning" \cite{selfsupervised} \cite{selfsupervisedvisual}.
+In contrast to classical supervised learning, the training samples in self-supervised learning are not manually labeled, but the inputs and labels are automatically created from each training sample using some mathematical function. An example of this could be erasing some pixels of an image in the input while leaving them untouched in the label.
+For training transformer decoder models like GPT2, the training goal typically is to make the model correctly complete a text similar to the training samples when only the start of such a text is given.
+To achieve this, each training sample's token sequence $\modIn_1 \ldots \modIn_n$ is shifted by one position: the inputs to the model are $\modIn_1 \ldots \modIn_{n-1}$ and the corresponding labels are $\modIn_2 \ldots \modIn_n$. This makes the model learn to predict $\modIn_{i+1}$ based on $\modIn_1 \ldots \modIn_i$ for all $i$ from $1$ to $n-1$ in a single optimization step (also see \cref{transformer:output}).
+
+For each probability distribution $\modOut_i$ output by the model, cross-entropy loss is used to measure the deviation between $\modOut_i$ and the ideal $\modTarget_i$,
+where $\modTarget_i$ is the probability distribution of a guaranteed token with ID $\modIn_{i+1}$ \citepage{2}{unsupervisedmultitask} \cite{HuggingFaceGPT2}.
+
+Standard initialization techniques (for example uniform initialization) can be used for the weight and bias matrices \citepage{5}{improvinglu}.
+
+GPT2 is trained using the Adaptive Moment Optimizer (Adam)  \citepage{5}{improvinglu}.
+A naive stochastic gradient optimizer will not achieve good results when training transformer networks like GPT2, thus more advanced optimizers like Adam need to be used to make the model converge to a degree where it becomes useful \cite{adambeatssgd}.
+
+
+
+
+
+
+\subsection{GPT2 block structure}
+\label{gpt2:block}
+
+The GPT2 blocks are the core of the model, where it learns to draw connections between the vectors at different positions, and data can flow between positions.
+Because its structure is somewhat complex, we dedicated this separate section to it.
+A high-level overview of the structure of a GPT2 block is presented in \cref{diagrams/gpt2/block} as well as equations \eqref{eq:gpt2_overview_start} to \eqref{eq:gpt2_overview_end}:
+
+\begin{enumerate}
+	\item \Cref{eq:gpt2_overview_start} shows the input vectors to the block with index $\modLayer$, given as $\modHiddenAt{l, 0}_1 \ldots \modHiddenAt{l, 0}_n$, are the are the outputs of the previous block $\modHiddenAt{l-1}_1 \ldots \modHiddenAt{l-1}_n$. For the first block, its inputs are the outputs of the preprocessing stage (\cref{gpt2:preproc}).
+	
+	\item The first step of each block is a layer normalization stage, described by \cref{eq:gpt2_overview_ln1}. It is explained in more detail in \cref{gpt2:layernorm}.
+	
+	\item After the layer normalization stage the vectors pass through the heart of the block - the multi-head attention mechanism. \Cref{eq:gpt2_overview_attn} shows that multi-head attention, in contrast to the other stages, needs access to the entire vector sequence $\modHiddenAt{l, 1}_1 \ldots \modHiddenAt{l, 1}_n$ as well as the position $i$ for which to compute the attention output. This is necessary because it connects the vectors at different positions and lets data flow between them. Multi-head attention is explained in detail in \cref{gpt2:attn}.
+	
+	\item After the attention mechanism, there is a residual connection described by \cref{eq:gpt2_overview_res1}, which lets data flow around the layer norm and attention stages as well as through it. The motivation behind this is explained in \cref{gpt2:residual}.
+	
+	\item Then, there is a second layer normalization stage described by \cref{eq:gpt2_overview_ln2}. It works the same as the first layer normalization stage, but with separate learnable parameters. It is followed by the multi-layer perceptron (MLP) stage, described by \cref{eq:gpt2_overview_mlp}. This stage is a basic feed-forward network with one hidden layer, explained in in \cref{gpt2:mlp}.
+	
+	\item Finally, there is a second residual connection, described by \cref{eq:gpt2_overview_res2}, whose outputs as defined by \cref{eq:gpt2_overview_end} are the outputs of the block, $\modHiddenAt{l}_1 \ldots \modHiddenAt{l}_n$.
+\end{enumerate}
+
+
+The layer normalization, attention and MLP stages all have learnable parameters, with each GPT2 block having a separate set of such learnable parameters. All stages except the attention stage operate on each vector $\modHidden_i$ independently.
+
+
+\begin{align}
+	\modHiddenAt{l, 0}_i &= \modHiddenAt{l-1}_i
+	\label{eq:gpt2_overview_start}
+	\\
+	\modHiddenAt{l, 1}_i &= \mathrm{LN1}\AtLayer{l}(\modHiddenAt{l, 0}_i)
+	\label{eq:gpt2_overview_ln1}
+	\\
+	\modHiddenAt{l, 2}_i &= \mathrm{MHA}\AtLayer{l}(\modHiddenAt{l, 1}_1 \ldots \modHiddenAt{l, 1}_i)
+	\label{eq:gpt2_overview_attn}
+	\\
+	\modHiddenAt{l, 3}_i &= \modHiddenAt{l, 0}_i + \modHiddenAt{l, 2}_i
+	\label{eq:gpt2_overview_res1}
+	\\
+	\modHiddenAt{l, 4}_i &= \mathrm{LN2}\AtLayer{l}(\modHiddenAt{l, 3}_i)
+	\label{eq:gpt2_overview_ln2}
+	\\
+	\modHiddenAt{l, 5}_i &= \mathrm{MLP}\AtLayer{l}(\modHiddenAt{l, 4}_i)
+	\label{eq:gpt2_overview_mlp}
+	\\
+	\modHiddenAt{l, 6}_i &= \modHiddenAt{l, 3}_i + \modHiddenAt{l, 5}_i
+	\label{eq:gpt2_overview_res2}
+	\\
+	\modHiddenAt{l}_i &= \modHiddenAt{l, 6}_i
+	\label{eq:gpt2_overview_end}
+\end{align}
+
+
+
+\includediagram{diagrams/gpt2/block}{Overview of the components of a GPT2 block with index $\modLayer$. This example shows 3 positions $\modHiddenAt{\modLayer}_1 \ldots \modHiddenAt{\modLayer}_3$, but the actual model is flexible regarding sequence length.}
+
+\subsubsection{Notation used}
+\label{gpt2:notation}
+
+To keep the diagrams and equations readable when describing the stages of the GPT2 block (layer norm, attention, MLP) next, we define the inputs to the stage simply as $\modHidden_i$ for each position $i$ from 1 to $n$, intermediate results as $\modHiddenStep{1}_i$ and the outputs as $\modHidden'_i$, dropping the block index $l$ and stage index.
+Each block and each stage of the block has separate, independent learnable parameters despite this not being reflected in the notation used below.
+
+\subsubsection{Layer normalization}
+\label{gpt2:layernorm}
+
+The two layer normalization stages of the GPT2 block are illustrated \cref{diagrams/gpt2/layernorm} as well as equations \eqref{eq:gpt2:ln_intermediate} to \eqref{eq:gpt2:ln_ln2}.
+
+First, the input vector $\modHidden_i$ is normalized in \cref{eq:gpt2:ln_intermediate} by subtracting its mean $\mu$ and dividing by its standard deviation $\sigma$, with $\epsilon$ being a small positive constant added for numerical stability of the square root.
+
+Then, a gain and bias value is applied per component to the intermediate result $\modHiddenStep{1}_i$. The first layer normalization stage LN1 uses learnable gain and bias vectors $\mathbf{w}_\mathrm{LN1}, \mathbf{b}_\mathrm{LN1} \in \mathbb{R}^\dHidden$ as described in \cref{eq:gpt2:ln_ln1}.
+The second layer normalization stage LN2 uses separate gain and bias vectors $\mathbf{w}_\mathrm{LN2}, \mathbf{b}_\mathrm{LN2} \in \mathbb{R}^\dHidden$ as described in \cref{eq:gpt2:ln_ln2}.
+
+
+\begin{align}
+	(\modHiddenStep{1}_i)_j &= \frac
+	{(\modHidden_i)_j - \mu(\modHidden_i)}
+	{\sqrt {\sigma^2(\modHidden_i)+\epsilon}}
+	\label{eq:gpt2:ln_intermediate}
+	\\
+	(\modHidden'_i)_j &= (\mathbf{w}_{\textrm{LN1}})_j (\modHiddenStep{1}_i)_j + (\mathbf{b}_{\textrm{LN1}})_j
+	\label{eq:gpt2:ln_ln1}
+	\\
+	(\modHidden'_i)_j &= (\mathbf{w}_{\textrm{LN2}})_j (\modHiddenStep{1}_i)_j + (\mathbf{b}_{\textrm{LN2}})_j
+	\label{eq:gpt2:ln_ln2}
+\end{align}
+
+\includediagram{diagrams/gpt2/layernorm}{Detailed view of the layer normalization stages of the GPT2 block. $d=\dHidden$. For the first layer norm LN1, $\mathbf{w}=\mathbf{w}_\mathrm{LN1}, \mathbf{b}=\mathbf{b}_\mathrm{LN1}$. For the second layer norm LN2, $\mathbf{w}=\mathbf{w}_\mathrm{LN2}, \mathbf{b}=\mathbf{b}_\mathrm{LN2}$.}
+
+\subsubsection{Residual connection}
+\label{gpt2:residual}
+
+A residual connection, as described in \cref{eq:gpt2_res}, works by adding the inputs of some function $f$, like a layer in a machine learning model, back to its outputs \citepage{3}{allyouneed} \cite{residual}.
+When using residual connections, the input data does not need to flow through all computation steps before reaching a given point, instead it can bypass some of them, allowing later computations easier access to earlier data.
+Such connections are found in almost all models having many steps/layers, because they were found to greatly help when training deep models \citepage{1-2}{residual}.
+
+\begin{align}
+	\modHidden'_i = \modHidden_i + f(\modHidden_i)
+	\label{eq:gpt2_res}
+\end{align}
+
+
+\subsubsection{Multi-head attention}
+\label{gpt2:attn}
+
+GPT2, just like the original transformer introduced in \cite{allyouneed}, uses a form of attention mechanism called multi-head attention \citepage{4}{unsupervisedmultitask}.\\
+The stages of multi-head attention are presented in \cref{diagrams/gpt2/attention_multihead} and equations \eqref{eq:mha:q} to \eqref{eq:mha:output}.
+At first, query, key and value vectors are computed for each position, which are then split into segments of equal size called attention heads. Then, the actual attention values are computed for each head, which are then merged and finally subjected to a linear projection \citepage{4}{allyouneed}.
+
+The reasoning behind introducing multiple attention heads is given in \citepage{5}{allyouneed} as allowing the model to better attend to multiple separate positions $i'$ from some position $i$, each position being highlighted by a separate attention head. When just using a single attention head, blending the value vectors (see \cref{gpt2:attn_dot}) causes this information to become more diluted compared to having each $i'$ focused in a separate attention head's output and then concatenated.
+
+Based on the input vectors $\modHidden_1 \ldots \modHidden_i$, the multi-head attention output $\modHidden'_i$ is computed as follows: 
+
+\begin{enumerate}
+	\item For each position $i' \leq i$, a query vector $\mathbf{q}_{i'}$, a key vector $\mathbf{k}_{i'}$, and a value vector $\mathbf{v}_{i'}$ are generated using linear transforms with learnable parameters $(\mathbf{W}_q, \mathbf{b}_q),(\mathbf{W}_k, \mathbf{b}_k), (\mathbf{W}_v, \mathbf{b}_v)$, as described by equations \eqref{eq:mha:q} to \eqref{eq:mha:v}. Each of these vectors has dimension $\dHidden$, just like $\modHidden_i$.
+	
+	\item These vectors are each split into $\nHeads$ segments of equal size $\dHead$. This splitting including the slicing indices $j_1, j_2$ is described by equations \eqref{eq:mha:qh} to \eqref{eq:mha:vh}. Each slice index $h$ represents an attention head.
+	
+	\item For each attention head $h$, scaled dot-product attention (\cref{gpt2:attn_dot}) is used to compute an attention output $\mathbf{a}_{i_h}$ at position i for that head, as described by \cref{eq:mha:sdpa}. This needs the query, key, and value vectors for that head at each position up to $i$.
+	
+	\item These attention outputs $\mathbf{a}_{i_h}$ are concatenated for all heads, giving a total attention output $\mathbf{a}_i$, as described by \cref{eq:mha:concat}.
+	
+	\item The concatenated attention outputs are passed through a linear transform with learnable parameters $(\mathbf{W}_{\mathrm{proj}}, \mathbf{v}_{\mathrm{proj}})$, as described by \cref{eq:mha:output}. This results in the output of the multi-head attention algorithm, $\modHidden'_i$.
+\end{enumerate}
+
+\begin{align}
+	\mathbf{q}_{i'} &= \mathbf{W}_q \modHidden_{i'} + \mathbf{b}_q
+	\quad 1 \leq i' \leq i
+	\label{eq:mha:q}
+	\\
+	\mathbf{k}_{i'} &= \mathbf{W}_k \modHidden_{i'} + \mathbf{b}_k
+	\quad 1 \leq i' \leq i
+	\label{eq:mha:k}
+	\\
+	\mathbf{v}_{i'} &= \mathbf{W}_v \modHidden_{i'} + \mathbf{b}_v
+	\quad 1 \leq i' \leq i
+	\label{eq:mha:v}
+	\\
+	\mathbf{q}_{i_h} &= (\mathbf{q}_i)_{j_1:j_2}
+	\quad 1 \leq h \leq \nHeads, j_1 = (h-1) \cdot \dHead + 1, j_2 = h \cdot \dHead
+	\label{eq:mha:qh}
+	\\
+	\mathbf{k}_{i_h} &= (\mathbf{k}_i)_{j_1:j_2}
+	\quad 1 \leq h \leq \nHeads, j_1 = (h-1) \cdot \dHead + 1, j_2 = h \cdot \dHead
+	\label{eq:mha:kh}
+	\\
+	\mathbf{v}_{i_h} &= (\mathbf{v}_i)_{j_1:j_2}
+	\quad 1 \leq h \leq \nHeads, j_1 = (h-1) \cdot \dHead + 1, j_2 = h \cdot \dHead
+	\label{eq:mha:vh}
+	\\
+	\mathbf{a}_{i_h} &= \operatorname{SDPA}(
+	\mathbf{q}_{1_h} \ldots \mathbf{q}_{i_h},
+	\mathbf{k}_{1_h} \ldots \mathbf{k}_{i_h},
+	\mathbf{v}_{1_h} \ldots \mathbf{v}_{i_h}
+	)
+	\label{eq:mha:sdpa}
+	\\
+	\mathbf{a}_i &= \operatorname{concat}_{1 \leq h \leq \nHeads} \ \mathbf{a}_{i_h}
+	\label{eq:mha:concat}
+	\\
+	\modHidden'_i &= \mathbf{W}_{\mathrm{proj}} \mathbf{a}_i + \mathbf{b}_\mathrm{proj}
+	\label{eq:mha:output}
+\end{align}
+
+\includediagram{diagrams/gpt2/attention_multihead}{Structure of the multi-head attention mechanism. This example uses two positions $\mathbf{h}_1, \mathbf{h}_2$ and two attention heads. The actual model can in theory handle arbitrary sequence lengths and also has more attention heads.}
+
+
+
+\subsubsection{Scaled dot-product attention}
+\label{gpt2:attn_dot}
+The scaled dot-product attention mechanism as outlined in \cref{diagrams/gpt2/attention_dot} and equations \eqref{eq:attn_dot_weight} to \eqref{eq:attn_dot_out} is the core part of multi-head attention described in \cref{gpt2:attn}.
+Its job is to use the keys to find the positions most relevant to the query and amplify the values at these positions.
+It is run in parallel for each of the $\nHeads$ attention heads. For simplicity, the head index $h$ is not repeated in the diagrams and equations here.
+Note that scaled dot-product attention does not have any learnable parameters, the learnable parts like the creation of query, key and value vectors and projection after merging heads is done by multi-head attention.
+The attention mechanism described here is more a less a more detailed explanation of the overview given in \cref{transformer:attn}:
+
+\begin{enumerate}
+	\item The query vector $\mathbf{q}_i$ at position $i$ is compared with the key vector of each position $1 \leq i' \leq i$ using dot product to generate a score value $w_{i'i} \in \mathbb{R}$, as described in \cref{eq:attn_dot_weight}.
+	The scaling factor $\frac {1} {\sqrt{d_{head}}}$ helps improve gradient stability \citepage{4}{allyouneed}.
+	
+	Positions after $i$ $(i' > i)$ are not considered because of the autoregressive nature of the model, i.e. the model is going to be used to predict the token at position $i+1$ based on the tokens up to position $i$. While the entire sequence is available during training, allowing for an efficient training process, during text generation only the tokens up to the current position $i$ will be available so this is what should be learned \citepage{5}{allyouneed}.
+	
+	\item The scores $w_{i'i}$ are normalized in \cref{eq:attn_dot_softmax} using softmax so their sum is 1, this is required for the next step.
+	
+	\item Using the scores from before as weights, the output vector $\mathbf{a}_i$ is "blended together" in \cref{eq:attn_dot_out} from each of the value vectors $\mathbf{v}_{i'}$ \cite{alammar-gpt2}:
+\end{enumerate}
+
+\begin{align}
+	w_{i'i} &= \frac{1}{\sqrt{\dHead}} \ \mathbf{k}_{i'} \mathbf{q}_i
+	\label{eq:attn_dot_weight}
+	\\
+	\operatorname{softmax}(w_{i'i}) &= \frac{\mathrm{e}^{w_{i'i}}} {\sum_{1 \leq i'' \leq i} \mathrm{e}^{w_{i''i}} }
+	\label{eq:attn_dot_softmax}
+	\\
+	\mathbf{a}_i &= \sum _{1 \leq i' \leq i} \operatorname{softmax}(w_{i'i}) \mathbf{v}_{i'}
+	\label{eq:attn_dot_out}
+\end{align}
+
+\includediagram{diagrams/gpt2/attention_dot}{Structure of the scaled dot-product attention mechanism. This diagram illustrates the computation of the attention output $\mathbf{a}_3$. The other output positions $\mathbf{a}_i$ are computed in a similar fashion, replacing $\mathbf{q}_3$ in the diagram with $\mathbf{q}_i$ and considering $\mathbf{k}_1 \ldots \mathbf{k}_i$ and $\mathbf{v}_1 \ldots \mathbf{v}_i$, giving the diagram $i$ columns.}
+
+
+\subsubsection{Multi-layer perceptron}
+\label{gpt2:mlp}
+
+
+The multi-layer perceptron stage in the GPT2 block is a simple feed-forward neural network with one hidden layer \citepage{5}{allyouneed}, illustrated in \cref{diagrams/gpt2/mlp} and equations \eqref{eq:gpt2:gelu} to \eqref{eq:gpt2:mlp2}.
+
+In contrast to the original transformer paper, GPT2 uses the Gaussian Error Linear Unit (GELU) activation function \citepage{5}{improvinglu}.
+The GELU function for a real input $z$ is defined in \cref{eq:gpt2:gelu} as $z$ multiplied by the probability that a random variable $Z$ which follows a normal distribution with mean 0 and variance 1 is less than $z$ \cite{gelu}.
+
+The input vector $\modHidden_i$ is first subjected to a linear transformation with weights $\mathbf{W}_\textrm{MLP1}$ and biases $\mathbf{b}_\textrm{MLP1}$, followed by applying GELU to each component, to get the intermediate $\modHiddenStep{1}_i$, as described by \cref{eq:gpt2:mlp1}. The size of this intermediate vector is dependent on the dimensions of the learnable weight matrices and bias vectors ($\mathbf{W}_\textrm{MLP1}, \mathbf{b}_\textrm{MLP1}), (\mathbf{W}_\textrm{MLP2}, \mathbf{b}_\textrm{MLP2}$), which are typically configured such that the dimension of $\modHiddenStep{1}_i$ is $4 \cdot \dHidden$ \citepage{5}{allyouneed} \cite[source code]{HuggingFaceGPT2}.
+Then another linear transformation happens in \cref{eq:gpt2:mlp2} with a different set of learnable parameters $\mathbf{W}_\textrm{MLP2}, \mathbf{b}_\textrm{MLP2}$ to get the output $\modHidden'_i$ with dimension $\dHidden$.
+
+\begin{align}
+	\mathrm{GELU}(z) &= z \cdot \mathbb{P}(Z<z) & z \in \mathbb{R}, Z \sim \mathcal{N}(0, 1)
+	\label{eq:gpt2:gelu}
+	\\
+	\modHiddenStep{1}_i &= \mathrm{GELU}(\mathbf{W}_\textrm{MLP1} \modHidden_i + \mathbf{b}_\textrm{MLP1})
+	\label{eq:gpt2:mlp1}
+	\\
+	\modHidden'_i &= \mathbf{W}_\textrm{MLP2} \modHiddenStep{1}_i + \mathbf{b}_\textrm{MLP2}
+	\label{eq:gpt2:mlp2}
+\end{align}
+
+\includediagram{diagrams/gpt2/mlp}{Multi-layer perceptron stage of the GPT2 block. It is a simple feed-forward neural network with two linear steps with bias and an activation function in between.}
