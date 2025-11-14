@@ -74,7 +74,7 @@ To train a tokenizer, the byte-pair-encoding (BPE) algorithm \cite{subwordunits}
 Apart from the regular token vocabulary, most tokenizers also contain some special token values that will not be found in the input text. These are used for example to represent the start and end of each training sample, delimit individual pieces of text when they are fed to the model, or separate parts of a question/answer pair \cite{HuggingFaceTokenizers}.
 
 
-\subsection{Input / output}
+\subsection{Input and output}
 \label{transformer:input}
 
 Formally, the input to the model consists of a sequence of integers (token IDs) $\modIn_1 \ldots \modIn_n$, where $n$ is the length of the token sequence.
@@ -134,7 +134,7 @@ This allows a relatively small amount of hand picked fine-tuning examples to mak
 \subsection{Attention mechanism}
 \label{transformer:attn}
 
-Before transformers, model architectures such as recurrent neural networks (RNN) and Long Short Term Memory (LSTM) were commonly used to handle textual or other sequential data. They ingest the tokenized text one token at a time, keeping one or multiple fixed vectors of model state. Transformers, in contrast, dropped recurrence and handle the entire sequence in parallel \citepage{1}{allyouneed}.
+Before transformers, model architectures such as recurrent neural networks (RNN) and long short-term memory (LSTM) were commonly used to handle textual or other sequential data. They ingest the tokenized text one token at a time, keeping one or multiple fixed vectors of model state. Transformers, in contrast, dropped recurrence and handle the entire sequence in parallel \citepage{1}{allyouneed}.
 
 To draw connections between elements of the token sequence, they use a so-called attention mechanism. It is in fact the only part of the model that connects the different parts of the sequence it is processing, all other components of a transformer model handle each position independently. The concept of an attention mechanism is best explained using a high-level example \cite{alammar-gpt2}: Suppose the model is processing the sentence "A robot must obey orders given to it" and each word is one token. The model should learn that there is a connection from the pronoun "it" to the earlier noun "robot".
 The model's attention mechanism would do the following when handling the token "it":
