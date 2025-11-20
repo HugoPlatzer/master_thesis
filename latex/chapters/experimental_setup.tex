@@ -1,6 +1,6 @@
 \section{Experimental setup}
 
-Based on the methods outlined in \cref{methods}, we set up a training pipeline that first creates a dataset for the given arithmetic operation, operand digits and sampling method, then initializes a GPT2-style model (\cref{methods:model}) with the given model configuration, and then trains the model on the dataset, monitoring loss and accuracy during training.
+Based on the methods outlined in \cref{methods}, we set up a training pipeline that first creates a dataset for the given arithmetic operation, operand digits and sampling method, then initializes a GPT-2-style model (\cref{methods:model}) with the given model configuration, and then trains the model on the dataset, monitoring loss and accuracy during training.
 
 \subsection{General setup}
 \label{setup:general}
@@ -17,8 +17,8 @@ The experiments were run on Linux machines with NVIDIA GPUs that were rented and
 
 \subsubsection{Model implementation}
 
-We use the GPT2LMHeadModel class of the HuggingFace transformers library which implements a GPT2-style decoder-only transformer model.
-We adjust the model configuration so it matches nanoGPT \cite{nanogpt}, a basic lightweight GPT2 implementation which was also used for the experiments in \cite{teaching}. 
+We use the GPT2LMHeadModel class of the HuggingFace transformers library which implements a GPT-2-style decoder-only transformer model.
+We adjust the model configuration so it matches nanoGPT \cite{nanogpt}, a basic lightweight GPT-2 implementation which was also used for the experiments in \cite{teaching}. 
 The model uses $\dHidden=384$, $\nBlocks=6$, $\nHeads=6$.
 
 \subsubsection{Data format}
@@ -137,7 +137,7 @@ To see whether changing the number of parameters of the model improves accuracy,
 
 \begin{itemize}
 	\item Change the hidden vector size $\dHidden$ from 384 to either 192 or 768. This causes a substantial change to the number of learnable model parameters: The model with $\dHidden=192$ has about 2.7M parameters, the baseline model with $\dHidden=384$ about 11M parameters, and the model with $\dHidden=768$ about 43M parameters. Thus doubling $\dHidden$ roughly quadruples the number of parameters (due to matrices for transformations on vectors twice the size having 4 times as many parameters).
-	\item Change the number of GPT2 blocks $\nBlocks$ from 6 to either 3 or 12. This also changes the number of parameters, but in a linear fashion: The model with 3 blocks has 5.4M parameters, and the model with 12 blocks has 21M parameters. 
+	\item Change the number of GPT-2 blocks $\nBlocks$ from 6 to either 3 or 12. This also changes the number of parameters, but in a linear fashion: The model with 3 blocks has 5.4M parameters, and the model with 12 blocks has 21M parameters. 
 	\item Change the number of attention heads $\nHeads$ from 6 to either 3 or 12. This has no effect on the number of model parameters, it only affects the "partitioning" of the parameters inside the model.
 \end{itemize}
 
@@ -417,7 +417,7 @@ We thus run the following experiments to test model performance when using scrat
 \subsection{Attention heatmaps}
 \label{setup:heatmap}
 
-We generate diagrams illustrating attention activation between positions (attention heatmap diagrams) based on the methods outlined in \cref{methods:heatmap}. All diagrams consider only the first GPT2 block and are averaged across all attention heads, except for the baseline "123+456" example, where a detailed diagram across all blocks and attention heads is also provided. Diagrams were generated for the following models handling the following example inputs:
+We generate diagrams illustrating attention activation between positions (attention heatmap diagrams) based on the methods outlined in \cref{methods:heatmap}. All diagrams consider only the first GPT-2 block and are averaged across all attention heads, except for the baseline "123+456" example, where a detailed diagram across all blocks and attention heads is also provided. Diagrams were generated for the following models handling the following example inputs:
 
 \begin{itemize}
 	\item \textbf{Addition:} 

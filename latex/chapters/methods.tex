@@ -20,8 +20,8 @@ We stick to a simple tokenization scheme where each character in the string is c
 \subsection{Model choice}
 \label{methods:model}
 
-We use a transformer model with mostly the same GPT2 architecture described in \cref{gpt2}, with parameters $\dVocab=128, \nBlocks=6, \dHidden=384, \nHeads=6, \dHead=64$ (these parameters are explained in \cref{gpt2:parameters}).
-This means we use the same model architecture and configuration parameters as in \cite{teaching} and thus get a model with about 11M parameters \citepage{3}{teaching}. This is considerably smaller than the versions of GPT2 released by OpenAI with about 100M to 1B parameters (\cref{gpt2:parameters}).
+We use a transformer model with mostly the same GPT-2 architecture described in \cref{gpt2}, with parameters $\dVocab=128, \nBlocks=6, \dHidden=384, \nHeads=6, \dHead=64$ (these parameters are explained in \cref{gpt2:parameters}).
+This means we use the same model architecture and configuration parameters as in \cite{teaching} and thus get a model with about 11M parameters \citepage{3}{teaching}. This is considerably smaller than the versions of GPT-2 released by OpenAI with about 100M to 1B parameters (\cref{gpt2:parameters}).
 Since our resources in terms of hardware are limited and we train for single-purpose transformer models that can only do one specific arithmetic task, we consider this acceptable.
 We do however briefly experiment with larger model sizes in some experiments described in \cref{setup:modelsize}.
 
@@ -255,15 +255,15 @@ else:
 
 To get some degree of insight into how the trained model computes the results for the arithmetic tasks presented to it, we generated 2D heatmaps showing activation of the attention mechanism for various input sequences. Our process for creating heatmap diagrams roughly follows the attention heatmaps presented in \cite{bertsecrets} and \cite{analyzingheads}:
 
-The model consists of a pre-processing stage, a number of GPT2 blocks and finally a post-processing stage (\cref{diagrams/gpt2/overview}). Inside the GPT2 blocks, the core part is the attention mechanism (\cref{gpt2:attn_dot}): The input vector at each position is transformed into a query, a key and a value vector. The query vector at one position is then compared with the key vectors at every position, to generate an attention score from 0 to 1 at each position, which is then used to blend the value vectors together to get the output at this position (\cref{diagrams/gpt2/attention_dot}).
+The model consists of a pre-processing stage, a number of GPT-2 blocks and finally a post-processing stage (\cref{diagrams/gpt2/overview}). Inside the GPT-2 blocks, the core part is the attention mechanism (\cref{gpt2:attn_dot}): The input vector at each position is transformed into a query, a key and a value vector. The query vector at one position is then compared with the key vectors at every position, to generate an attention score from 0 to 1 at each position, which is then used to blend the value vectors together to get the output at this position (\cref{diagrams/gpt2/attention_dot}).
 Before running the attention mechanism, the input vector is split into multiple attention heads, on each of which a separate attention mechanism is run, whose outputs are then combined (\cref{diagrams/gpt2/attention_multihead}).
 
-We can thus generate, for a given token sequence, a diagram that, for each GPT2 block and each attention head inside that block, contains a 2D heatmap that shows which token / position attends to which other position.
+We can thus generate, for a given token sequence, a diagram that, for each GPT-2 block and each attention head inside that block, contains a 2D heatmap that shows which token / position attends to which other position.
 We create two types of heatmap diagrams: First we started with full diagrams showing each block and attention head, then for clarity we simplified the other diagrams to averaged diagrams with just a single 2D image:
 
 \begin{itemize}
-	\item \textbf{Full diagram:} For each GPT2 block of the model and each attention head per block, generate a 2D image with color values corresponding to how strongly attention output for one position is influenced by inputs at each position (\cref{gpt2:attn_dot}).
-	\item \textbf{Averaged diagram:} When looking at the full diagrams, we noticed meaningful attention patterns only in the first GPT2 block, with no clear difference between attention heads. Also, full diagrams can get quite large, especially when showing the model's handling of longer sequences (result reversal or scratchpad). We thus reduced diagrams to only showing the first layer and averaging among all attention heads. This is in contrast to \cite{bertsecrets} which focused more on the different roles of individual attention heads. For out purposes of showing some meaningful patters in the model's attention mechanism, averaging worked fine however and presented a single 2D image.
+	\item \textbf{Full diagram:} For each GPT-2 block of the model and each attention head per block, generate a 2D image with color values corresponding to how strongly attention output for one position is influenced by inputs at each position (\cref{gpt2:attn_dot}).
+	\item \textbf{Averaged diagram:} When looking at the full diagrams, we noticed meaningful attention patterns only in the first GPT-2 block, with no clear difference between attention heads. Also, full diagrams can get quite large, especially when showing the model's handling of longer sequences (result reversal or scratchpad). We thus reduced diagrams to only showing the first layer and averaging among all attention heads. This is in contrast to \cite{bertsecrets} which focused more on the different roles of individual attention heads. For out purposes of showing some meaningful patters in the model's attention mechanism, averaging worked fine however and presented a single 2D image.
 \end{itemize}
 
 Examples of our full and averaged heatmap diagrams can be seen in \cref{results:heatmap}.

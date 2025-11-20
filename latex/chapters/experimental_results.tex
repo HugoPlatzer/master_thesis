@@ -249,7 +249,7 @@ For the addition task, we can see in \cref{tbl:model_size} that all of the tried
 
 When looking at the development of accuracy in \cref{fig:model_size_add}, we can see that there are substantial differences in how quickly the model converges on the addition task when changing the hidden vector size $n_{embd}$. For $n_{embd}=192$, it took about 2500 optimization steps for the model to cross 50\% accuracy, for $n_{embd}=384$ (baseline) it took about 900 steps and for $n_{embd}=768$ only about 500 steps. So in this case the bigger model with more parameters is able to learn faster than smaller models with fewer parameters.
 
-Increasing or decreasing the number of GPT2 blocks/layers however only made a minor change in convergence speed, with 12 layers performing actually a bit worse than the baseline 6 layers.
+Increasing or decreasing the number of GPT-2 blocks/layers however only made a minor change in convergence speed, with 12 layers performing actually a bit worse than the baseline 6 layers.
 
 Changing the number of attention heads, which does not impact the number of model parameters but only the "partitioning" of data inside the model, also had only a minor impact on convergence speed.
 
@@ -1149,12 +1149,12 @@ These diagrams are to be interpreted as follows:
 
 \subsubsection{Addition task}
 
-Attention activation for the addition task "123+456=0579" is illustrated in \cref{fig:heatmap_add_full} for each of the 6 GPT2 blocks and each of the 6 attention heads per block.
+Attention activation for the addition task "123+456=0579" is illustrated in \cref{fig:heatmap_add_full} for each of the 6 GPT-2 blocks and each of the 6 attention heads per block.
 When looking for patterns in these activation heatmaps, a clear relationship is visible in Block 1, where the position of the output digit "5" is mostly attending to the positions to the input digits "1" and "4", the position of the output digit "7" to the input digits "2" and "5" and the output digit "9" to the input digits "3" and "6". The first output digit "0" also attends mostly to the input digits "1" and "4". This is consistent with how data would flow from input to output in a standard addition algorithm. The stop token "." position does not attend to any input position in particular.
 This pattern is more or less the same across all 6 attention heads.
 When looking at the later blocks, there are also some spots of high activation, however these are often not uniform across attention heads and there is no obvious pattern between input and outputs.
 
-Since we found out that the most visible attention patterns are in the first block, to keep the diagrams of reasonable size especially for larger sequences, for the rest of the diagrams only the attention mechanism of the first GPT2 block is considered, and the attention values of all 6 heads are averaged.
+Since we found out that the most visible attention patterns are in the first block, to keep the diagrams of reasonable size especially for larger sequences, for the rest of the diagrams only the attention mechanism of the first GPT-2 block is considered, and the attention values of all 6 heads are averaged.
 The single-diagram heatmap of \cref{fig:heatmap_add_simple1} for the same addition task shows the same pattern mentioned before, with an output digit being connected to those two input digits being added for this position, with the relationship being clear for the digits "579" and a bit less prominent for the digit "0".
 
 There is little change to the previous diagram in \cref{fig:heatmap_add_simple2} which shows the same addition model working on different numbers, namely the addition "999+001". Only minor changes in attention value are visible when doing addition of different numbers using the same model.
