@@ -126,7 +126,7 @@ Compared to augmenting the training sample with the reversed result, which is a 
 
 Similar to result reversal, we put the scratchpad (the intermediate steps) in brackets before the correct result. The model then, when prompted, outputs this scratchpad for the task at hand, thus executing the algorithm, then in the ideal case arrives at the correct output after the brackets.
 
-\subsubsection{Scratchpad: Addition}
+\subsubsection{Addition}
 \label{add_scratchpad}
 
 For the addition task, the scratchpad illustrates basic digit-by digit addition of two integers: Add two digits of operands plus carry from the previous step, separate ones and tens, take ones as a digit of the sum, keep tens as carry. Move one digit to the left and repeat until the operands have been fully processed. For the training sample \verb!456+789=1245! the sample with scratchpad is as described in \cref{lst:scratchpad_add}.
@@ -146,7 +146,7 @@ The scratchpad is deliberately kept minimal because of the increase in training 
 This increase in training time is not due to an increase in model parameters, but rather due to the model's attention mechanism comparing one position to all previous positions (\cref{gpt2:attn}). This causes training time to increase quadratically with sequence length. Memory requirements also increase quadratically due to the resulting attention matrix when comparing each position with each previous one.
 
 \FloatBarrier
-\subsubsection{Scratchpad: Multiplication}
+\subsubsection{Multiplication}
 \label{mul_scratchpad}
 
 Basic multiplication works by doing single-digit multiplication between the multiplicand and all digits of the multiplier, then adding an appropriate amount of zero digits to each intermediate product, then computing the sum of all the intermediate products. This process forms the basis for our multiplication scratchpad. For example, the multiplication task \verb!67*89=5963!
@@ -187,7 +187,7 @@ The final addition happens like this ($5360+603$ for our example):
 Each addition step is separated by semicolons. The parts of each addition step are separated by commas. For each addition step, we first list the corresponding digits of the summands (e.g., 0 and 3 for the first step of $5360+603$). Then we list the previous carry, then the output digit, and finally, the current carry.
 
 \FloatBarrier
-\subsubsection{Scratchpad: Square root}
+\subsubsection{Square root}
 \label{sqrt_scratchpad}
 
 A straightforward way to compute the integer square root of an integer $n$ is by using a binary search algorithm is illustrated in \cref{lst:binarysearch}.
