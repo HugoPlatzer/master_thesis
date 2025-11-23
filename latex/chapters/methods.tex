@@ -117,7 +117,6 @@ For the multiplication and square root tasks, the digits of the product or integ
 
 
 
-\FloatBarrier
 \subsection{Scratchpads}
 \label{methods:scratchpad}
 
@@ -131,48 +130,47 @@ Similar to result reversal, we put the scratchpad (the intermediate steps) in br
 
 For the addition task, the scratchpad illustrates basic digit-by digit addition of two integers: Add two digits of operands plus carry from the previous step, separate ones and tens, take ones as a digit of the sum, keep tens as carry. Move one digit to the left and repeat until the operands have been fully processed. For the training sample \verb!456+789=1245! the sample with scratchpad is as described in \cref{lst:scratchpad_add}.
 
-\begin{lstlisting}[
-	style=floating,
-	caption={Example scratchpad for the addition task 456+789=1245.},
-	label={lst:scratchpad_add}
-	]
-456+789=[69051|58141|47121]1245
-\end{lstlisting}
-
 Each step is separated by \verb!|! characters. The two summand digits, previous carry, sum digit, and new carry are written for each step.
 The scratchpad is deliberately kept minimal because of the increase in training time with increased sample length.
 
 \label{training_time_growth}
 This increase in training time is not due to an increase in model parameters, but rather due to the model's attention mechanism comparing one position to all previous positions (\cref{gpt2:attn}). This causes training time to increase quadratically with sequence length. Memory requirements also increase quadratically due to the resulting attention matrix when comparing each position with each previous one.
 
-\FloatBarrier
+\begin{lstlisting}[
+style=listingstyle,
+caption={Example scratchpad for the addition task 456+789=1245.},
+label={lst:scratchpad_add}
+]
+456+789=[69051|58141|47121]1245
+\end{lstlisting}
+
+
+
 \subsubsection{Multiplication}
 \label{mul_scratchpad}
 
 Basic multiplication works by doing single-digit multiplication between the multiplicand and all digits of the multiplier, then adding an appropriate amount of zero digits to each intermediate product, then computing the sum of all the intermediate products. This process forms the basis for our multiplication scratchpad. For example, the multiplication task \verb!67*89=5963!
 is transformed into the scratchpad-augmented form seen in \cref{lst:scratchpad_mul}.
-
-\begin{lstlisting}[
-	style=floating,
-	caption={Example scratchpad for the multiplication task 67*89=5963.},
-	label={lst:scratchpad_mul}
-	]
-67*89=[
-*80{78065,68535}5360,
-*9{79036,69606}603
-|
-{03,0,3,0;60,0,6,0;36,0,9,0;5,0,5,0}
-]5963
-\end{lstlisting}
-
-\noindent
 The multiplication scratchpad is divided by \verb!|! into the part computing the digit products and the part doing the final addition.
 Each digit product has its own scratchpad enclosed in \verb!{}!.
+
+\begin{lstlisting}[
+style=listingstyle,
+caption={Example scratchpad for the multiplication task 67*89=5963.},
+label={lst:scratchpad_mul}
+]
+67*89=[
+  *80{78065,68535}5360,
+  *9{79036,69606}603
+  |
+  {03,0,3,0;60,0,6,0;36,0,9,0;5,0,5,0}
+]5963
+\end{lstlisting}
 
 The computation of the digit products happens like this (example for the multiplication 67*89):
 
 \begin{lstlisting}
-	*80{78065,68535}5360
+*80{78065,68535}5360
 \end{lstlisting}
 
 First comes the multiplier (80 in this case), then the multiplication steps in curly braces, then the result of the digit multiplication.
@@ -181,37 +179,22 @@ For each multiplication step, we list five digits: First, the corresponding digi
 The final addition happens like this ($5360+603$ for our example):
 
 \begin{lstlisting}
-	{03,0,3,0;60,0,6,0;36,0,9,0;5,0,5,0}
+{03,0,3,0;60,0,6,0;36,0,9,0;5,0,5,0}
 \end{lstlisting}
 
 Each addition step is separated by semicolons. The parts of each addition step are separated by commas. For each addition step, we first list the corresponding digits of the summands (e.g., 0 and 3 for the first step of $5360+603$). Then we list the previous carry, then the output digit, and finally, the current carry.
 
-\FloatBarrier
+
+
 \subsubsection{Square root}
 \label{sqrt_scratchpad}
 
 A straightforward way to compute the integer square root of an integer $n$ is by using a binary search algorithm is illustrated in \cref{lst:binarysearch}.
-The integer square root scratchpad we use follows the steps of this algorithm, illustrated on the training sample \verb|123:11| in \cref{lst:binarysearchexample}.
-
-The steps of the binary search algorithm are in brackets, separated by pipes.
-Consider the first step for example:
-\begin{lstlisting}
-	{0,123} 61*61=3721
-\end{lstlisting}
-
-The current search range is in braces, for this step it is from 0 to 123.
-Then, the midpoint of the search range (61) is squared to 3721.
-We are looking for the integer square root of 123, which is the largest integer whose square is at most 123 (\cref{methods:ops:isqrt}). Because 3721 is larger than $n=123$, the search range in the next step gets restricted to the lower half, which is from 0 to 61.
-The algorithm ends when the search range consists of at most two integers (11 and 12 in this case), at which point the larger one is tested, as $12*12=144$ is too large, $11$ is the correct integer square root.
-
-It would have been nice to include the multiplication scratchpad from \cref{mul_scratchpad} for the square operations of this algorithm, however to keep training feasible we have to keep the samples below a few thousand characters. Considering the fact that we want to compute square roots of 6, 10, and 20 digit integers as in the baseline experiments, this is not possible.
-Thus we simply include the square operations without their own scratchpads and hope this illustration of binary search still provides improved accuracy compared to the baseline.
-
 
 \begin{lstlisting}[
-	style=floating,
-	caption={Binary search algorithm for computing the integer square root.},
-	label={lst:binarysearch}
+style=listingstyle,
+caption={Binary search algorithm for computing the integer square root.},
+label={lst:binarysearch}
 ]
 low, high = 0, n
 while high - low > 1:
@@ -227,29 +210,45 @@ else:
 \end{lstlisting}
 
 
+The integer square root scratchpad we use follows the steps of this algorithm, illustrated on the training sample \verb|123:11| in \cref{lst:binarysearchexample}.
 
 \begin{lstlisting}[
-	style=floating,
-	caption={Scratchpad example for computing the integer square root of 123.},
-	label={lst:binarysearchexample}
-	]
+style=listingstyle,
+caption={Scratchpad example for computing the integer square root of 123.},
+label={lst:binarysearchexample}
+]
 123:[
-{0,123} 61*61=3721| 
-{0,61} 30*30=900|
-{0,30} 15*15=225|
-{0,15} 7*7=49|
-{7,15} 11*11=121|
-{11,15} 13*13=169|
-{11,13} 12*12=144|
-{11,12}
+  {0,123} 61*61=3721| 
+  {0,61} 30*30=900|
+  {0,30} 15*15=225|
+  {0,15} 7*7=49|
+  {7,15} 11*11=121|
+  {11,15} 13*13=169|
+  {11,13} 12*12=144|
+  {11,12}
 ]11
 \end{lstlisting}
 
 
+The steps of the binary search algorithm are in brackets, separated by pipes.
+Consider the first step for example:
+\begin{lstlisting}
+{0,123} 61*61=3721
+\end{lstlisting}
+
+The current search range is in braces, for this step it is from 0 to 123.
+Then, the midpoint of the search range (61) is squared to 3721.
+We are looking for the integer square root of 123, which is the largest integer whose square is at most 123 (\cref{methods:ops:isqrt}). Because 3721 is larger than $n=123$, the search range in the next step gets restricted to the lower half, which is from 0 to 61.
+The algorithm ends when the search range consists of at most two integers (11 and 12 in this case), at which point the larger one is tested, as $12*12=144$ is too large, $11$ is the correct integer square root.
+
+It would have been nice to include the multiplication scratchpad from \cref{mul_scratchpad} for the square operations of this algorithm, however to keep training feasible we have to keep the samples below a few thousand characters. Considering the fact that we want to compute square roots of 6, 10, and 20 digit integers as in the baseline experiments, this is not possible.
+Thus we simply include the square operations without their own scratchpads and hope this illustration of binary search still provides improved accuracy compared to the baseline.
 
 
 
-\FloatBarrier
+
+
+
 \subsection{Attention heatmaps}
 \label{methods:heatmap}
 
