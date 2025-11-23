@@ -60,14 +60,16 @@ A model that can compute the integer square root $\lfloor \sqrt{x} \rfloor$ for 
 \subsection{Sampling methods}
 \label{methods:sampling}
 
-The distribution based on which training samples are picked can have a big impact on the performance of machine learning models. To find out how much of an improvement can be had on the operations we study just by changing sampling methods, we experimented with multiple sampling methods: Basic sampling, from-zero sampling, uniform digits sampling and uniform bits sampling.
+The distribution from which training samples are picked can have a big impact on the performance of machine learning models. To find out how much of an improvement can be had on the arithmetic tasks studied by us just by changing the sampling method, we experimented with multiple sampling methods: Basic sampling, from-zero sampling, uniform digits sampling and uniform bits sampling.
+With the exception of the sampling strategy experiments (\cref{setup:sampling}) where we compare each of the four sampling methods, we stick to basic sampling for all experiments.
+The sampling methods are defined as follows:
 
 \begin{itemize}
 	\item \textbf{Basic sampling:} For the addition and multiplication tasks with $n$ digits, the operands $a$ and $b$ are independently sampled uniformly from the range $[{10}^{n-1}, 10^n - 1]$, which ensures both operands have exactly $n$ decimal digits. We train the models for $n=3$, $n=5$,  and $n=10$ operand digits, giving a sample space of approximate size $10^6$, $10^{10}$, $10^{20}$ respectively.
 	
-	For the square root operation with $n$ operand digits, we also sample the operand $x$ uniformly from the range $[{10}^{n-1}, 10^n - 1]$. However, because square root is a unary operator, we double the number of decimal digits of the single operand to make sure we have a similarly large space of possible samples. Therefore we train the models for $n=6$, $n=10$,  and $n=20$ operand digits, giving a sample space of approximate size $10^6$, $10^{10}$, $10^{20}$ respectively.
+	For the integer square root operation with $n$ operand digits, we also sample the operand $x$ uniformly from the range $[{10}^{n-1}, 10^n - 1]$. However, because square root is a unary operation, we double the number of decimal digits of the single operand to make sure we have a similarly large space of possible samples. Therefore we train the models for $n=6$, $n=10$,  and $n=20$ operand digits, giving a sample space of approximate size $10^6$, $10^{10}$, $10^{20}$ respectively, similar to the sample space sizes for addition and multiplication.
 	
-	\item \textbf{From-zero sampling:} For basic sampling the limits of operand sampling were set as $[10^{n-1}, 10^n - 1]$ to include all $n$-digit numbers, where n is the number of operand digits. From-zero sampling instead uses the limits $[0, 10^n - 1]$, to also include operand numbers with fewer decimal digits.
+	\item \textbf{From-zero sampling:} For basic sampling, the limits of operand sampling were set as $[10^{n-1}, 10^n - 1]$ to include all $n$-digit numbers, where n is the number of operand digits. From-zero sampling instead uses the limits $[0, 10^n - 1]$, thus also including operands with fewer than $n$ decimal digits.
 	
 	\item \textbf{Uniform digits sampling:} For this sampling method, first a number of decimal digits $k$ is picked uniformly at random from $[1, n]$. Then the operands are picked uniformly at random from $[10^{k-1}, 10^k - 1]$, to ensure they are $k$-decimal digit integers.
 	
