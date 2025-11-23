@@ -1173,19 +1173,14 @@ When looking for patterns in these activation heatmaps, a clear relationship is 
 This pattern is more or less the same across all 6 attention heads.
 When looking at the later blocks, there are also some spots of high activation, however these are often not uniform across attention heads and there is no obvious pattern between input and outputs.
 
+\includePDFPlot{experiment_results/heatmaps/add_full_1.pdf}{fig:heatmap_add_full}{Attention activation heatmap for all blocks and attention heads for the addition task "123+456".}
+
 Since we found out that the most visible attention patterns are in the first block, to keep the diagrams of reasonable size especially for larger sequences, for the rest of the diagrams only the attention mechanism of the first GPT-2 block is considered, and the attention values of all 6 heads are averaged.
 The single-diagram heatmap of \cref{fig:heatmap_add_simple1} for the same addition task shows the same pattern mentioned before, with an output digit being connected to those two input digits being added for this position, with the relationship being clear for the digits "579" and a bit less prominent for the digit "0".
 
-There is little change to the previous diagram in \cref{fig:heatmap_add_simple2} which shows the same addition model working on different numbers, namely the addition "999+001". Only minor changes in attention value are visible when doing addition of different numbers using the same model.
-
-
-
-
-\includePDFPlot{experiment_results/heatmaps/add_full_1.pdf}{fig:heatmap_add_full}{Attention activation heatmap for all blocks and attention heads for the addition task "123+456".}
-
-
 \includePDFPlot{experiment_results/heatmaps/add_simple_1.pdf}{fig:heatmap_add_simple1}{First block attention heatmap for the addition task "123+456", averaged over all 6 heads.}
 
+There is little change to the previous diagram in \cref{fig:heatmap_add_simple2} which shows the same addition model working on different numbers, namely the addition "999+001". Only minor changes in attention value are visible when doing addition of different numbers using the same model.
 
 \includePDFPlot{experiment_results/heatmaps/add_simple_2.pdf}{fig:heatmap_add_simple2}{First block attention heatmap for the addition task "999+001", averaged over all 6 heads.}
 
@@ -1194,15 +1189,13 @@ There is little change to the previous diagram in \cref{fig:heatmap_add_simple2}
 
 When switching to a model trained for 5-digit addition and the addition task "12345+67890" (\cref{fig:heatmap_add_5digits}) we can still see a similar pattern of output digits referring to those input digits that make sense when thinking about an addition algorithm. However the pattern is somewhat more diffuse for the more significant output digits, which are also attending to less significant digits of the input numbers somewhat.
 
-For 3-digit addition using result reversal (\cref{fig:heatmap_add_rev}), we can see a very clear pattern of the final output digits attending to the corresponding digits of the reversed result. There however is not such a clear pattern for the reversed addition that happens before, with the output digits "9750" not having a strong connection to the matching input digits as was seen before for normal addition.
-
-For the addition task using the scratchpad (\cref{fig:heatmap_add_scratch}), we can also see some patterns: For the individual addition steps, the input digits are fetched as the first two digits of each step. We can also see that the old carry value (third digit of each step) to some degree attends to the fifth digit of the previous step, which is the output carry value of that previous step.
-
-
 \includePDFPlot{experiment_results/heatmaps/add_5digits_1.pdf}{fig:heatmap_add_5digits}{First block attention heatmap for the addition task "12345+67890", averaged over all 6 heads.}
+
+For 3-digit addition using result reversal (\cref{fig:heatmap_add_rev}), we can see a very clear pattern of the final output digits attending to the corresponding digits of the reversed result. There however is not such a clear pattern for the reversed addition that happens before, with the output digits "9750" not having a strong connection to the matching input digits as was seen before for normal addition.
 
 \includePDFPlot{experiment_results/heatmaps/add_rev_1.pdf}{fig:heatmap_add_rev}{First block attention heatmap for the addition task "123+456", using result reversal, averaged over all 6 heads.}
 
+For the addition task using the scratchpad (\cref{fig:heatmap_add_scratch}), we can also see some patterns: For the individual addition steps, the input digits are fetched as the first two digits of each step. We can also see that the old carry value (third digit of each step) to some degree attends to the fifth digit of the previous step, which is the output carry value of that previous step.
 
 \includePDFPlot{experiment_results/heatmaps/add_scratch_1.pdf}{fig:heatmap_add_scratch}{First block attention heatmap for the addition task "123+456", using scratchpad, averaged over all 6 heads.}
 
