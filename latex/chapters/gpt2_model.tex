@@ -65,11 +65,11 @@ OpenAI GPT-2 was released in four versions with different parameter counts, as s
 
 The GPT-2 models as released by OpenAI were trained using a Byte-pair encoding (BPE) tokenizer (\cref{transformer:tokenization}) with a vocabulary of 50257 tokens \citepage{4}{unsupervisedmultitask} \cite{HuggingFaceGPT2}. The tokenizer was itself trained on a natural language corpus separately before training the actual models. The models were then configured with $\dVocab=50257$ and the training texts were processed using this tokenizer before being fed into the model. Thus, when using these models with the weights as released by OpenAI, the same tokenizer must be used for text generation during inference time as well. An example on how the tokenizer that was released with OpenAI GPT-2 handles a sentence can be seen in \cref{diagrams/gpt2/tokenizer}.
 
+\includediagram{diagrams/gpt2/tokenizer}{Operation of the GPT-2 tokenizer on an example sentence.}
+
 It is also possible to train a GPT-2 model with a different tokenizer with, e.g., a smaller vocabulary. Instead of a proper tokenizer that was trained to efficiently chunk text in some natural language, other GPT-2 implementations like nanoGPT \cite{nanogpt} use a simpler approach: Each ASCII character in the training text is mapped to one token, with the token value equal to the ASCII character value.
 This makes for a simpler overall implementation that keeps all the processing outside the tokenizer and inside the actual model.
 The downside is that token sequences get significantly longer, thus a model with the same $\nPos$ and ASCII tokenization can only handle significantly shorter texts than one with a trained tokenizer that recognizes, e.g., frequent words and groups all their characters into a single token.
-
-\includediagram{diagrams/gpt2/tokenizer}{Operation of the GPT-2 tokenizer on an example sentence.}
 
 
 \subsection{Preprocessing}
@@ -103,7 +103,7 @@ First, a final layer normalization step is performed \citepage{4}{unsupervisedmu
 GPT-2 then re-uses the same matrix $\embTok$ that was used in the preprocessing stage to convert $\modHiddenAt{\nBlocks, norm}_i$ into a token probability vector $\modOut'_i$ of dimension $\dVocab$, using matrix-vector product, as shown in \cref{eq:postproc} and \cref{eq:postproc_detailed}.
 This tying of the weights in the postprocessing stage to those of the preprocessing stage is done for improving model performance as well as reducing the number of learnable parameters \cite{weightstying}.
 
-Finally, softmax is applied to transform this vector $\modOut'_i$ into a proper probability distribution $\modOut_i$.
+Finally, softmax is applied to transform this vector $\modOut'_i$ into a proper probability distribution $\modOut_i$ (\cref{eq:postproc_softmax}).
 
 \begin{align}
 	\modOut'_i &= \embPos \modHiddenAt{\nBlocks, \textrm{norm}}_i
@@ -111,6 +111,9 @@ Finally, softmax is applied to transform this vector $\modOut'_i$ into a proper 
 	\\
 	(\modOut'_i)_k &= \sum_{j=1}^{\dHidden}{\embPosAt{k,j} (\modHiddenAt{\nBlocks, \textrm{norm}}_i)_j} & 1 \leq k \leq \dVocab
 	\label{eq:postproc_detailed}
+	\\
+	\modOut_i &= \operatorname{softmax}(\modOut'_i)
+	\label{eq:postproc_softmax}
 \end{align}
 
 \includediagram{diagrams/gpt2/postproc}{Detailed example of the GPT-2 postprocessing stage. $\modHiddenAt{\nBlocks}_i$, the output of the last GPT-2 block, is converted into token probabilities.}
@@ -204,7 +207,7 @@ The layer normalization, attention and MLP stages all have learnable parameters,
 
 
 
-\includediagram{diagrams/gpt2/block}{Overview of the components of a GPT-2 block with index $\modLayer$. This example shows 3 positions $\modHiddenAt{\modLayer}_1 \ldots \modHiddenAt{\modLayer}_3$, but the actual model is flexible regarding sequence length.}
+\includediagram{diagrams/gpt2/block}{Overview of the components of a GPT-2 block with index $\modLayer$. This example shows three positions $\modHiddenAt{\modLayer}_1 \ldots \modHiddenAt{\modLayer}_3$, but the actual model is flexible regarding sequence length.}
 
 \subsubsection{Notation used}
 \label{gpt2:notation}
@@ -251,6 +254,7 @@ Such connections are found in almost all models having many steps/layers, becaus
 \end{align}
 
 
+\newpage
 \subsubsection{Multi-head attention}
 \label{gpt2:attn}
 
@@ -271,9 +275,10 @@ Based on the input vectors $\modHidden_1 \ldots \modHidden_i$, the multi-head at
 	
 	\item These attention outputs $\mathbf{a}_{i_h}$ are concatenated for all heads, giving a total attention output $\mathbf{a}_i$, as described by \cref{eq:mha:concat}.
 	
-	\item The concatenated attention outputs are passed through a linear transform with learnable parameters $(\mathbf{W}_{\mathrm{proj}}, \mathbf{v}_{\mathrm{proj}})$, as described by \cref{eq:mha:output}. This results in the output of the multi-head attention algorithm, $\modHidden'_i$.
+	\item The concatenated attention outputs are passed through a linear transform with learnable parameters $(\mathbf{W}_{\mathrm{proj}}, \mathbf{v}_{\mathrm{proj}})$, as described by \cref{eq:mha:output}. This results in the output of the multi-head attention mechanism, $\modHidden'_i$.
 \end{enumerate}
 
+\newpage
 \begin{align}
 	\mathbf{q}_{i'} &= \mathbf{W}_q \modHidden_{i'} + \mathbf{b}_q
 	\quad 1 \leq i' \leq i
@@ -316,7 +321,7 @@ Based on the input vectors $\modHidden_1 \ldots \modHidden_i$, the multi-head at
 \includediagram{diagrams/gpt2/attention_multihead}{Structure of the multi-head attention mechanism. This example uses two positions $\mathbf{h}_1, \mathbf{h}_2$ and two attention heads. The actual model can in theory handle arbitrary sequence lengths and also has more attention heads.}
 
 
-
+\newpage
 \subsubsection{Scaled dot-product attention}
 \label{gpt2:attn_dot}
 The scaled dot-product attention mechanism as outlined in \cref{diagrams/gpt2/attention_dot} and equations \eqref{eq:attn_dot_weight} to \eqref{eq:attn_dot_out} is the core part of multi-head attention described in \cref{gpt2:attn}.
@@ -336,6 +341,7 @@ The attention mechanism described here is more a less a more detailed explanatio
 	\item Using the scores from before as weights, the output vector $\mathbf{a}_i$ is "blended together" in \cref{eq:attn_dot_out} from each of the value vectors $\mathbf{v}_{i'}$ \cite{alammar-gpt2}:
 \end{enumerate}
 
+\newpage
 \begin{align}
 	w_{i'i} &= \frac{1}{\sqrt{\dHead}} \ \mathbf{k}_{i'} \mathbf{q}_i
 	\label{eq:attn_dot_weight}
@@ -350,6 +356,7 @@ The attention mechanism described here is more a less a more detailed explanatio
 \includediagram{diagrams/gpt2/attention_dot}{Structure of the scaled dot-product attention mechanism. This diagram illustrates the computation of the attention output $\mathbf{a}_3$. The other output positions $\mathbf{a}_i$ are computed in a similar fashion, replacing $\mathbf{q}_3$ in the diagram with $\mathbf{q}_i$ and considering $\mathbf{k}_1 \ldots \mathbf{k}_i$ and $\mathbf{v}_1 \ldots \mathbf{v}_i$, giving the diagram $i$ columns.}
 
 
+\newpage
 \subsubsection{Multi-layer perceptron}
 \label{gpt2:mlp}
 
