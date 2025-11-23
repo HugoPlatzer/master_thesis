@@ -35,7 +35,7 @@ Creating this token sequence from the input text is done by the tokenizer (\cref
 \label{gpt2:parameters}
 
 To make the model bigger (needing more memory and computation time, but allowing for more accurate generation) or smaller (faster, but lower quality output), two hyperparameters can be adjusted \citepage{4}{unsupervisedmultitask} \citepage{5}{improvinglu}: The vector size for each position can be changed just like the number of transformer blocks. The number of attention heads is usually adapted so that the size of each head remains around 64 \citepage{4}{unsupervisedmultitask} \cite{hfpretrained}.
-OpenAI GPT-2 was released in four versions with different parameter counts:
+OpenAI GPT-2 was released in four versions with different parameter counts, as seen in \cref{tab:gpt2-sizesX}:
 
 \includeTable
 {

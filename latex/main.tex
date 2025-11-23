@@ -103,7 +103,7 @@
 \newcommand{\citepage}[2]{\cite[p.~#1]{#2}}
 
 \newcommand{\includediagram}[2]{
-    \begin{figure}[!htbp]
+    \begin{figure}[H]
     \centering
     
     \begin{tikzpicture}[framed]
@@ -117,7 +117,7 @@
 
 % arguments: table content, label, caption, additional styling options
 \newcommand{\includeTable}[4]{
-    \begin{table}[!htbp]
+    \begin{table}[H]
         \centering
         \pgfplotstabletypeset[
             string type,
@@ -170,7 +170,7 @@
 
 % arguments: csv file, label, caption, additional styling options
 \newcommand{\includeAccuracyTable}[4]{
-    \begin{table}[!htbp]
+    \begin{table}[H]
         \centering
         \includeAccuracyTableCore{#1}{#4}
         \caption{#3}
@@ -182,7 +182,7 @@
 
 \newcommand{\ErrorAnalysisTableBegin}
 {
-	\begin{table}[!htbp]
+	\begin{table}[H]
 	\centering
 	\begin{tabular}{ll}
 	\toprule
@@ -205,7 +205,7 @@
 
 % arguments: pdf file, label, caption
 \newcommand{\includePDFPlotSmall}[3]{
-\begin{figure}[!htbp]
+\begin{figure}[H]
     \centering
     \includegraphics[scale=0.75]{#1}%
     \caption{#3}
@@ -215,7 +215,7 @@
 
 % arguments: pdf file, label, caption
 \newcommand{\includePDFPlot}[3]{
-	\begin{figure}[!htbp]
+	\begin{figure}[H]
 		\centering
 		\includegraphics[scale=0.9]{#1}%
 		\caption{#3}

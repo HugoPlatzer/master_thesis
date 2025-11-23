@@ -33,7 +33,6 @@ When looking at the accuracy curves in \cref{fig:baseline_sqrt}, we can see curv
 
 \includeAccuracyTable{experiment_results/baseline_final_accuracy/sqrt.csv}{tbl:baseline_sqrt}{Final model accuracy on the test dataset for the square root operation for the given training dataset sizes and operand digits.}{}
 
-\FloatBarrier
 
 \includePDFPlotSmall{experiment_results/baseline_accuracy/add.pdf}{fig:baseline_add}{Development of accuracy on the validation dataset when training for the addition task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
 
@@ -42,7 +41,7 @@ When looking at the accuracy curves in \cref{fig:baseline_sqrt}, we can see curv
 \includePDFPlotSmall{experiment_results/baseline_accuracy/sqrt.pdf}{fig:baseline_sqrt}{Development of accuracy on the validation dataset when training for the square root task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
 
 
-\FloatBarrier
+
 \subsubsection{Error analysis}
 \label{error_analysis}
 
@@ -54,7 +53,7 @@ To get a better understanding of the presented accuracy numbers, we took a close
 	\item Square root (6 digits, 100k training samples)
 \end{itemize}
 
-as well as tasks where the final model showed poor performance or did not even manage to go above zero accuracy:
+We also looked at tasks where the final model showed poor performance or did not even manage to go above zero accuracy:
 
 \begin{itemize}
 	\item Multiplication (3 digits, 100k training samples)
@@ -64,26 +63,15 @@ as well as tasks where the final model showed poor performance or did not even m
 
 For each of these tasks, a separate error analysis dataset of 100k samples was created and the responses of the best model that was saved during training evaluated on it. A selection of the respective errors per task is analyzed below.
 
-For addition with 5 operand digits, the model achieved near-perfect accuracy (\cref{tbl:baseline_add}).
+
+
+
+
+
+
+
+For 5-digit addition, the model achieved near-perfect accuracy (\cref{tbl:baseline_add}).
 It can be seen that the errors the model makes for this task (\cref{tbl:errors_add_5digits}) are single digits of the result being off by one.
-
-
-A similar pattern emerges for 10-digit addition, which also achieved near-perfect accuracy. The failed tasks in \cref{tbl:errors_add_10digits} show a single digit, typically in the middle, being off by one. 
-
-
-For the multiplication task with 3 digits, the model achieved an accuracy of about 20\% (\cref{tbl:baseline_mul}). The errors are affecting only single digits, however some of the digits are off by more than one (\cref{tbl:errors_mul_3digits}).
-
-
-For the multiplication task with 5 digits, which did not achieve above-zero accuracy (\cref{tbl:baseline_mul}), the first and last digits were still correct for failed tasks, but multiple digits in the middle of the product were off (\cref{tbl:errors_mul_5digits}).
-
-
-For the integer square root task with 6 operand digits, the model achieved about 99\% accuracy (\cref{tbl:baseline_sqrt}). The observed errors show the model answer being off by one from the correct answer (\cref{tbl:errors_sqrt_20digits}). Also, the real square root of the failed tasks was very close to an integer for 9 out of 10 failed tasks, which means the task was close to a square number, which are points from which on the integer square root increases by one. It is reasonable to assume that for such a "close call" it is harder to find the exact integer square root.
-
-For the integer square root task with 20 operand digits, the model did not achieve above-zero accuracy. Analyzing some of the failed tasks shows the model predictions only have the leftmost digits correct, with about 4 out of 10 digits of the result being correct. Also, these tasks are not particularly close to a square number, which stands in contrast to the failed tasks for 6 operand digits.
-
-To conclude, we can see that the errors our model makes follow clear patterns: If the model is trained successfully (achieves good accuracy) the wrong answer is similar to the correct answer, with either a single digit being wrong in the case of addition and multiplication, or the square root being off by one in the case of integer square root. If the model is trained unsuccessfully (zero accuracy achieved) errors often affect more digits (as in the case of 5-digit multiplication).
-
-
 
 
 % Add errors
@@ -112,6 +100,12 @@ To conclude, we can see that the errors our model makes follow clear patterns: I
 	columns/correct/.style={column name={Correct result}}
 }
 
+
+
+
+A similar pattern emerges for 10-digit addition, which also achieved near-perfect accuracy (\cref{tbl:baseline_add}). The failed tasks in \cref{tbl:errors_add_10digits} show a single digit, typically in the middle, being off by one. 
+
+
 \includeTable
 {
 	task;model;correct\\
@@ -136,7 +130,12 @@ To conclude, we can see that the errors our model makes follow clear patterns: I
 	columns/correct/.style={column name={Correct result}}
 }
 
+
+
 % Mul errors
+
+For 3-digit multiplication, the model achieved an accuracy of about 20\% (\cref{tbl:baseline_mul}). The errors are affecting only single digits, however some of the digits are off by more than one (\cref{tbl:errors_mul_3digits}).
+
 
 \includeTable
 {
@@ -162,6 +161,11 @@ To conclude, we can see that the errors our model makes follow clear patterns: I
 	columns/correct/.style={column name={Correct result}}
 }
 
+
+
+
+For 5-digit multiplication, for which the model did not achieve above-zero accuracy (\cref{tbl:baseline_mul}), the first and last digits were still correct for failed tasks, but multiple digits in the middle of the product were off (\cref{tbl:errors_mul_5digits}).
+
 \includeTable
 {
 	task;model;correct\\
@@ -186,7 +190,11 @@ To conclude, we can see that the errors our model makes follow clear patterns: I
 	columns/correct/.style={column name={Correct result}}
 }
 
+
+
 % Sqrt errors
+
+For 6-digit integer square root, the model achieved about 99\% accuracy (\cref{tbl:baseline_sqrt}). The observed errors show the model answer being off by one from the correct answer (\cref{tbl:errors_sqrt_6digits}). Also, the real square root of the failed tasks was very close to an integer for 9 out of 10 failed tasks, which means the task was close to a square number, which are points from which on the integer square root increases by one. It is reasonable to assume that for such a "close call" it is harder to find the exact integer square root.
 
 \includeTable
 {
@@ -212,6 +220,9 @@ To conclude, we can see that the errors our model makes follow clear patterns: I
 	columns/correct/.style={column name={Correct result}},
 	columns/sqrt/.style={column name={$\sqrt{Task}$}}
 }
+
+For 20-digit integer square root, the model did not achieve above-zero accuracy (\cref{tbl:baseline_sqrt}). Analyzing some of the failed tasks shows the model predictions only have the leftmost digits correct (\cref{tbl:errors_sqrt_20digits}), with about 4 out of 10 digits of the result being correct. Also, these tasks are not particularly close to a square number, which stands in contrast to the failed tasks for 6 operand digits.
+
 
 \includeTable
 {
@@ -239,7 +250,9 @@ To conclude, we can see that the errors our model makes follow clear patterns: I
 }
 
 
-\FloatBarrier
+To conclude, we can see that the errors our model makes follow clear patterns: If the model is trained successfully (achieves good accuracy) the wrong answer is similar to the correct answer, with either a single digit being wrong in the case of addition and multiplication, or the square root being off by one in the case of integer square root. If the model is trained unsuccessfully (zero accuracy achieved) errors often affect more digits (as in the case of 5-digit multiplication).
+
+
 \subsection{Model size experiments}
 \label{results:modelsize}
 
@@ -281,7 +294,7 @@ For the multiplication task with 5 operand digits, we can see in \cref{tbl:model
 
 
 
-\FloatBarrier
+
 \subsection{Sampling strategy experiments}
 \label{results:sampling}
 
@@ -392,7 +405,7 @@ The integer square root task (\cref{tbl:sampling_strategies_sqrt_basic} to \cref
 \end{table}
 
 
-\FloatBarrier
+
 \subsection{Result reversal experiments}
 \label{results:reversal}
 
@@ -454,35 +467,23 @@ For the integer square root task (\cref{tbl:reverse_sqrt}), the results were als
 	\end{minipage}
 \end{table}
 
-\FloatBarrier
+
 \subsubsection{Accuracy development}
 
 We also generated accuracy development plots for the result reversal experiments. These plots were combined for the result reversal and scratchpad experiments and are analyzed in \cref{results:rev_scratch_accuracy}.
 
 
-\FloatBarrier
 \subsubsection{Error analysis}
 \label{results:reversal:error}
 
 We wanted to investigate whether there was any difference in the error patterns between the baseline models and the ones trained using result reversal. To do this, we used the same tasks as for the baseline error analysis (\cref{error_analysis}): addition with 5 and 10 digits (100k dataset), multiplication with 3 and 5 digits (100k dataset) and square root with 6 and 20 digits (100k dataset).
 
-For both the addition task with 5 digit and the addition task with 10 digit operands, when training using result reversal on a 100k training dataset, there were \textbf{no errors} in the entire 100k error analysis dataset, meaning the model performed each addition correctly. This corresponds to the perfect scores seen on the test dataset for these tasks (\cref{tbl:reverse_add}).
-It stands in contrast to the baseline experiments, where despite 99\% accuracy, it was not hard to still find numbers where the addition was performed incorrectly (\cref{tbl:errors_add_5digits}, \cref{tbl:errors_add_10digits}).
+For both 5-digit addition and 10-digit addition, when training using result reversal on a 100k training dataset, there were \textbf{no errors} in the entire 100k error analysis dataset, meaning the model performed each addition correctly. This corresponds to the perfect scores seen on the test dataset for these tasks (\cref{tbl:reverse_add}).
+This stands in contrast to the baseline experiments, where despite 99\% accuracy, it was not hard to still find numbers where the addition was performed incorrectly (\cref{tbl:errors_add_5digits}, \cref{tbl:errors_add_10digits}).
 
-For the multiplication task with 3 digits (\cref{tbl:reverse_errors_mul_3digits}), the error patterns observed were basically the same as for the baseline experiments  (\cref{tbl:errors_mul_3digits}): Single digits being off by one or, sometimes, more than one.
+For 3-digit multiplication (\cref{tbl:reverse_errors_mul_3digits}), the error patterns observed were basically the same as for the baseline experiments  (\cref{tbl:errors_mul_3digits}): Single digits being off by one or, sometimes, more than one.
 The mistakes are already present in the reversed result,
 which is then reversed correctly.
-
-For the multiplication task with 5 digits (\cref{tbl:reverse_errors_mul_5digits}), we can also observe similar error patterns compared to the corresponding baseline experiment: The first and last digits of the result are correct, while the digits in the middle are wrong.
-There also seems to be a pattern of repetition of single digits in the middle of the results, where the model has not learned to output the correct digits.
-
-For the 6-digit square root task (\cref{tbl:reverse_errors_sqrt_6digits}), the error patterns are also similar to the baseline (\cref{tbl:errors_sqrt_6digits}): Off-by-one errors on numbers where the operand is close to a square number, and the model "picked the wrong side".
-
-For the 20-digit square root task (\cref{tbl:reverse_errors_sqrt_20digits}), the error patterns once again more or less match the baseline (\cref{tbl:errors_sqrt_20digits}): the 3 most significant digits are correct, the rest are wrong.
-Compared to the baseline, we can see the result reversal model only got 3 out of 10 most significant digits correct for the examples in the table, whereas for the baseline it was 4 or even 5 correct digits for the examples.
-Also there is an interesting digit pattern not seen in the baseline errors. A lot of repeated "8"s in the less significant digits where the model is wrong. This corresponds to similar digit repetitions for the multiplication task errors (\cref{tbl:reverse_errors_mul_5digits}).
-
-
 
 \includeTable
 {
@@ -503,6 +504,9 @@ Also there is an interesting digit pattern not seen in the baseline errors. A lo
 	columns/correct/.style={column name={Correct result}}
 }
 
+For 5-digit multiplication (\cref{tbl:reverse_errors_mul_5digits}), we can also observe similar error patterns compared to the corresponding baseline experiment: The first and last digits of the result are correct, while the digits in the middle are wrong.
+There also seems to be a pattern of repetition of single digits in the middle of the results, where the model has not learned to output the correct digits.
+
 \includeTable
 {
 	task;model;correct\\
@@ -522,7 +526,7 @@ Also there is an interesting digit pattern not seen in the baseline errors. A lo
 	columns/correct/.style={column name={Correct result}}
 }
 
-
+For  6-digit integer square root (\cref{tbl:reverse_errors_sqrt_6digits}), the error patterns are also similar to the baseline (\cref{tbl:errors_sqrt_6digits}): Off-by-one errors on numbers where the operand is close to a square number, and the model "picked the wrong side".
 
 \includeTable
 {
@@ -543,6 +547,11 @@ Also there is an interesting digit pattern not seen in the baseline errors. A lo
 	columns/correct/.style={column name={Correct result}},
 	columns/sqrt/.style={column name={$\sqrt{Task}$}}
 }
+
+For 20-digit integer square root (\cref{tbl:reverse_errors_sqrt_20digits}), the error patterns once again more or less match the baseline (\cref{tbl:errors_sqrt_20digits}): the 3 most significant digits are correct, the rest are wrong.
+Compared to the baseline, we can see the result reversal model only got 3 out of 10 most significant digits correct for the examples in the table, whereas for the baseline it was 4 or even 5 correct digits for the examples.
+Also there is an interesting digit pattern not seen in the baseline errors. A lot of repeated "8"s in the less significant digits where the model is wrong. This corresponds to similar digit repetitions for the multiplication task errors (\cref{tbl:reverse_errors_mul_5digits}).
+
 
 \includeTable
 {
@@ -565,7 +574,7 @@ Also there is an interesting digit pattern not seen in the baseline errors. A lo
 }
 
 
-\FloatBarrier
+
 \subsection{Scratchpad experiments}
 \label{results:scratchpad}
 
@@ -636,7 +645,6 @@ Also, there is an important difference in the scratchpad structure between addit
 	\end{minipage}
 \end{table}
 
-\FloatBarrier
 \subsubsection{Accuracy development}
 \label{results:rev_scratch_accuracy}
 
@@ -665,7 +673,6 @@ For 10 operand digits, scratchpad actually failed to converge, as opposed to bas
 
 
 
-\FloatBarrier
 \subsubsection{Error analysis}
 
 Similar to the baseline and result reversal experiments, we looked for errors in the model output for the addition task with 5 and 10 digits (100k dataset), multiplication task with 3 and 5 digits (100k dataset) and square root task with 6 digits (100k dataset).
@@ -781,7 +788,6 @@ For the other two error samples, the model did the entire calculation correctly,
 
 
 % 5 digit mul errors
-\FloatBarrier
 
 For the multiplication task with 5 operand digits, the first example (\cref{tbl:errors_scratchpad_mul5_1}) shows the model failing to compute the correct sum based on the correct list of digits and current carry value. This led to some digits in the middle of the product being wrong.
 The second example  (\cref{tbl:errors_scratchpad_mul5_2}) shows the same pattern: wrong sum adding multiple digits during the addition phase - leading to some wrong digits in the middle of the final product.
@@ -959,7 +965,6 @@ In summary, there was only one error observed in the digit multiplication stage 
 
 
 % Sqrt errors
-\FloatBarrier
 
 For the square root task with 6 digits, in the first example (\cref{tbl:errors_scratchpad_sqrt6_1}) we can see the model making mistakes in squaring large numbers at the beginning of the algorithm. This, however, did not influence the final result as the algorithm always has to take a few steps in the same direction at the start due do the large search interval $[0, n]$.
 The model did make another mistake at the very end of the algorithm, picking the wrong half of the search space and then picking the wrong one of two numbers for the final square root.
@@ -1131,7 +1136,6 @@ In summary, we can see that errors happen when computing larger square numbers a
 
 
 
-\FloatBarrier
 \subsection{Attention heatmaps}
 \label{results:heatmap}
 
@@ -1171,7 +1175,7 @@ There is little change to the previous diagram in \cref{fig:heatmap_add_simple2}
 \includePDFPlot{experiment_results/heatmaps/add_simple_2.pdf}{fig:heatmap_add_simple2}{First block attention heatmap for the addition task "999+001", averaged over all 6 heads.}
 
 
-\FloatBarrier
+
 
 When switching to a model trained for 5-digit addition and the addition task "12345+67890" (\cref{fig:heatmap_add_5digits}) we can still see a similar pattern of output digits referring to those input digits that make sense when thinking about an addition algorithm. However the pattern is somewhat more diffuse for the more significant output digits, which are also attending to less significant digits of the input numbers somewhat.
 
@@ -1189,7 +1193,7 @@ For the addition task using the scratchpad (\cref{fig:heatmap_add_scratch}), we 
 
 
 
-\FloatBarrier
+
 \subsubsection{Multiplication task}
 
 
@@ -1204,7 +1208,6 @@ This corresponds well to the fact that accuracy achieved for multiplication was 
 
 
 
-\FloatBarrier
 \subsubsection{Square root task}
 
 For the square root tasks with 6 digits (\cref{fig:heatmap_sqrt}) we can see the least significant digit of the output "1" attending to the 3 most significant digits of the input (and slightly to previous output digit "3") whereas the more significant output digit 5 attends mostly to the second most significant input digit "2" and the most significant output digit "3" attends mostly to the most significant input digit "1".

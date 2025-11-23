@@ -224,23 +224,6 @@ Since scratchpads (including intermediate steps of the computation in the traini
 
 Augmenting the training samples with a scratchpad that details the steps of the arithmetic operation to be performed results in a large increase in sequence length (\cref{tbl:scratchpad_sample_lengths}). This increase is especially noticeable for the multiplication operation (which is composed of several single-digit multiplications followed by a large addition) and the square root operation (which is done by binary search with squaring at every step).
 
-These large sequences of sometimes well beyond 1000 characters necessitate some changes to the training regime. Based on the available hardware, we need to make training batches and the intermediate results during forward/backward pass fit into GPU memory (\cref{setup:hardware}). The smaller batches in turn mean more optimization steps per epoch, thus taking more time to do training for a given number of epochs. At the same time, a training batch with longer sequences results in larger matrices during optimization, thus taking more time per batch than the same batch size with shorter sequences.
-Time for evaluating the model (generating answers for the samples in the test/validation dataset to test accuracy) also rises proportionally to the lengths of the sequences being generated, meaning it can become a significant part of training time when sequences are long due to an elaborate scratchpad being trained on.
-
-We want to keep the duration for a single experiment (e.g., square root, using scratchpad, 20 digits, 100k dataset) below 24 hours on the available hardware (\cref{setup:hardware}).
-We still want to run all experiments, even those with the largest dataset size of 100k, thus we made the compromise of reducing the maximum number of training epochs for the experiments that would take too much time otherwise. This does have the downside of the models being undertrained (unless early stopping would have halted training before the epoch limit) but it seems like the best choice given the time and hardware constraints.
-
-
-For the addition operation (\cref{tbl:scratchpad_training_add}) the only change that needed to be made was reducing the maximum epochs from 200 to 20 for experiments with the large 100k training dataset.
-
-For the multiplication operation (\cref{tbl:scratchpad_training_mul}) the batch sizes needed to be reduced depending on the sequence length. Also the number of epochs needed to be reduced for the experiments with 10k and 100k datasets.
-
-For the square root operation (\cref{tbl:scratchpad_training_sqrt}), due to time and memory constraints (see \cref{training_time_growth}), the batch sizes and epoch counts needed to be cut even more, even down to a batch size of 1 and epoch count of 1 for the task with 20 operand digits and 100k dataset. Even though this results in much less training than the comparable baseline task, we still think it is better trying to at least get a glimpse of training results for this task instead of not including it at all.
-
-In addition to the experiment-specific changes mentioned above, we also reduced the size of the validation dataset from 1000 to 10 elements and perform accuracy evaluations not once every 100 steps during logging but only at the end of each epoch. This gives a less detailed report of accuracy development during training but saves significant evaluation time. Accuracy on the test dataset, which is unchanged at 1000 elements, is performed only at the end of the experiment, same as for the baseline, thus final accuracy numbers in the results table do not suffer in precision.
-
-Similar to the result reversal experiments,  we do not consider the entire generated output of the model (the scratchpad and the final result) for evaluating accuracy, but instead strip the scratchpad before only comparing the result.
-
 \includeTable
 {
 	task; lenNormal; lenScratch\\
@@ -264,6 +247,14 @@ Similar to the result reversal experiments,  we do not consider the entire gener
 	columns/lenScratch/.style={column name={\begin{tabular}{c} Sequence length \\ (scratchpad) \\ \end{tabular}}}
 }
 
+These large sequences of sometimes well beyond 1000 characters necessitate some changes to the training regime. Based on the available hardware, we need to make training batches and the intermediate results during forward/backward pass fit into GPU memory (\cref{setup:hardware}). The smaller batches in turn mean more optimization steps per epoch, thus taking more time to do training for a given number of epochs. At the same time, a training batch with longer sequences results in larger matrices during optimization, thus taking more time per batch than the same batch size with shorter sequences.
+Time for evaluating the model (generating answers for the samples in the test/validation dataset to test accuracy) also rises proportionally to the lengths of the sequences being generated, meaning it can become a significant part of training time when sequences are long due to an elaborate scratchpad being trained on.
+
+We want to keep the duration for a single experiment (e.g., square root, using scratchpad, 20 digits, 100k dataset) below 24 hours on the available hardware (\cref{setup:hardware}).
+We still want to run all experiments, even those with the largest dataset size of 100k, thus we made the compromise of reducing the maximum number of training epochs for the experiments that would take too much time otherwise. This does have the downside of the models being undertrained (unless early stopping would have halted training before the epoch limit) but it seems like the best choice given the time and hardware constraints.
+
+
+For the addition operation (\cref{tbl:scratchpad_training_add}) the only change that needed to be made was reducing the maximum epochs from 200 to 20 for experiments with the large 100k training dataset.
 
 
 \includeTable
@@ -312,6 +303,10 @@ Similar to the result reversal experiments,  we do not consider the entire gener
 	\end{tabular}}}
 }
 
+
+
+For the multiplication operation (\cref{tbl:scratchpad_training_mul}) the batch sizes needed to be reduced depending on the sequence length. Also the number of epochs needed to be reduced for the experiments with 10k and 100k datasets.
+
 \includeTable
 {
 	digits; batch; batchScratch; epochs; epochsScratch\\
@@ -357,6 +352,10 @@ Similar to the result reversal experiments,  we do not consider the entire gener
 				(scratchpad)
 	\end{tabular}}}
 }
+
+
+
+For the square root operation (\cref{tbl:scratchpad_training_sqrt}), due to time and memory constraints (see \cref{training_time_growth}), the batch sizes and epoch counts needed to be cut even more, even down to a batch size of 1 and epoch count of 1 for the task with 20 operand digits and 100k dataset. Even though this results in much less training than the comparable baseline task, we still think it is better trying to at least get a glimpse of training results for this task instead of not including it at all.
 
 \includeTable
 {
@@ -404,6 +403,10 @@ Similar to the result reversal experiments,  we do not consider the entire gener
 	\end{tabular}}}
 }
 
+
+In addition to the experiment-specific changes mentioned above, we also reduced the size of the validation dataset from 1000 to 10 elements and perform accuracy evaluations not once every 100 steps during logging but only at the end of each epoch. This gives a less detailed report of accuracy development during training but saves significant evaluation time. Accuracy on the test dataset, which is unchanged at 1000 elements, is performed only at the end of the experiment, same as for the baseline, thus final accuracy numbers in the results table do not suffer in precision.
+
+Similar to the result reversal experiments,  we do not consider the entire generated output of the model (the scratchpad and the final result) for evaluating accuracy, but instead strip the scratchpad before only comparing the result.
 
 We thus run the following experiments to test model performance when using scratchpads:
 
