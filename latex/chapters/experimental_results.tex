@@ -8,35 +8,41 @@ Finally, this section contains diagrams illustrating attention patterns in the t
 \subsection{Baseline experiments}
 \label{results:baseline}
 
-For the addition operation, we can see in \cref{tbl:baseline_add} that addition up to 10 digits can be learned, as long as the training dataset has at least 10k samples. Accuracy numbers are high, but short of 100\% for 5 and 10 digit addition, meaning there are quite a few errors left in the validation dataset. Only 3 digit addition achieved perfect accuracy.
+For the addition task we can see in \cref{tbl:baseline_add} that addition up to 10 digits can be learned, as long as the training dataset has at least 10k samples. Accuracy numbers are high, but short of 100\% for 5 and 10 digit addition, meaning there are quite a few errors left in the validation dataset. Only 3 digit addition achieved perfect accuracy.
+
+\includeAccuracyTable{experiment_results/baseline_final_accuracy/add.csv}{tbl:baseline_add}{Final model accuracy on the test dataset for the addition operation for the given training dataset sizes and operand digits.}{}
+
 Considering the development of accuracy during training, we can see in \cref{fig:baseline_add} that accuracy flatlines until a few hundred to a few thousand optimization steps are performed. More operand digits mean more optimization steps to reach the point of accuracy leaving zero. Interestingly, larger dataset sizes also require slightly more optimization steps to leave zero accuracy.
 After leaving zero, accuracy quickly jumps to about 80\%, then slowly keeps climbing to close to 100\%.
 Based on these accuracy curves, it does not seem unreasonable that training for longer that early stopping permits (\cref{setup:early_stopping}) would have resulted in even better accuracy. Investigating the type and parameters of our early stopping criterion could be worthwhile.
 
+\includePDFPlotSmall{experiment_results/baseline_accuracy/add.pdf}{fig:baseline_add}{Development of accuracy on the validation dataset when training for the addition task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
 
-For the multiplication task, we can see, in \cref{tbl:baseline_mul}, a very different picture to the addition task. Accuracy never gets above zero, except for the 3 digits, 10k dataset experiment, where it reaches about 1\%, and the 3 digits, 100k dataset experiment, where it reaches about 22\%.
+
+
+
+For the multiplication task, we can see in \cref{tbl:baseline_mul} a very different picture to the addition task. Accuracy never gets above zero, except for the 3 digits, 10k dataset experiment, where it reaches about 1\%, and the 3 digits, 100k dataset experiment, where it reaches about 22\%.
 This suggests that learning multiplication, all else being equal, is harder than learning addition.
-When looking at the accuracy curves in  \cref{fig:baseline_mul}, we can see that for the only experiment where accuracy clearly leaves zero (3 digit multiplication, 100k dataset) accuracy does not jump quickly to a certain value as it did with addition, but slowly keeps climbing until early stopping terminates training.
-For the experiments that do not achieve any accuracy, we can see that the number of optimization steps performed until training is aborted depends mostly on training dataset size and not much on operand digits, with the experiments with 1k dataset getting aborted after about 200 steps, and the experiments with 100k dataset getting aborted after about 40000 steps.
 
-
-For the square root task, we can see, in \cref{tbl:baseline_sqrt}, accuracy numbers that lie somewhere between those for addition and multiplication.
-For 6 digit integer square root, there was high but not perfect accuracy when using a 10k or 100k training dataset.
-For 10 digit integer square root, accuracy was 63\% for the 100k dataset but remained low otherwise. For 20 digit integer square root, no samples in the validation dataset where predicted correctly.
-When looking at the accuracy curves in \cref{fig:baseline_sqrt}, we can see curves that are more similar to those of the multiplication experiment than the addition experiments, with accuracy slowly climbing from zero. Once again, it looks like early stopping might prevent the model from achieving their full accuracy potential.
-
-
-
-\includeAccuracyTable{experiment_results/baseline_final_accuracy/add.csv}{tbl:baseline_add}{Final model accuracy on the test dataset for the addition operation for the given training dataset sizes and operand digits.}{}
 
 \includeAccuracyTable{experiment_results/baseline_final_accuracy/mul.csv}{tbl:baseline_mul}{Final model accuracy on the test dataset for the multiplication operation for the given training dataset sizes and operand digits.}{}
 
-\includeAccuracyTable{experiment_results/baseline_final_accuracy/sqrt.csv}{tbl:baseline_sqrt}{Final model accuracy on the test dataset for the square root operation for the given training dataset sizes and operand digits.}{}
-
-
-\includePDFPlotSmall{experiment_results/baseline_accuracy/add.pdf}{fig:baseline_add}{Development of accuracy on the validation dataset when training for the addition task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
+When looking at the accuracy curves in  \cref{fig:baseline_mul}, we can see that for the only experiment where accuracy clearly leaves zero (3 digit multiplication, 100k dataset) accuracy does not jump quickly to a certain value as it did with addition, but slowly keeps climbing until early stopping terminates training.
+For the experiments that do not achieve any accuracy, we can see that the number of optimization steps performed until training is aborted depends mostly on training dataset size and not much on operand digits, with the experiments with 1k dataset getting aborted after about 200 steps, and the experiments with 100k dataset getting aborted after about 40000 steps.
 
 \includePDFPlotSmall{experiment_results/baseline_accuracy/mul.pdf}{fig:baseline_mul}{Development of accuracy on the validation dataset when training for the multiplication task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
+
+
+
+
+
+For the square root task we can see in \cref{tbl:baseline_sqrt} that accuracy numbers that lie somewhere between those for addition and multiplication.
+For 6 digit integer square root, there was high but not perfect accuracy when using a 10k or 100k training dataset.
+For 10 digit integer square root, accuracy was 63\% for the 100k dataset but remained low otherwise. For 20 digit integer square root, no samples in the validation dataset where predicted correctly.
+
+\includeAccuracyTable{experiment_results/baseline_final_accuracy/sqrt.csv}{tbl:baseline_sqrt}{Final model accuracy on the test dataset for the square root operation for the given training dataset sizes and operand digits.}{}
+
+When looking at the accuracy curves in \cref{fig:baseline_sqrt}, we can see curves that are more similar to those of the multiplication experiment than the addition experiments, with accuracy slowly climbing from zero. Once again, it looks like early stopping might prevent the model from achieving their full accuracy potential.
 
 \includePDFPlotSmall{experiment_results/baseline_accuracy/sqrt.pdf}{fig:baseline_sqrt}{Development of accuracy on the validation dataset when training for the square root task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
 
@@ -258,15 +264,8 @@ To conclude, we can see that the errors our model makes follow clear patterns: I
 
 
 
-For the addition task, we can see in \cref{tbl:model_size} that all of the tried model configurations were able to learn the task successfully, although there are small differences in final accuracy, such as the $n_{embd}=768$ model finishing with perfect accuracy on the test dataset.
-
-When looking at the development of accuracy in \cref{fig:model_size_add}, we can see that there are substantial differences in how quickly the model converges on the addition task when changing the hidden vector size $n_{embd}$. For $n_{embd}=192$, it took about 2500 optimization steps for the model to cross 50\% accuracy, for $n_{embd}=384$ (baseline) it took about 900 steps and for $n_{embd}=768$ only about 500 steps. So in this case the bigger model with more parameters is able to learn faster than smaller models with fewer parameters.
-
-Increasing or decreasing the number of GPT-2 blocks/layers however only made a minor change in convergence speed, with 12 layers performing actually a bit worse than the baseline 6 layers.
-
-Changing the number of attention heads, which does not impact the number of model parameters but only the "partitioning" of data inside the model, also had only a minor impact on convergence speed.
-
-For the multiplication task with 5 operand digits, we can see in \cref{tbl:model_size} and \cref{fig:model_size_mul} that none of the model size changes allowed the model to learn this harder task.
+For 10-digit addition, we can see in \cref{tbl:model_size} that all of the tried model configurations were able to learn the task successfully, although there are small differences in final accuracy, such as the $n_{embd}=768$ model finishing with perfect accuracy on the test dataset.
+For 5-digit multiplication, we can see that none of the model size changes made the model capable of learning this harder task.
 
 
 \includeAccuracyTable
@@ -288,9 +287,12 @@ For the multiplication task with 5 operand digits, we can see in \cref{tbl:model
 	columns/mul_5digits_100k/.style={column name={\makecell[r]{mul\\(5 digits, 100k)}}},
 }
 
-\includePDFPlotSmall{experiment_results/model_size_accuracy/add.pdf}{fig:model_size_add}{Development of accuracy on the validation dataset when training for the addition task (10 digits, 100k dataset) for different changes in model configuration.}
+When looking at the development of accuracy for 10-digit addition in \cref{fig:model_size_add}, we can see that there are substantial differences in how quickly the model converges on the addition task when changing the hidden vector size $n_{embd}$. For $n_{embd}=192$, it took about 2500 optimization steps for the model to cross 50\% accuracy, for $n_{embd}=384$ (baseline) it took about 900 steps and for $n_{embd}=768$ only about 500 steps. So in this case the bigger model with more parameters is able to learn faster than smaller models with fewer parameters.
 
-\includePDFPlotSmall{experiment_results/model_size_accuracy/mul.pdf}{fig:model_size_mul}{Development of accuracy on the validation dataset when training for the multiplication task (5 digits, 100k dataset) for different changes in model configuration.}
+Increasing or decreasing the number of GPT-2 blocks/layers however only made a minor change in convergence speed, with 12 layers performing actually a bit worse than the baseline 6 layers.
+Changing the number of attention heads, which does not impact the number of model parameters but only the "partitioning" of data inside the model, also had only a minor impact on convergence speed.
+
+\includePDFPlotSmall{experiment_results/model_size_accuracy/add.pdf}{fig:model_size_add}{Development of accuracy on the validation dataset when training for the addition task (10 digits, 100k dataset) for different changes in model configuration.}
 
 
 
@@ -303,12 +305,8 @@ For the addition task there were no dramatic differences in achieved model capab
 There were, however, some less significant but still noticeable differences when comparing to the other sampling methods: Uniform digits and uniform bits sampling performed very similar to one another. Both achieved about 40\% accuracy for 3 digits, 1k dataset size while basic sampling and from-zero sampling remained close to zero. Here, the mix of easier (smaller, often single-digit) and harder (larger) training samples might have allowed for quicker convergence as we intended. On the other hand, they both had somewhat lower accuracy compared to basic sampling for 10k dataset size. From-zero sampling performed very similar to basic sampling,  except for 10 digits, where 10k training samples were not enough to achieve convergence. In that case, it could be that uniform digits and uniform bits sampling did not allow for enough training samples with the full 10 decimal digits in the training dataset if the training dataset size is small and the number of possible bits/digits is large.
 
 
-As expected, the multiplication task (\cref{tbl:sampling_strategies_mul_basic} to \cref{tbl:sampling_strategies_mul_uniformbits}) is much harder to learn, with most combinations of operand size and dataset size leaving the final model at zero accuracy. This does not change significantly based on the sampling method used, however uniform digits and uniform bits sampling do lead to a  slight increase in accuracy for the 100k-dataset, 3-digits case, which given the limited sample space and large number of samples, is the easiest case as expected.
 
-The integer square root task (\cref{tbl:sampling_strategies_sqrt_basic} to \cref{tbl:sampling_strategies_sqrt_uniformbits}) is somewhat in between addition and multiplication  for learning difficulty. The accuracy tables for basic and from-zero sampling also look very similar for this task.  Uniform digits and uniform bits sampling lead to slightly worse accuracy numbers, but the general characteristic is the same: The accuracy numbers mostly depend on the operation learned (addition versus multiplication versus square root) and only slightly change based on the sampling method.
-
-
-\begin{table}[!htbp]
+\begin{table}[H]
 	\begin{minipage}[t]{0.47\linewidth}
 		\hfill
 		\includeAccuracyTableCore{experiment_results/sampling_strategies/basic_add.csv}{}
@@ -341,7 +339,9 @@ The integer square root task (\cref{tbl:sampling_strategies_sqrt_basic} to \cref
 \end{table}
 
 
-\begin{table}[!htbp]
+As expected, the multiplication task (\cref{tbl:sampling_strategies_mul_basic} to \cref{tbl:sampling_strategies_mul_uniformbits}) is much harder to learn, with most combinations of operand size and dataset size leaving the final model at zero accuracy. This does not change significantly based on the sampling method used, however uniform digits and uniform bits sampling do lead to a  slight increase in accuracy for the 100k-dataset, 3-digits case, which given the limited sample space and large number of samples, is the easiest case as expected.
+
+\begin{table}[H]
 	\begin{minipage}[t]{0.47\linewidth}
 		\hfill
 		\includeAccuracyTableCore{experiment_results/sampling_strategies/basic_mul.csv}{}
@@ -373,7 +373,10 @@ The integer square root task (\cref{tbl:sampling_strategies_sqrt_basic} to \cref
 \end{table}
 
 
-\begin{table}[!htbp]
+The integer square root task (\cref{tbl:sampling_strategies_sqrt_basic} to \cref{tbl:sampling_strategies_sqrt_uniformbits}) is somewhat in between addition and multiplication  for learning difficulty. The accuracy tables for basic and from-zero sampling also look very similar for this task.  Uniform digits and uniform bits sampling lead to slightly worse accuracy numbers, but the general characteristic is the same: The accuracy numbers mostly depend on the operation learned (addition versus multiplication versus square root) and only slightly change based on the sampling method.
+
+
+\begin{table}[H]
 	\begin{minipage}[t]{0.47\linewidth}
 		\hfill
 		\includeAccuracyTableCore{experiment_results/sampling_strategies/basic_sqrt.csv}{}
@@ -412,14 +415,9 @@ The integer square root task (\cref{tbl:sampling_strategies_sqrt_basic} to \cref
 
 For the addition task (\cref{tbl:reverse_add}), when compared to the baseline experiments (\cref{tbl:reverse_add_baseline}), result reversal led to somewhat successful training (71\% accuracy) for the 3 digits, 1k dataset scenario, which could not be learned in baseline. However, training failed for the 10 digits, 10k dataset scenario.
 To us it is not clear whether this is due to a true difference in the learnability between the two training sample structures, or simply due to variance between training runs. Similar differences observed in the sampling strategy experiments (\cref{results:sampling}) might point towards the latter.
-
 It is also worth noting that for result reversal, 5 of the 9 scenarios, including all operand sizes for the 100k dataset size, led to perfect test accuracy (all 1000 samples correct), while for the baseline addition experiments accuracy was not quite perfect for the experiments with 5 and 10 operand digits.
 
-For the multiplication task (\cref{tbl:reverse_mul}), results were in general very similar to those obtained without result reversal (\cref{tbl:reverse_mul_baseline}). This operation thus remained the hardest of the three studied and could not be made easier for the model by first presenting the digit-reversed product in the training samples.
-
-For the integer square root task (\cref{tbl:reverse_sqrt}), the results were also very similar to the baseline task without result reversal (\cref{tbl:reverse_sqrt_baseline}), without significant differences in which scenarios could be learned and  the final accuracy numbers obtained.
-
-\begin{table}[!htbp]
+\begin{table}[H]
 	\begin{minipage}[t]{0.47\linewidth}
 		\hfill
 		\includeAccuracyTableCore{experiment_results/baseline_final_accuracy/add.csv}{}
@@ -435,7 +433,10 @@ For the integer square root task (\cref{tbl:reverse_sqrt}), the results were als
 	\end{minipage}
 \end{table}
 
-\begin{table}[!htbp]
+
+For the multiplication task (\cref{tbl:reverse_mul}), results were in general very similar to those obtained without result reversal (\cref{tbl:reverse_mul_baseline}). This operation thus remained the hardest of the three studied and could not be made easier for the model by first presenting the digit-reversed product in the training samples.
+
+\begin{table}[H]
 	\begin{minipage}[t]{0.47\linewidth}
 		\hfill
 		\includeAccuracyTableCore{experiment_results/baseline_final_accuracy/mul.csv}{}
@@ -451,7 +452,10 @@ For the integer square root task (\cref{tbl:reverse_sqrt}), the results were als
 	\end{minipage}
 \end{table}
 
-\begin{table}[!htbp]
+For the integer square root task (\cref{tbl:reverse_sqrt}), the results were also very similar to the baseline task without result reversal (\cref{tbl:reverse_sqrt_baseline}), without significant differences in which scenarios could be learned and  the final accuracy numbers obtained.
+
+
+\begin{table}[H]
 	\begin{minipage}[t]{0.47\linewidth}
 		\hfill
 		\includeAccuracyTableCore{experiment_results/baseline_final_accuracy/sqrt.csv}{}
@@ -504,7 +508,7 @@ which is then reversed correctly.
 	columns/correct/.style={column name={Correct result}}
 }
 
-For 5-digit multiplication (\cref{tbl:reverse_errors_mul_5digits}), we can also observe similar error patterns compared to the corresponding baseline experiment: The first and last digits of the result are correct, while the digits in the middle are wrong.
+For 5-digit multiplication (\cref{tbl:reverse_errors_mul_5digits}), we can also observe similar error patterns compared to the corresponding baseline experiment (\cref{tbl:errors_mul_5digits}): The first and last digits of the result are correct, while the digits in the middle are wrong.
 There also seems to be a pattern of repetition of single digits in the middle of the results, where the model has not learned to output the correct digits.
 
 \includeTable
@@ -579,25 +583,10 @@ Also there is an interesting digit pattern not seen in the baseline errors. A lo
 \label{results:scratchpad}
 
 
-For the addition task (\cref{tbl:scratchpad_add}), using scratchpad brings clear improvements over baseline (\cref{tbl:scratchpad_add_baseline}): For the 1k dataset size, training was more or less successful for all operand sizes (good accuracy but not 100\%), whereas there was no accuracy for the baseline experiments at 1k dataset size.
+For the addition task (\cref{tbl:scratchpad_add}), using a scratchpad brings clear improvements over baseline (\cref{tbl:scratchpad_add_baseline}): For the 1k dataset size, training was more or less successful for all operand sizes (good accuracy but not 100\%), whereas there was no accuracy for the baseline experiments at 1k dataset size.
 For the 10k and 100k dataset sizes, accuracy was perfect for all operand sizes, whereas in the baseline experiments accuracy was perfect only for 3 digit addition.
 
-For the multiplication task (\cref{tbl:scratchpad_mul}), there were even more significant improvements made by providing a scratchpad: For the baseline experiments (\cref{tbl:scratchpad_mul_baseline}) only 3 digits, 10k dataset and 3 digits, 100k dataset provided above-zero accuracy, and even there it was only about 20\%. When using the scratchpad, accuracy is good for 3 digits, 10k and 100k dataset sizes.
-Even for 5 and 10 digit multiplication, there is some degree of accuracy obtained, whereas it was a flat zero in the baseline experiments.
-
-Because the accuracy numbers for 5 and 10 digits are somewhat "in the middle", showing the model is able to do a significant portion of multiplications correctly, but still making some errors, it is not unreasonable to assume training for longer would have made the model able to perform 5 and 10 digit multiplications with high accuracy. In contrast to the baseline, we had to limit training epochs for the multiplication scratchpad experiments to keep training times reasonable (\cref{setup:scratchpad}, \cref{tbl:scratchpad_training_add}).
-
-It is also an interesting observation that accuracy numbers obtained on the 100k training dataset were lower than those on the 10k dataset. Training was limited to 50 epochs for the 10k dataset and 5 epochs for the 100k dataset (\cref{tbl:scratchpad_training_mul}). However, the total amount of training batches / optimization steps is the same for both scenarios, but the variety of training samples is lower in the 10k dataset scenario, increasing the risk of overfitting.
-We would thus have expected better scores for the 100k dataset despite the lower epoch count.
-
-For the integer square root task (\cref{tbl:scratchpad_sqrt}) the results were, interestingly, generally worse than baseline (\cref{tbl:scratchpad_sqrt_baseline}). This might be for a number of reasons:
-First of all, we had to reduce the amount of training epochs, even more so than for the multiplication tasks, due to the very long scratchpads (\cref{tbl:scratchpad_sample_lengths}). Thus the resulting models are most likely severely undertrained.
-
-Also, there is an important difference in the scratchpad structure between addition/multiplication and integer square root: For the addition and multiplication operations, the task was decomposed down into the smallest of pieces (single-digit addition and multiplication) (\cref{add_scratchpad}, \cref{mul_scratchpad}). Whereas for the square root task, we modeled the steps of the binary search algorithm but just left the squaring operations of large numbers as-is, without any explanation on how to compute the squares (we could not include this information as it would have made the scratchpads too massive) (\cref{sqrt_scratchpad}).
-
-
-
-\begin{table}[!htbp]
+\begin{table}[H]
 	\begin{minipage}[t]{0.47\linewidth}
 		\hfill
 		\includeAccuracyTableCore{experiment_results/baseline_final_accuracy/add.csv}{}
@@ -613,7 +602,16 @@ Also, there is an important difference in the scratchpad structure between addit
 	\end{minipage}
 \end{table}
 
-\begin{table}[!htbp]
+
+For the multiplication task (\cref{tbl:scratchpad_mul}), there were even more significant improvements made by providing a scratchpad: For the baseline experiments (\cref{tbl:scratchpad_mul_baseline}) only 3 digits, 10k dataset and 3 digits, 100k dataset provided above-zero accuracy, and even there it was only about 20\%. When using the scratchpad, accuracy is good for 3 digits, 10k and 100k dataset sizes.
+Even for 5 and 10 digit multiplication, there is some degree of accuracy obtained, whereas it was a flat zero in the baseline experiments.
+
+Because the accuracy numbers for 5-digit and 10-digit multiplication are somewhat "in the middle", showing the model is able to do a significant portion of multiplications correctly, but still making some errors, it is not unreasonable to assume training for longer would have made the model able to perform 5 and 10 digit multiplications with high accuracy. In contrast to the baseline, we had to limit training epochs for the multiplication scratchpad experiments to keep training times reasonable (\cref{setup:scratchpad}, \cref{tbl:scratchpad_training_add}).
+
+It is also an interesting observation that accuracy numbers obtained on the 100k training dataset were lower than those on the 10k dataset. Training was limited to 50 epochs for the 10k dataset and 5 epochs for the 100k dataset (\cref{tbl:scratchpad_training_mul}). However, the total amount of training batches / optimization steps is the same for both scenarios, but the variety of training samples is lower in the 10k dataset scenario, increasing the risk of overfitting.
+We would thus have expected better scores for the 100k dataset despite the lower epoch count.
+
+\begin{table}[H]
 	\begin{minipage}[t]{0.47\linewidth}
 		\hfill
 		\includeAccuracyTableCore{experiment_results/baseline_final_accuracy/mul.csv}{}
@@ -629,7 +627,13 @@ Also, there is an important difference in the scratchpad structure between addit
 	\end{minipage}
 \end{table}
 
-\begin{table}[!htbp]
+
+For the integer square root task (\cref{tbl:scratchpad_sqrt}) the results were, interestingly, generally worse than baseline (\cref{tbl:scratchpad_sqrt_baseline}). This might be for a number of reasons:
+First of all, we had to reduce the amount of training epochs, even more so than for the multiplication tasks, due to the very long scratchpads (\cref{tbl:scratchpad_sample_lengths}). Thus the resulting models are most likely severely undertrained.
+
+Also, there is an important difference in the scratchpad structure between addition/multiplication and integer square root: For the addition and multiplication operations, the task was decomposed down into the smallest of pieces (single-digit addition and multiplication) (\cref{add_scratchpad}, \cref{mul_scratchpad}). Whereas for the square root task, we modeled the steps of the binary search algorithm but just left the squaring operations of large numbers as-is, without any explanation on how to compute the squares (we could not include this information as it would have made the scratchpads too massive) (\cref{sqrt_scratchpad}).
+
+\begin{table}[H]
 	\begin{minipage}[t]{0.47\linewidth}
 		\hfill
 		\includeAccuracyTableCore{experiment_results/baseline_final_accuracy/sqrt.csv}{}
@@ -656,18 +660,16 @@ For scratchpad-based training, we evaluated accuracy only once every epoch and r
 For the addition task (\cref{fig:intermediate_steps_accuracy_add}) we can see that baseline training needs between 2000 (3 digits) and over 20000 (10 digits) training steps to achieve near 100\% accuracy. In contrast, when using result reversal, the model learned somewhat faster (1000-2000 steps for 3 and 5 digits, 10000 steps for 10 digits) and accuracy hits 100\% much more abruptly compared to baseline, where it hits 80\% and then needs some time to get to 100\%.
 Using a scratchpad leads to much faster convergence, where 3 digit addition already converged at the first log interval at 400 steps, and 5 and 10 digit addition converged before 1000 steps.
 
+\includePDFPlotSmall{experiment_results/intermediate_steps_accuracy/add.pdf}{fig:intermediate_steps_accuracy_add}{Development of accuracy on the validation dataset, when training the addition task using a 100k dataset using various training methods and operand digits.}
+
 For the multiplication task (\cref{fig:intermediate_steps_accuracy_mul}), we can see that only scratchpad with 3 digit multiplication converged to 100\%. For the same task, baseline and result reversal had similar curves, starting to leave zero at about 3000 steps, and ending at around 20\% accuracy after about 40000 steps.
 For 5 and 10 digit multiplication, only scratchpad-based training achieved above-zero accuracy, while still remaining at around 20\% accuracy and taking between 3000 and 20000 steps to start converging.
 It might however converge all the way to 100\% given continued training, but resource constraints made us limit the number of training epochs (\cref{tbl:scratchpad_training_mul}).
 
+\includePDFPlotSmall{experiment_results/intermediate_steps_accuracy/mul.pdf}{fig:intermediate_steps_accuracy_mul}{Development of accuracy on the validation dataset, when training the multiplication task using a 100k dataset using various training methods and operand digits.}
+
 For the square root task with 6 operand digits (\cref{fig:intermediate_steps_accuracy_sqrt}), baseline and result reversal performed very similar while the scratchpad took longer to start converging but then quickly converged, matching the other two training methods.
 For 10 operand digits, scratchpad actually failed to converge, as opposed to baseline and result reversal. This happened despite taking more optimization steps until training was stopped. It would thus be reasonable to assume that the form of scratchpad we used here, which does not further elaborate on the squaring step, is not helpful for model training, as opposed to the successful addition and multiplication scratchpads.
-
-
-
-\includePDFPlotSmall{experiment_results/intermediate_steps_accuracy/add.pdf}{fig:intermediate_steps_accuracy_add}{Development of accuracy on the validation dataset, when training the addition task using a 100k dataset using various training methods and operand digits.}
-
-\includePDFPlotSmall{experiment_results/intermediate_steps_accuracy/mul.pdf}{fig:intermediate_steps_accuracy_mul}{Development of accuracy on the validation dataset, when training the multiplication task using a 100k dataset using various training methods and operand digits.}
 
 \includePDFPlotSmall{experiment_results/intermediate_steps_accuracy/sqrt.pdf}{fig:intermediate_steps_accuracy_sqrt}{Development of accuracy on the validation dataset, when training the square root task using a 100k dataset using various training methods and operand digits.}
 
