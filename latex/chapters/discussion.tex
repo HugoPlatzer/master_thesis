@@ -17,9 +17,9 @@ Multiplication proved much tougher, with only about 20\% accuracy achieved for 3
 Integer square root, for a comparable operand size (single operand with twice as many digits as the two operands of addition or multiplication) proved to be somewhat in the middle in terms of difficulty. A 100k training dataset achieved 98\% accuracy for 6 digit integer square root and 64\% accuracy for 10 digit integer square root, with zero accuracy for 20 digit integer square root (\cref{fig:baseline_sqrt}).
 
 Errors for addition and multiplication were generally single/multiple digits being off in the middle of the sum/product (\cref{error_analysis}). This matches the error patterns observed in \citepage{7}{lengthgen}, which shows digits in the middle of the result taking longer to converge and finishing at lower accuracy.
-For square root, the errors where the result being off by one for numbers close to a square number.
+For square root, the errors were the result being off by one for numbers close to a square number.
 
-Changing the model size did result in a model with bigger vectors or more layers needing fewer training steps to achieve the same accuracy (\cref{fig:model_size_add}, \cref{fig:model_size_mul}) but did not make a substantial difference in model capabilities, meaning it could still not learn multiplication with 5 or 10 digits, or integer square root with 20 digits.
+Changing the model size did result in a model with bigger vectors or more layers needing fewer training steps to achieve the same addition accuracy (\cref{fig:model_size_add}) but did not make a substantial difference in model capabilities (\cref{tbl:model_size}), meaning it still could not learn tasks such as 5-digit multiplication.
 
 Changing the digit sampling from uniform across the whole sample space to bit-uniform or digit-uniform provided little improvement either. This stands in contrast to \cite{positionmatters} where both uniform-digit sampling and result reversal provided some improvement in model accuracy.
 

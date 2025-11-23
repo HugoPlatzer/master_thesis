@@ -16,7 +16,7 @@ Considering the development of accuracy during training, we can see in \cref{fig
 After leaving zero, accuracy quickly jumps to about 80\%, then slowly keeps climbing to close to 100\%.
 Based on these accuracy curves, it does not seem unreasonable that training for longer that early stopping permits (\cref{setup:early_stopping}) would have resulted in even better accuracy. Investigating the type and parameters of our early stopping criterion could be worthwhile.
 
-\includePDFPlotSmall{experiment_results/baseline_accuracy/add.pdf}{fig:baseline_add}{Development of accuracy on the validation dataset when training for the addition task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
+\includePDFPlot{experiment_results/baseline_accuracy/add.pdf}{fig:baseline_add}{Development of accuracy on the validation dataset when training for the addition task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
 
 
 
@@ -30,7 +30,7 @@ This suggests that learning multiplication, all else being equal, is harder than
 When looking at the accuracy curves in  \cref{fig:baseline_mul}, we can see that for the only experiment where accuracy clearly leaves zero (3 digit multiplication, 100k dataset) accuracy does not jump quickly to a certain value as it did with addition, but slowly keeps climbing until early stopping terminates training.
 For the experiments that do not achieve any accuracy, we can see that the number of optimization steps performed until training is aborted depends mostly on training dataset size and not much on operand digits, with the experiments with 1k dataset getting aborted after about 200 steps, and the experiments with 100k dataset getting aborted after about 40000 steps.
 
-\includePDFPlotSmall{experiment_results/baseline_accuracy/mul.pdf}{fig:baseline_mul}{Development of accuracy on the validation dataset when training for the multiplication task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
+\includePDFPlot{experiment_results/baseline_accuracy/mul.pdf}{fig:baseline_mul}{Development of accuracy on the validation dataset when training for the multiplication task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
 
 
 
@@ -44,7 +44,7 @@ For 10 digit integer square root, accuracy was 63\% for the 100k dataset but rem
 
 When looking at the accuracy curves in \cref{fig:baseline_sqrt}, we can see curves that are more similar to those of the multiplication experiment than the addition experiments, with accuracy slowly climbing from zero. Once again, it looks like early stopping might prevent the model from achieving their full accuracy potential.
 
-\includePDFPlotSmall{experiment_results/baseline_accuracy/sqrt.pdf}{fig:baseline_sqrt}{Development of accuracy on the validation dataset when training for the square root task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
+\includePDFPlot{experiment_results/baseline_accuracy/sqrt.pdf}{fig:baseline_sqrt}{Development of accuracy on the validation dataset when training for the square root task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
 
 
 
@@ -259,6 +259,7 @@ For 20-digit integer square root, the model did not achieve above-zero accuracy 
 To conclude, we can see that the errors our model makes follow clear patterns: If the model is trained successfully (achieves good accuracy) the wrong answer is similar to the correct answer, with either a single digit being wrong in the case of addition and multiplication, or the square root being off by one in the case of integer square root. If the model is trained unsuccessfully (zero accuracy achieved) errors often affect more digits (as in the case of 5-digit multiplication).
 
 
+\newpage
 \subsection{Model size experiments}
 \label{results:modelsize}
 
@@ -292,7 +293,7 @@ When looking at the development of accuracy for 10-digit addition in \cref{fig:m
 Increasing or decreasing the number of GPT-2 blocks/layers however only made a minor change in convergence speed, with 12 layers performing actually a bit worse than the baseline 6 layers.
 Changing the number of attention heads, which does not impact the number of model parameters but only the "partitioning" of data inside the model, also had only a minor impact on convergence speed.
 
-\includePDFPlotSmall{experiment_results/model_size_accuracy/add.pdf}{fig:model_size_add}{Development of accuracy on the validation dataset when training for the addition task (10 digits, 100k dataset) for different changes in model configuration.}
+\includePDFPlot{experiment_results/model_size_accuracy/add.pdf}{fig:model_size_add}{Development of accuracy on the validation dataset when training for the addition task (10 digits, 100k dataset) for different changes in model configuration.}
 
 
 
@@ -660,18 +661,18 @@ For scratchpad-based training, we evaluated accuracy only once every epoch and r
 For the addition task (\cref{fig:intermediate_steps_accuracy_add}) we can see that baseline training needs between 2000 (3 digits) and over 20000 (10 digits) training steps to achieve near 100\% accuracy. In contrast, when using result reversal, the model learned somewhat faster (1000-2000 steps for 3 and 5 digits, 10000 steps for 10 digits) and accuracy hits 100\% much more abruptly compared to baseline, where it hits 80\% and then needs some time to get to 100\%.
 Using a scratchpad leads to much faster convergence, where 3 digit addition already converged at the first log interval at 400 steps, and 5 and 10 digit addition converged before 1000 steps.
 
-\includePDFPlotSmall{experiment_results/intermediate_steps_accuracy/add.pdf}{fig:intermediate_steps_accuracy_add}{Development of accuracy on the validation dataset, when training the addition task using a 100k dataset using various training methods and operand digits.}
+\includePDFPlot{experiment_results/intermediate_steps_accuracy/add.pdf}{fig:intermediate_steps_accuracy_add}{Development of accuracy on the validation dataset, when training the addition task using a 100k dataset using various training methods and operand digits.}
 
 For the multiplication task (\cref{fig:intermediate_steps_accuracy_mul}), we can see that only scratchpad with 3 digit multiplication converged to 100\%. For the same task, baseline and result reversal had similar curves, starting to leave zero at about 3000 steps, and ending at around 20\% accuracy after about 40000 steps.
 For 5 and 10 digit multiplication, only scratchpad-based training achieved above-zero accuracy, while still remaining at around 20\% accuracy and taking between 3000 and 20000 steps to start converging.
 It might however converge all the way to 100\% given continued training, but resource constraints made us limit the number of training epochs (\cref{tbl:scratchpad_training_mul}).
 
-\includePDFPlotSmall{experiment_results/intermediate_steps_accuracy/mul.pdf}{fig:intermediate_steps_accuracy_mul}{Development of accuracy on the validation dataset, when training the multiplication task using a 100k dataset using various training methods and operand digits.}
+\includePDFPlot{experiment_results/intermediate_steps_accuracy/mul.pdf}{fig:intermediate_steps_accuracy_mul}{Development of accuracy on the validation dataset, when training the multiplication task using a 100k dataset using various training methods and operand digits.}
 
 For the square root task with 6 operand digits (\cref{fig:intermediate_steps_accuracy_sqrt}), baseline and result reversal performed very similar while the scratchpad took longer to start converging but then quickly converged, matching the other two training methods.
 For 10 operand digits, scratchpad actually failed to converge, as opposed to baseline and result reversal. This happened despite taking more optimization steps until training was stopped. It would thus be reasonable to assume that the form of scratchpad we used here, which does not further elaborate on the squaring step, is not helpful for model training, as opposed to the successful addition and multiplication scratchpads.
 
-\includePDFPlotSmall{experiment_results/intermediate_steps_accuracy/sqrt.pdf}{fig:intermediate_steps_accuracy_sqrt}{Development of accuracy on the validation dataset, when training the square root task using a 100k dataset using various training methods and operand digits.}
+\includePDFPlot{experiment_results/intermediate_steps_accuracy/sqrt.pdf}{fig:intermediate_steps_accuracy_sqrt}{Development of accuracy on the validation dataset, when training the square root task using a 100k dataset using various training methods and operand digits.}
 
 
 
