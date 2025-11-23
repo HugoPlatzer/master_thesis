@@ -677,17 +677,17 @@ For 10 operand digits, scratchpad actually failed to converge, as opposed to bas
 
 Similar to the baseline and result reversal experiments, we looked for errors in the model output for the addition task with 5 and 10 digits (100k dataset), multiplication task with 3 and 5 digits (100k dataset) and square root task with 6 digits (100k dataset).
 We did not analyze errors for the square root task with 20 operand digits, because the scratchpads are so long that presenting them here is impractical.
-We only looked at 3 errors per task due to the longer output size when using the scratchpad. The error examples presented are simply the first 3 samples from the error analysis dataset where the model output did not match the correct output (considering both the scratchpad and final result).
+We only looked at 3 errors per task due to the longer output size when using the scratchpad. The error samples presented are simply the first 3 samples from the error analysis dataset where the model output did not match the correct output (considering both the scratchpad and final result).
 
 % Add errors
 
-For the addition tasks with 5 and 10 digits and 100k training dataset, there were no errors in the 100k error analysis dataset, similar to training for addition using result reversal (\cref{results:reversal:error}).
+For 5-digit and 10-digit addition using a 100k training dataset, there were no errors in the 100k error analysis dataset, similar to training for addition using result reversal (\cref{results:reversal:error}).
 Thus both result reversal and scratchpads allow for training a model that has a very low error probability for addition tasks up to 10 digits.
 
 % 3 digit mul errors
 
-For the 3-digit multiplication task (\cref{tbl:errors_scratchpad_mul3}), we can see there were no errors in the single-digit multiplications. In the first error sample, the model fetched the wrong digit from the single-digit results during the addition phase. We hypothesize this could be due to there being multiple single-digit products that are zero, thus making it harder to pick the right digits due to the uneven length of the products.
-For the other two error samples, the model did the entire calculation correctly, but surprisingly failed to read the correct digit sequence from the addition scratchpad.
+For 3-digit multiplication, the three error samples in \cref{tbl:errors_scratchpad_mul3} show that there were no errors in the single-digit multiplications. In the first error sample, the model fetched the wrong digit from the single-digit results during the addition phase. We hypothesize this could be due to there being multiple single-digit products that are zero, thus making it harder to pick the right digits due to the uneven length of the products.
+For the second and third error sample, the model did the entire calculation correctly, but surprisingly failed to read the correct digit sequence from the addition scratchpad.
 
 \ErrorAnalysisTableBegin
 
@@ -780,19 +780,18 @@ For the other two error samples, the model did the entire calculation correctly,
 98090
 \end{lstlisting} \\
 
-\ErrorAnalysisTableEnd{tbl:errors_scratchpad_mul3}{Error examples for the multiplication task (3 digits, 100k training dataset, using scratchpad, trained for 5 epochs).}
+\ErrorAnalysisTableEnd{tbl:errors_scratchpad_mul3}{Error samples for the multiplication task (3 digits, 100k training dataset, using scratchpad, trained for 5 epochs).}
 
 
 
 
 
-
+\newpage
 % 5 digit mul errors
 
-For the multiplication task with 5 operand digits, the first example (\cref{tbl:errors_scratchpad_mul5_1}) shows the model failing to compute the correct sum based on the correct list of digits and current carry value. This led to some digits in the middle of the product being wrong.
-The second example  (\cref{tbl:errors_scratchpad_mul5_2}) shows the same pattern: wrong sum adding multiple digits during the addition phase - leading to some wrong digits in the middle of the final product.
-The third example  (\cref{tbl:errors_scratchpad_mul5_3}) shows a somewhat different pattern: Interestingly, there were mistakes in a single-digit multiplication with factor 1, basically failing to copy the digits. This led to wrong digits in the middle of the final product.
-In summary, there was only one error observed in the digit multiplication stage and one error writing the final result, while there were multiple errors in the sum stage, either computing the wrong sum or fetching the wrong digits.
+For 5-digit multiplication, the first error sample (\cref{tbl:errors_scratchpad_mul5_1}) shows the model failing to compute the correct sum based on the correct list of digits and current carry value. This led to some digits in the middle of the product being wrong.
+
+
 
 
 
@@ -850,7 +849,11 @@ In summary, there was only one error observed in the digit multiplication stage 
 }]
 1715521605
 \end{lstlisting} \\ \ErrorAnalysisTableRule
-\ErrorAnalysisTableEnd{tbl:errors_scratchpad_mul5_1}{Error example 1 for the multiplication task (5 digits, 100k training dataset, using scratchpad, trained for 5 epochs).}
+\ErrorAnalysisTableEnd{tbl:errors_scratchpad_mul5_1}{First error sample for the multiplication task (5 digits, 100k training dataset, using scratchpad, trained for 5 epochs).}
+
+
+\newpage
+The second error sample  (\cref{tbl:errors_scratchpad_mul5_2}) shows the same pattern: wrong sum adding multiple digits during the addition phase - leading to some wrong digits in the middle of the final product.
 
 \ErrorAnalysisTableBegin
 \begin{lstlisting}
@@ -903,8 +906,12 @@ In summary, there was only one error observed in the digit multiplication stage 
 }]
 240264280
 \end{lstlisting} \\
-\ErrorAnalysisTableEnd{tbl:errors_scratchpad_mul5_2}{Error example 2 for the multiplication task (5 digits, 100k training dataset, using scratchpad, trained for 5 epochs).}
+\ErrorAnalysisTableEnd{tbl:errors_scratchpad_mul5_2}{Second error sample for the multiplication task (5 digits, 100k training dataset, using scratchpad, trained for 5 epochs).}
 
+
+\newpage
+The third error sample  (\cref{tbl:errors_scratchpad_mul5_3}) shows a somewhat different pattern: Interestingly, there were mistakes in a single-digit multiplication with factor 1, basically failing to copy the digits. This led to wrong digits in the middle of the final product.
+In summary, there was only one error observed in the digit multiplication stage and one error writing the final result, while there were multiple errors in the sum stage, either computing the wrong sum or fetching the wrong digits.
 
 \ErrorAnalysisTableBegin
 \begin{lstlisting}
@@ -960,17 +967,14 @@ In summary, there was only one error observed in the digit multiplication stage 
 2058581023
 \end{lstlisting}
 \\
-\ErrorAnalysisTableEnd{tbl:errors_scratchpad_mul5_3}{Error example 3 for the multiplication task (5 digits, 100k training dataset, using scratchpad, trained for 5 epochs).}
+\ErrorAnalysisTableEnd{tbl:errors_scratchpad_mul5_3}{Third error sample for the multiplication task (5 digits, 100k training dataset, using scratchpad, trained for 5 epochs).}
 
 
 
 % Sqrt errors
-
-For the square root task with 6 digits, in the first example (\cref{tbl:errors_scratchpad_sqrt6_1}) we can see the model making mistakes in squaring large numbers at the beginning of the algorithm. This, however, did not influence the final result as the algorithm always has to take a few steps in the same direction at the start due do the large search interval $[0, n]$.
+\newpage
+For the square root task with 6 digits, in the first error sample (\cref{tbl:errors_scratchpad_sqrt6_1}) we can see the model making mistakes in squaring large numbers at the beginning of the algorithm. This, however, did not influence the final result as the algorithm always has to take a few steps in the same direction at the start due do the large search interval $[0, n]$.
 The model did make another mistake at the very end of the algorithm, picking the wrong half of the search space and then picking the wrong one of two numbers for the final square root.
-In the second example (\cref{tbl:errors_scratchpad_sqrt6_2}) we can see the model making similar errors computing large squares at the start. It then did fine computing smaller squares and picking the right half of the search space. At the very end, it picked the wrong half of the search space, similarly to the first example.
-Example 3 (\cref{tbl:errors_scratchpad_sqrt6_3}) shows the model coming to the right conclusion after making a few mistakes computing larger squares at the start.
-In summary, we can see that errors happen when computing larger square numbers at the start of the algorithm and when picking the right half at the end of the algorithm. Interestingly, computing squares towards of the algorithm does not seem a cause of errors.
 
 \ErrorAnalysisTableBegin
 \begin{lstlisting}
@@ -1025,8 +1029,11 @@ In summary, we can see that errors happen when computing larger square numbers a
 ]
 957
 \end{lstlisting} \\
-\ErrorAnalysisTableEnd{tbl:errors_scratchpad_sqrt6_1}{Error example 1 for the square root task (6 digits, 100k training dataset, using scratchpad, trained for 5 epochs).}
+\ErrorAnalysisTableEnd{tbl:errors_scratchpad_sqrt6_1}{First error sample for the square root task (6 digits, 100k training dataset, using scratchpad, trained for 5 epochs).}
 
+
+\newpage
+In the second error sample (\cref{tbl:errors_scratchpad_sqrt6_2}) we can see the model making similar errors computing large squares at the start. It then did fine computing smaller squares and picking the right half of the search space. At the very end, it picked the wrong half of the search space, similarly to the first example.
 
 \ErrorAnalysisTableBegin
 \begin{lstlisting}
@@ -1077,7 +1084,13 @@ In summary, we can see that errors happen when computing larger square numbers a
 ]
 441
 \end{lstlisting} \\
-\ErrorAnalysisTableEnd{tbl:errors_scratchpad_sqrt6_2}{Error example 2 for the square root task (6 digits, 100k training dataset, using scratchpad, trained for 5 epochs).}
+\ErrorAnalysisTableEnd{tbl:errors_scratchpad_sqrt6_2}{Second error sample for the square root task (6 digits, 100k training dataset, using scratchpad, trained for 5 epochs).}
+
+
+
+\newpage
+The third error sample (\cref{tbl:errors_scratchpad_sqrt6_3}) shows the model coming to the right conclusion after making a few mistakes computing larger squares at the start.
+In summary, we can see that errors happen when computing larger square numbers at the start of the algorithm and when picking the right half at the end of the algorithm. Interestingly, computing squares towards of the algorithm does not seem a cause of errors.
 
 \ErrorAnalysisTableBegin
 \begin{lstlisting}
@@ -1131,7 +1144,7 @@ In summary, we can see that errors happen when computing larger square numbers a
 749
 \end{lstlisting} \\
 \\
-\ErrorAnalysisTableEnd{tbl:errors_scratchpad_sqrt6_3}{Error example 3 for the square root task (6 digits, 100k training dataset, using scratchpad, trained for 5 epochs).}
+\ErrorAnalysisTableEnd{tbl:errors_scratchpad_sqrt6_3}{Third error sample for the square root task (6 digits, 100k training dataset, using scratchpad, trained for 5 epochs).}
 
 
 
