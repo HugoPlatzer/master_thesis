@@ -1,4 +1,5 @@
 \section{Experimental setup}
+\label{setup:main}
 
 Based on the methods outlined in \cref{methods}, we set up a training pipeline that first creates a dataset for the given arithmetic operation, operand digits and sampling method, then initializes a GPT-2-style model (\cref{methods:model}) with the given model configuration, and then trains the model on the dataset, monitoring loss and accuracy during training.
 The details of our training pipeline are as follows:
@@ -43,12 +44,12 @@ Based on the sampling and formatting methods described above, for each experimen
 
 \begin{itemize}
 	\item \textbf{Training dataset:} This dataset is used to optimize the model weights during training. Its size varies from 1k to 100k samples as part of the experiment.
-	\item \textbf{Validation dataset:} A separate dataset with 1k samples. Loss on this dataset is used to decide when to stop training (\cref{setup:early_stopping}). Accuracy on this dataset is also tracked.
+	\item \textbf{Validation dataset:} A separate dataset with 1k samples. Loss on this dataset is used to decide when to stop training (early stopping). Accuracy on this dataset is also tracked.
 	For some experiments (\cref{setup:scratchpad}) we had to lower the size of the validation dataset to avoid accuracy tracking slowing down training too much.
 	\item \textbf{Test dataset:} Another separate dataset with 1k samples. This dataset is used at the end of each training run to compute the final accuracy numbers.
 \end{itemize}
 
-All datasets are sampled using the \textbf{basic sampling} method illustrated in \cref{methods:sampling:basic}. This applies to all experiments except those studying different sampling methods (\cref{setup:sampling}).
+All datasets are sampled using the \textbf{basic sampling} method illustrated in \cref{methods:sampling}. This applies to all experiments except those studying different sampling methods (\cref{setup:sampling}).
 For addition and multiplication, the operands $a$ and $b$ of each sample are encoded into a string based on their decimal digit representation, the same applies to the sum / product $c$. 
 To avoid uneven string/sequence length, $c$ is encoded with leading zeroes up to the maximum possible sum / product length based on the operand size. For example, for 3-digit addition, the sum is padded to 4 digits:
 
@@ -96,7 +97,7 @@ We then tried to identify and discuss observable patterns in the small sample of
 \subsection{Baseline experiments}
 \label{setup:baseline}
 
-To test the ability of transformer networks to learn arithmetic operations, and to see whether we can replicate the results of \cite{teaching}, we first run some baseline experiments. The general setup is as described in \cref{setup:general} and the training samples for the studied operations were created as described in \cref{methods:ops}.
+To test the ability of transformer networks to learn arithmetic operations, and to see whether we can replicate the results of \cite{teaching}, we first run some baseline experiments. The training pipeline is as described above and the training samples for the studied operations were created as described in \cref{methods:ops}.
 
 
 
@@ -162,7 +163,7 @@ Changing the sampling method / distribution of training samples does not change 
 We wanted to find out whether reversing the digits of the result of the arithmetic tasks in the training samples can improve model performance. For this we augmented the training samples with the reversed digits of the result, as described in \cref{methods:reversal}.
 
 
-This results in increased sample length (\cref{tbl:reverse_sample_lengths}) which means we have to increase the number of positions in the model configuration ($\nPos$) to handle these longer sequences. This does lead to more model parameters due to each position having a learnable positional embedding vector (\cref{gpt2:preproc}). The increase however is just a minute fraction of the total parameters (e.g., 10.710 million parameters for the 10-digit addition baseline requiring 34 positions, and 10.715 million parameters for 10-digit addition with result reversal requiring 47 positions). This minute increase does not necessitate other changes to the training regime such as reduced batch sizes or fewer epochs - we can keep the default batch size of 256 and epoch limit of 200 (\cref{setup:batchsize}, \cref{setup:learnrate}).
+This results in increased sample length (\cref{tbl:reverse_sample_lengths}) which means we have to increase the number of positions in the model configuration ($\nPos$) to handle these longer sequences. This does lead to more model parameters due to each position having a learnable positional embedding vector (\cref{gpt2:preproc}). The increase however is just a minute fraction of the total parameters (e.g., 10.710 million parameters for the 10-digit addition baseline requiring 34 positions, and 10.715 million parameters for 10-digit addition with result reversal requiring 47 positions). This minute increase does not necessitate other changes to the training regime such as reduced batch sizes or fewer epochs - we can keep the default batch size of 256 and epoch limit of 200 (\cref{setup:main}).
 
 For the result reversal experiments, to evaluate accuracy as described in \cref{setup:eval} we do not consider the entire generated output of the model (the reversed result in brackets and the final result), but instead strip the reversed part before only comparing the actual result.
 
@@ -230,10 +231,10 @@ Augmenting the training samples with a scratchpad that details the steps of the 
 	columns/lenScratch/.style={column name={\begin{tabular}{c} Sequence length \\ (scratchpad) \\ \end{tabular}}}
 }
 
-These large sequences of sometimes well beyond 1000 characters necessitate some changes to the training regime. Based on the available hardware, we need to make training batches and the intermediate results during forward/backward pass fit into GPU memory (\cref{setup:hardware}). The smaller batches in turn mean more optimization steps per epoch, thus taking more time to do training for a given number of epochs. At the same time, a training batch with longer sequences results in larger matrices during optimization, thus taking more time per batch than the same batch size with shorter sequences.
+These large sequences of sometimes well beyond 1000 characters necessitate some changes to the training regime. Based on the available hardware, we need to make training batches and the intermediate results during forward/backward pass fit into GPU memory. The smaller batches in turn mean more optimization steps per epoch, thus taking more time to do training for a given number of epochs. At the same time, a training batch with longer sequences results in larger matrices during optimization, thus taking more time per batch than the same batch size with shorter sequences.
 Time for evaluating the model (generating answers for the samples in the test/validation dataset to test accuracy) also rises proportionally to the lengths of the sequences being generated, meaning it can become a significant part of training time when sequences are long due to an elaborate scratchpad being trained on.
 
-We want to keep the duration for a single experiment (e.g., square root, using scratchpad, 20 digits, 100k dataset) below 24 hours on the available hardware (\cref{setup:hardware}).
+We want to keep the duration for a single experiment (e.g., square root, using scratchpad, 20 digits, 100k dataset) below 24 hours on the hardware available to us.
 We still want to run all experiments, even those with the largest dataset size of 100k, thus we made the compromise of reducing the maximum number of training epochs for the experiments that would take too much time otherwise. This does have the downside of the models being undertrained (unless early stopping would have halted training before the epoch limit) but it seems like the best choice given the time and hardware constraints.
 
 

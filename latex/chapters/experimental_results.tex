@@ -14,7 +14,7 @@ For the addition task we can see in \cref{tbl:baseline_add} that addition up to 
 
 Considering the development of accuracy during training, we can see in \cref{fig:baseline_add} that accuracy flatlines until a few hundred to a few thousand optimization steps are performed. More operand digits mean more optimization steps to reach the point of accuracy leaving zero. Interestingly, larger dataset sizes also require slightly more optimization steps to leave zero accuracy.
 After leaving zero, accuracy quickly jumps to about 80\%, then slowly keeps climbing to close to 100\%.
-Based on these accuracy curves, it does not seem unreasonable that training for longer that early stopping permits (\cref{setup:early_stopping}) would have resulted in even better accuracy. Investigating the type and parameters of our early stopping criterion could be worthwhile.
+Based on these accuracy curves, it does not seem unreasonable that training for longer that early stopping permits (\cref{setup:main}) would have resulted in even better accuracy. Investigating the type and parameters of our early stopping criterion could be worthwhile.
 
 \includePDFPlot{experiment_results/baseline_accuracy/add.pdf}{fig:baseline_add}{Development of accuracy on the validation dataset when training for the addition task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
 
