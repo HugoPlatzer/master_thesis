@@ -1,30 +1,56 @@
 \section{Experimental setup}
 
 Based on the methods outlined in \cref{methods}, we set up a training pipeline that first creates a dataset for the given arithmetic operation, operand digits and sampling method, then initializes a GPT-2-style model (\cref{methods:model}) with the given model configuration, and then trains the model on the dataset, monitoring loss and accuracy during training.
+The details of our training pipeline are as follows:
 
-\subsection{General setup}
-\label{setup:general}
-
-
-%\subsubsection{Libraries / Frameworks}
-
+\begin{itemize}
+\item \textbf{Libraries/Frameworks:}
 We use the HuggingFace transformers library \cite{github-hf} with PyTorch backend \cite{pytorch} which takes care of implementing transformer networks and the training process. Based on this, we wrote some Python code that implements generating training samples, running model training, evaluating model performance, logging results and generating plots. The generation of plots from the result logs utilized the matplotlib Python library.
 
-\subsubsection{Hardware}
-\label{setup:hardware}
-
+\item \textbf{Hardware:}
 The experiments were run on Linux machines with NVIDIA GPUs that were rented and accessed via a GPU renting website. We ensured each system had a reasonably recent NVIDIA GPU with at least 16GB VRAM to ensure our experiment computations fit inside GPU memory.
 
-\subsubsection{Model implementation}
-
+\item \textbf{Model implementation:}
 We use the GPT2LMHeadModel class of the HuggingFace transformers library which implements a GPT-2-style decoder-only transformer model.
 We adjust the model configuration so it matches nanoGPT \cite{nanogpt}, a basic lightweight GPT-2 implementation which was also used for the experiments in \cite{teaching}. 
 The model uses $\dHidden=384$, $\nBlocks=6$, $\nHeads=6$.
 
-\subsubsection{Data format}
+\item \textbf{Weight initialization:}
+The model weights are initialized using the default distributions as defined in the GPT2LMHeadModel class of the HuggingFace transformers framework.
 
-For addition and multiplication, the operands $a$ and $b$ are encoded into the string based on their decimal digit representation, the same applies to the sum / product $c$. 
-To avoid uneven string/sequence length, $c$ is encoded with leading zeroes up to the maximum possible sum / product length based on the operand size. For example, for the addition task with 3 digits, the sum is padded to 4 digits:
+\item \textbf{Optimizer:} Training uses the AdamW optimizer with default parameters as defined by the HuggingFace transformers Trainer / TrainingArguments class.
+
+
+\item \textbf{Batch size:}
+For the baseline experiments, we used a fixed batch size of 256. We picked this batch size as it was also used in \cite{teaching} and it fits the memory of our training GPU. For some experiments (\cref{setup:scratchpad}) we needed to reduce batch size to fit batches into GPU memory.
+
+
+\item \textbf{Learning rate scheduling:}
+The learning rate is adjusted using a linear schedule with warmup steps, with default parameters as defined by the HuggingFace transformers framework.
+For computing the learning rate, we assume a maximum of 200 epochs for training.
+
+\item \textbf{Early stopping:}
+We use an early stopping strategy where training is aborted if for 5 epochs there is no new minimum in loss on the validation dataset (minimum improvement $\epsilon=10^{-4}$).
+
+\item \textbf{Text generation:}
+To generate answers to a prompt string like "1+2=", we use auto-regressive generation as is standard practice with transformer decoder models (\cref{transformer:textgen}). We use greedy decoding, always selecting the token with the highest probability. Generation stops when token ID 0 (stop token) is generated or the model maximum sequence length is reached.
+\end{itemize}
+
+
+\subsection{Datasets}
+
+Based on the sampling and formatting methods described above, for each experiment we create three separate dataset:
+
+\begin{itemize}
+	\item \textbf{Training dataset:} This dataset is used to optimize the model weights during training. Its size varies from 1k to 100k samples as part of the experiment.
+	\item \textbf{Validation dataset:} A separate dataset with 1k samples. Loss on this dataset is used to decide when to stop training (\cref{setup:early_stopping}). Accuracy on this dataset is also tracked.
+	For some experiments (\cref{setup:scratchpad}) we had to lower the size of the validation dataset to avoid accuracy tracking slowing down training too much.
+	\item \textbf{Test dataset:} Another separate dataset with 1k samples. This dataset is used at the end of each training run to compute the final accuracy numbers.
+\end{itemize}
+
+All datasets are sampled using the \textbf{basic sampling} method illustrated in \cref{methods:sampling:basic}. This applies to all experiments except those studying different sampling methods (\cref{setup:sampling}).
+For addition and multiplication, the operands $a$ and $b$ of each sample are encoded into a string based on their decimal digit representation, the same applies to the sum / product $c$. 
+To avoid uneven string/sequence length, $c$ is encoded with leading zeroes up to the maximum possible sum / product length based on the operand size. For example, for 3-digit addition, the sum is padded to 4 digits:
 
 \begin{lstlisting}
 	"123+456=0579"
@@ -38,50 +64,7 @@ For the square root operation, we encode a sample like this:
 
 For even $n$, the integer square root of a $n$-digit decimal number always has $\frac{n}{2}$ decimal digits, thus no padding is needed.
 
-\subsubsection{Datasets}
-
-Based on the sampling and formatting methods described above, we create 3 separated datasets for the given arithmetic operation, operand size and dataset size:
-
-\begin{itemize}
-	\item \textbf{Training dataset:} This dataset is used to optimize the model weights during training. Its size varies from 1k to 100k samples as part of the experiment.
-	\item \textbf{Validation dataset:} A separate dataset with 1k samples. Loss on this dataset is used to decide when to stop training (\cref{setup:early_stopping}). Accuracy on this dataset is also tracked.
-	For some experiments (\cref{setup:scratchpad}) we had to lower the size of the validation dataset to avoid accuracy tracking slowing down training too much.
-	\item \textbf{Test dataset:} Another separate dataset with 1k samples. This dataset is used at the end of each training run to compute the final accuracy numbers.
-\end{itemize}
-
-All these datasets are sampled using the \textbf{basic sampling} method illustrated in \cref{methods:sampling:basic}. This applies to all experiments except those studying different sampling methods (\cref{setup:sampling}).
-
-\subsubsection{Weight initialization}
-
-The model weights are initialized using the default distributions as defined in the GPT2LMHeadModel class of the HuggingFace transformers framework.
-
-\subsubsection{Optimizer}
-
-Training uses the AdamW optimizer with default parameters as defined by the HuggingFace transformers Trainer / TrainingArguments class.
-
-\subsubsection{Batch size}
-\label{setup:batchsize}
-
-For the baseline experiments, we used a fixed batch size of 256. We picked this batch size as it was also used in \cite{teaching} and it fits the memory of our training GPU. For some experiments (\cref{setup:scratchpad}) we needed to reduce batch size to fit batches into GPU memory.
-
-\subsubsection{Learning rate scheduling}
-\label{setup:learnrate}
-
-The learning rate is adjusted using a linear schedule with warmup steps, with default parameters as defined by the HuggingFace transformers framework.
-For computing the learning rate, we assume a maximum of 200 epochs for training.
-
-\subsubsection{Early stopping}
-\label{setup:early_stopping}
-
-We use an early stopping strategy where training is aborted if for 5 epochs there is no new minimum in loss on the validation dataset (minimum improvement $\epsilon=10^{-4}$).
-
-\subsubsection{Generation}
-\label{setup:generation}
-
-To generate answers to a prompt string like "1+2=", we use auto-regressive generation as is standard practice with transformer decoder models (\cref{transformer:textgen}). We use greedy decoding, always selecting the token with the highest probability. Generation stops when token ID 0 (stop token) is generated or the model maximum sequence length is reached.
-
-
-\subsubsection{Evaluation}
+\subsection{Evaluation}
 \label{setup:eval}
 
 During the training process, multiple metrics are tracked:
@@ -292,13 +275,11 @@ For the addition operation (\cref{tbl:scratchpad_training_add}) the only change 
 				(scratchpad)
 	\end{tabular}}},
 	columns/epochs/.style={column name={\begin{tabular}{c}
-				Max. \\
-				\# epochs \\
+				Max. \\ epochs \\
 				(baseline)
 	\end{tabular}}},
 	columns/epochsScratch/.style={column name={\begin{tabular}{c}
-				Max. \\
-				\# epochs \\
+				Max. \\ epochs \\
 				(scratchpad)
 	\end{tabular}}}
 }
@@ -342,13 +323,11 @@ For the multiplication operation (\cref{tbl:scratchpad_training_mul}) the batch 
 				(scratchpad)
 	\end{tabular}}},
 	columns/epochs/.style={column name={\begin{tabular}{c}
-				Max. \\
-				\# epochs \\
+				Max. \\ epochs \\
 				(baseline)
 	\end{tabular}}},
 	columns/epochsScratch/.style={column name={\begin{tabular}{c}
-				Max. \\
-				\# epochs \\
+				Max. \\ epochs \\
 				(scratchpad)
 	\end{tabular}}}
 }
@@ -392,13 +371,11 @@ For the square root operation (\cref{tbl:scratchpad_training_sqrt}), due to time
 				(scratchpad)
 	\end{tabular}}},
 	columns/epochs/.style={column name={\begin{tabular}{c}
-				Max. \\
-				\# epochs \\
+				Max. \\ epochs \\
 				(baseline)
 	\end{tabular}}},
 	columns/epochsScratch/.style={column name={\begin{tabular}{c}
-				Max. \\
-				\# epochs \\
+				Max. \\ epochs \\
 				(scratchpad)
 	\end{tabular}}}
 }
@@ -417,6 +394,7 @@ We thus run the following experiments to test model performance when using scrat
 \end{itemize}
 
 
+\newpage
 \subsection{Attention heatmaps}
 \label{setup:heatmap}
 
