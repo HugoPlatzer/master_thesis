@@ -33,22 +33,22 @@ In summary, the best results we could achieve for the arithmetic functions we st
 For addition and multiplication, these results were obtained when using scratchpads, for integer square root, they are from the baseline model.
 
 On the one hand, these results could likely be made even better by longer training when using scratchpads (we constrained epochs to keep training time manageable with the long scratchpad strings).
-On the other hand, using scratchpads also requires knowledge of meaningful intermediate steps - how to compute the output from the input step by step. A key advantage of machine learning over traditional algorithms is that this knowledge of how to compute the result is generally not required: The model is provided input/output pairs and figures out the rest. This advantage is lost when needing to build a detailed scratchpad for the training samples.
+On the other hand, using scratchpads also requires knowledge of meaningful intermediate steps - how to compute the output from the input step by step. A key advantage of machine learning over traditional algorithms is that this knowledge of how to compute the result is generally not required: The model is provided only a sequence of input and output pairs with the optimizer handling how to make the model get from input to output. This advantage is lost when devising a detailed scratchpad for the training samples.
 
 
 
 \subsection{Future work}
 
-Adding to the results of our work could start by running training on the scratchpad experiments for longer, until an actual plateau is reached. Training using scratchpad was limited by resources available to us. Training for more epochs would allow to see the actual limitations of scratchpad training for multiplication on our model better.
-It is also unclear whether the stopping condition we used does lead to premature termination of training - looking at accuracy curves suggests this might be a possibility. Focusing not only on loss but also accuracy might ensure training does not stop before the model reaches maximum accuracy.
+An obvious avenue for building on our results would be running training on the scratchpad experiments for longer, until an actual plateau is reached. Training using scratchpad was limited by the resources and budget. Training for more epochs would likely allow to see the actual limitations of scratchpad-aided multiplication on our model better, as we have reason to believe our models were undertrained (\cref{results:scratchpad}).
+It is also possible that the stopping condition we used contributes to premature termination of training; analyzing accuracy development curves suggests this might be a possibility. Focusing not only on loss but also accuracy might ensure training does not stop before the model reaches maximum accuracy.
 
-We did not analyze variance between multiple training runs as even a single training run took substantial resources. It would however be interesting to see if a task that normally fails to converge occasionally does converge or vice versa.
+We did not analyze variances between multiple training runs as even a single training run took substantial resources. It would however be interesting to see if a task that normally fails to converge occasionally does converge or vice versa.
 It would be worth combining result reversal with uniform-digit sampling to try and replicate the good results for multiplication in \cite{positionmatters}.
-It would also be interesting to see whether a second model could learn to predict where the main model makes a mistake and try to correct it, especially for longer scratchpads
+It would also be interesting to see whether a second model could learn to predict where the main model made a mistake and try to correct it, especially for long output sequences when using scratchpads.
 
-The good results of basic feed-forward networks in \cite{visual} would make it worthwhile to explore their limits, especially with regards to longer scratchpad sequences. It would be worth finding out at which point transformers start having an advantage over older, more basic networks. Other structures like 1-dimensional CNNs or recurrent networks could be compared too.
+The good results of basic feed-forward networks in \cite{visual} would make it promising to explore their limits, especially with regards to longer scratchpad sequences. It remains to determine at which point transformers start having an advantage over more basic and established models. Other architectures like one-dimensional CNNs or recurrent networks could be compared too.
 
-Using a simpler, more straightforward scratchpad for multiplication as in \cite{implicit} would reduce sequence length and thus accelerate training. Performance between such a bare-bones scratchpad and the more elaborate one we are using should be compared.
-At the same time, a better scratchpad for integer square root should be devised. It must be reasonably short, yet not leave big chunks without intermediate steps, like ours does for squaring integers.
+Using a simpler, more straightforward scratchpad for multiplication as in \cite{implicit} would reduce sequence length and thus accelerate training. It is worthwhile to compare performance between such a bare-bones scratchpad and the more elaborate one we are using.
+Furthermore, a better scratchpad for integer square root should be devised. It must be reasonably short, yet not leave big chunks of computation without intermediate steps, which we identified as a potential problem of our square root scratchpad.
 
-Finally, the inner mechanisms of the model could be explored further. Our heatmaps show clear, logical relationships between input and output in the first layer already - but it does not explain the whole "algorithm" learned by the model. Analysis would have to focus on the more opaque patterns in later layers of the model.
+Finally, the inner mechanisms of the model could be explored further. The heatmap diagrams in \cref{results:heatmap} show clear, logical relationships between input and output in the first layer already - but it does not explain the whole "algorithm" learned by the model. Analysis would have to focus on the more opaque patterns in later layers of the model.
