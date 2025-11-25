@@ -8,7 +8,7 @@ Finally, this section contains diagrams illustrating attention patterns in the t
 \subsection{Baseline experiments}
 \label{results:baseline}
 
-For the addition task we can see in \cref{tbl:baseline_add} that addition up to 10 digits can be learned, as long as the training dataset has at least 10k samples. Accuracy numbers are high, but short of 100\% for 5 and 10 digit addition, meaning there are quite a few errors left in the validation dataset. Only 3 digit addition achieved perfect accuracy.
+For the addition task we can see in \cref{tbl:baseline_add} that addition up to 10 digits can be learned, as long as the training dataset has at least 10k samples. Accuracy numbers are high, but short of 100\% for 5- and 10-digit addition, meaning there are quite a few errors left in the validation dataset. Only 3-digit addition achieved perfect accuracy.
 
 \includeAccuracyTable{experiment_results/baseline_final_accuracy/add.csv}{tbl:baseline_add}{Final model accuracy on the test dataset for the addition operation for the given training dataset sizes and operand digits.}{}
 
@@ -27,7 +27,7 @@ This suggests that learning multiplication, all else being equal, is harder than
 
 \includeAccuracyTable{experiment_results/baseline_final_accuracy/mul.csv}{tbl:baseline_mul}{Final model accuracy on the test dataset for the multiplication operation for the given training dataset sizes and operand digits.}{}
 
-When looking at the accuracy curves in  \cref{fig:baseline_mul}, we can see that for the only experiment where accuracy clearly leaves zero (3 digit multiplication, 100k dataset) accuracy does not jump quickly to a certain value as it did with addition, but slowly keeps climbing until early stopping terminates training.
+When looking at the accuracy curves in  \cref{fig:baseline_mul}, we can see that for the only experiment where accuracy clearly leaves zero (3-digit multiplication, 100k dataset) accuracy does not jump quickly to a certain value as it did with addition, but slowly keeps climbing until early stopping terminates training.
 For the experiments that do not achieve any accuracy, we can see that the number of optimization steps performed until training is aborted depends mostly on training dataset size and not much on operand digits, with the experiments with 1k dataset getting aborted after about 200 steps, and the experiments with 100k dataset getting aborted after about 40000 steps.
 
 \includePDFPlot{experiment_results/baseline_accuracy/mul.pdf}{fig:baseline_mul}{Development of accuracy on the validation dataset when training for the multiplication task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
@@ -37,8 +37,8 @@ For the experiments that do not achieve any accuracy, we can see that the number
 
 
 For the square root task we can see in \cref{tbl:baseline_sqrt} that accuracy numbers that lie somewhere between those for addition and multiplication.
-For 6 digit integer square root, there was high but not perfect accuracy when using a 10k or 100k training dataset.
-For 10 digit integer square root, accuracy was 63\% for the 100k dataset but remained low otherwise. For 20 digit integer square root, no samples in the validation dataset where predicted correctly.
+For 6-digit integer square root, there was high but not perfect accuracy when using a 10k or 100k training dataset.
+For 10-digit integer square root, accuracy was 63\% for the 100k dataset but remained low otherwise. For 20-digit integer square root, no samples in the validation dataset where predicted correctly.
 
 \includeAccuracyTable{experiment_results/baseline_final_accuracy/sqrt.csv}{tbl:baseline_sqrt}{Final model accuracy on the test dataset for the square root operation for the given training dataset sizes and operand digits.}{}
 
@@ -585,7 +585,7 @@ Also there is an interesting digit pattern not seen in the baseline errors. A lo
 
 
 For the addition task (\cref{tbl:scratchpad_add}), using a scratchpad brings clear improvements over baseline (\cref{tbl:scratchpad_add_baseline}): For the 1k dataset size, training was more or less successful for all operand sizes (good accuracy but not 100\%), whereas there was no accuracy for the baseline experiments at 1k dataset size.
-For the 10k and 100k dataset sizes, accuracy was perfect for all operand sizes, whereas in the baseline experiments accuracy was perfect only for 3 digit addition.
+For the 10k and 100k dataset sizes, accuracy was perfect for all operand sizes, whereas in the baseline experiments accuracy was perfect only for 3-digit addition.
 
 \begin{table}[H]
 	\begin{minipage}[t]{0.47\linewidth}
@@ -605,9 +605,9 @@ For the 10k and 100k dataset sizes, accuracy was perfect for all operand sizes, 
 
 
 For the multiplication task (\cref{tbl:scratchpad_mul}), there were even more significant improvements made by providing a scratchpad: For the baseline experiments (\cref{tbl:scratchpad_mul_baseline}) only 3 digits, 10k dataset and 3 digits, 100k dataset provided above-zero accuracy, and even there it was only about 20\%. When using the scratchpad, accuracy is good for 3 digits, 10k and 100k dataset sizes.
-Even for 5 and 10 digit multiplication, there is some degree of accuracy obtained, whereas it was a flat zero in the baseline experiments.
+Even for 5- and 10-digit multiplication, there is some degree of accuracy obtained, whereas it was a flat zero in the baseline experiments.
 
-Because the accuracy numbers for 5-digit and 10-digit multiplication are somewhat "in the middle", showing the model is able to do a significant portion of multiplications correctly, but still making some errors, it is not unreasonable to assume training for longer would have made the model able to perform 5 and 10 digit multiplications with high accuracy. In contrast to the baseline, we had to limit training epochs for the multiplication scratchpad experiments to keep training times reasonable (\cref{setup:scratchpad}, \cref{tbl:scratchpad_training_add}).
+Because the accuracy numbers for 5-digit and 10-digit multiplication are somewhat "in the middle", showing the model is able to do a significant portion of multiplications correctly, but still making some errors, it is not unreasonable to assume training for longer would have made the model able to perform 5- and 10-digit multiplications with high accuracy. In contrast to the baseline, we had to limit training epochs for the multiplication scratchpad experiments to keep training times reasonable (\cref{setup:scratchpad}, \cref{tbl:scratchpad_training_add}).
 
 It is also an interesting observation that accuracy numbers obtained on the 100k training dataset were lower than those on the 10k dataset. Training was limited to 50 epochs for the 10k dataset and 5 epochs for the 100k dataset (\cref{tbl:scratchpad_training_mul}). However, the total amount of training batches / optimization steps is the same for both scenarios, but the variety of training samples is lower in the 10k dataset scenario, increasing the risk of overfitting.
 We would thus have expected better scores for the 100k dataset despite the lower epoch count.
@@ -659,12 +659,12 @@ The diagrams only show accuracy development for the 100k dataset size for brevit
 For scratchpad-based training, we evaluated accuracy only once every epoch and reduced the validation dataset to 10 samples (\cref{setup:scratchpad}). This of course leads to less precise curves, but can still give a rough idea about training progress.
 
 For the addition task (\cref{fig:intermediate_steps_accuracy_add}) we can see that baseline training needs between 2000 (3 digits) and over 20000 (10 digits) training steps to achieve near 100\% accuracy. In contrast, when using result reversal, the model learned somewhat faster (1000-2000 steps for 3 and 5 digits, 10000 steps for 10 digits) and accuracy hits 100\% much more abruptly compared to baseline, where it hits 80\% and then needs some time to get to 100\%.
-Using a scratchpad leads to much faster convergence, where 3 digit addition already converged at the first log interval at 400 steps, and 5 and 10 digit addition converged before 1000 steps.
+Using a scratchpad leads to much faster convergence, where 3-digit addition already converged at the first log interval at 400 steps, and 5- and 10-digit addition converged before 1000 steps.
 
 \includePDFPlot{experiment_results/intermediate_steps_accuracy/add.pdf}{fig:intermediate_steps_accuracy_add}{Development of accuracy on the validation dataset, when training the addition task using a 100k dataset using various training methods and operand digits.}
 
-For the multiplication task (\cref{fig:intermediate_steps_accuracy_mul}), we can see that only scratchpad with 3 digit multiplication converged to 100\%. For the same task, baseline and result reversal had similar curves, starting to leave zero at about 3000 steps, and ending at around 20\% accuracy after about 40000 steps.
-For 5 and 10 digit multiplication, only scratchpad-based training achieved above-zero accuracy, while still remaining at around 20\% accuracy and taking between 3000 and 20000 steps to start converging.
+For the multiplication task (\cref{fig:intermediate_steps_accuracy_mul}), we can see that only scratchpad with 3-digit multiplication converged to 100\%. For the same task, baseline and result reversal had similar curves, starting to leave zero at about 3000 steps, and ending at around 20\% accuracy after about 40000 steps.
+For 5- and 10-digit multiplication, only scratchpad-based training achieved above-zero accuracy, while still remaining at around 20\% accuracy and taking between 3000 and 20000 steps to start converging.
 It might however converge all the way to 100\% given continued training, but resource constraints made us limit the number of training epochs (\cref{tbl:scratchpad_training_mul}).
 
 \includePDFPlot{experiment_results/intermediate_steps_accuracy/mul.pdf}{fig:intermediate_steps_accuracy_mul}{Development of accuracy on the validation dataset, when training the multiplication task using a 100k dataset using various training methods and operand digits.}
@@ -680,14 +680,14 @@ For 10 operand digits, scratchpad actually failed to converge, as opposed to bas
 
 Similar to the baseline and result reversal experiments, we looked for errors in the model output for the addition task with 5 and 10 digits (100k dataset), multiplication task with 3 and 5 digits (100k dataset) and square root task with 6 digits (100k dataset).
 We did not analyze errors for the square root task with 20 operand digits, because the scratchpads are so long that presenting them here is impractical.
-We only looked at 3 errors per task due to the longer output size when using the scratchpad. The error samples presented are simply the first 3 samples from the error analysis dataset where the model output did not match the correct output (considering both the scratchpad and final result).
+We only looked at three errors per task due to the longer output size when using the scratchpad. The error samples presented are simply the first three samples from the error analysis dataset where the model output did not match the correct output (considering both the scratchpad and final result).
 
 % Add errors
 
 For 5-digit and 10-digit addition using a 100k training dataset, there were no errors in the 100k error analysis dataset, similar to training for addition using result reversal (\cref{results:reversal:error}).
 Thus both result reversal and scratchpads allow for training a model that has a very low error probability for addition tasks up to 10 digits.
 
-% 3 digit mul errors
+% 3-digit mul errors
 
 For 3-digit multiplication, the three error samples in \cref{tbl:errors_scratchpad_mul3} show that there were no errors in the single-digit multiplications. In the first error sample, the model fetched the wrong digit from the single-digit results during the addition phase. We hypothesize this could be due to there being multiple single-digit products that are zero, thus making it harder to pick the right digits due to the uneven length of the products.
 For the second and third error sample, the model did the entire calculation correctly, but surprisingly failed to read the correct digit sequence from the addition scratchpad.
@@ -790,7 +790,7 @@ For the second and third error sample, the model did the entire calculation corr
 
 
 \newpage
-% 5 digit mul errors
+% 5-digit mul errors
 
 For 5-digit multiplication, the first error sample (\cref{tbl:errors_scratchpad_mul5_1}) shows the model failing to compute the correct sum based on the correct list of digits and current carry value. This led to some digits in the middle of the product being wrong.
 
@@ -1169,36 +1169,36 @@ These diagrams are to be interpreted as follows:
 
 \subsubsection{Addition task}
 
-Attention activation for the addition task "123+456=0579" is illustrated in \cref{fig:heatmap_add_full} for each of the 6 GPT-2 blocks and each of the 6 attention heads per block.
+Attention activation for the addition task "123+456=0579" is illustrated in \cref{fig:heatmap_add_full} for each of the six GPT-2 blocks and each of the six attention heads per block.
 When looking for patterns in these activation heatmaps, a clear relationship is visible in Block 1, where the position of the output digit "5" is mostly attending to the positions to the input digits "1" and "4", the position of the output digit "7" to the input digits "2" and "5" and the output digit "9" to the input digits "3" and "6". The first output digit "0" also attends mostly to the input digits "1" and "4". This is consistent with how data would flow from input to output in a standard addition algorithm. The stop token "." position does not attend to any input position in particular.
-This pattern is more or less the same across all 6 attention heads.
+This pattern is more or less the same across all six attention heads.
 When looking at the later blocks, there are also some spots of high activation, however these are often not uniform across attention heads and there is no obvious pattern between input and outputs.
 
 \includePDFPlot{experiment_results/heatmaps/add_full_1.pdf}{fig:heatmap_add_full}{Attention activation heatmap for all blocks and attention heads for the addition task "123+456".}
 
-Since we found out that the most visible attention patterns are in the first block, to keep the diagrams of reasonable size especially for larger sequences, for the rest of the diagrams only the attention mechanism of the first GPT-2 block is considered, and the attention values of all 6 heads are averaged.
+Since we found out that the most visible attention patterns are in the first block, to keep the diagrams of reasonable size especially for larger sequences, for the rest of the diagrams only the attention mechanism of the first GPT-2 block is considered, and the attention values of all six heads are averaged.
 The single-diagram heatmap of \cref{fig:heatmap_add_simple1} for the same addition task shows the same pattern mentioned before, with an output digit being connected to those two input digits being added for this position, with the relationship being clear for the digits "579" and a bit less prominent for the digit "0".
 
-\includePDFPlot{experiment_results/heatmaps/add_simple_1.pdf}{fig:heatmap_add_simple1}{First block attention heatmap for the addition task "123+456", averaged over all 6 heads.}
+\includePDFPlot{experiment_results/heatmaps/add_simple_1.pdf}{fig:heatmap_add_simple1}{First block attention heatmap for the addition task "123+456", averaged over all six heads.}
 
 There is little change to the previous diagram in \cref{fig:heatmap_add_simple2} which shows the same addition model working on different numbers, namely the addition "999+001". Only minor changes in attention value are visible when doing addition of different numbers using the same model.
 
-\includePDFPlot{experiment_results/heatmaps/add_simple_2.pdf}{fig:heatmap_add_simple2}{First block attention heatmap for the addition task "999+001", averaged over all 6 heads.}
+\includePDFPlot{experiment_results/heatmaps/add_simple_2.pdf}{fig:heatmap_add_simple2}{First block attention heatmap for the addition task "999+001", averaged over all six heads.}
 
 
 
 
 When switching to a model trained for 5-digit addition and the addition task "12345+67890" (\cref{fig:heatmap_add_5digits}) we can still see a similar pattern of output digits referring to those input digits that make sense when thinking about an addition algorithm. However the pattern is somewhat more diffuse for the more significant output digits, which are also attending to less significant digits of the input numbers somewhat.
 
-\includePDFPlot{experiment_results/heatmaps/add_5digits_1.pdf}{fig:heatmap_add_5digits}{First block attention heatmap for the addition task "12345+67890", averaged over all 6 heads.}
+\includePDFPlot{experiment_results/heatmaps/add_5digits_1.pdf}{fig:heatmap_add_5digits}{First block attention heatmap for the addition task "12345+67890", averaged over all six heads.}
 
 For 3-digit addition using result reversal (\cref{fig:heatmap_add_rev}), we can see a very clear pattern of the final output digits attending to the corresponding digits of the reversed result. There however is not such a clear pattern for the reversed addition that happens before, with the output digits "9750" not having a strong connection to the matching input digits as was seen before for normal addition.
 
-\includePDFPlot{experiment_results/heatmaps/add_rev_1.pdf}{fig:heatmap_add_rev}{First block attention heatmap for the addition task "123+456", using result reversal, averaged over all 6 heads.}
+\includePDFPlot{experiment_results/heatmaps/add_rev_1.pdf}{fig:heatmap_add_rev}{First block attention heatmap for the addition task "123+456", using result reversal, averaged over all six heads.}
 
 For the addition task using the scratchpad (\cref{fig:heatmap_add_scratch}), we can also see some patterns: For the individual addition steps, the input digits are fetched as the first two digits of each step. We can also see that the old carry value (third digit of each step) to some degree attends to the fifth digit of the previous step, which is the output carry value of that previous step.
 
-\includePDFPlot{experiment_results/heatmaps/add_scratch_1.pdf}{fig:heatmap_add_scratch}{First block attention heatmap for the addition task "123+456", using scratchpad, averaged over all 6 heads.}
+\includePDFPlot{experiment_results/heatmaps/add_scratch_1.pdf}{fig:heatmap_add_scratch}{First block attention heatmap for the addition task "123+456", using scratchpad, averaged over all six heads.}
 
 
 
@@ -1213,7 +1213,7 @@ We can see the 3 least significant digits of the product (188) attending primari
 This does not follow a pattern clearly related to a normal multiplication algorithm: For the least significant digit of the product only the least significant digit of the factors should be relevant, for the second least significant digit this should extend to the first and second digit of the factors and so on, which does not match the pattern visible in the diagram.
 This corresponds well to the fact that accuracy achieved for multiplication was much poorer that for addition (only 22\% for 3-digit multiplication, see \cref{tbl:baseline_mul}), prompting speculation whether models with high accuracy on an arithmetic task show more meaningful digit relationships in their heatmaps that those with low accuracy.
 
-\includePDFPlot{experiment_results/heatmaps/mul_1.pdf}{fig:heatmap_mul}{First block attention heatmap for the multiplication task "123*456", averaged over all 6 heads.}
+\includePDFPlot{experiment_results/heatmaps/mul_1.pdf}{fig:heatmap_mul}{First block attention heatmap for the multiplication task "123*456", averaged over all six heads.}
 
 
 
@@ -1225,4 +1225,4 @@ This also does not clearly correspond to a normal integer square root algorithm 
 
 Accuracy was 98\% for 6-digit integer square root (\cref{tbl:baseline_sqrt}), but for this operation it is plausible that the model just guesses the square root based on the first few digits, which would of course fail on numbers close to a square number which require precise computation, but such hard cases should be only a small fraction of the test dataset (which is uniformly selected from all 6-digit integers).
 
-\includePDFPlot{experiment_results/heatmaps/sqrt_1.pdf}{fig:heatmap_sqrt}{First block attention heatmap for the integer square root task "123456", averaged over all 6 heads.}
+\includePDFPlot{experiment_results/heatmaps/sqrt_1.pdf}{fig:heatmap_sqrt}{First block attention heatmap for the integer square root task "123456", averaged over all six heads.}

@@ -120,8 +120,8 @@ Because integer square root is a unary operation, we double the number of operan
 To see whether changing the number of parameters of the model improves accuracy, we tried each of the following changes to model dimensions:
 
 \begin{itemize}
-	\item Change the hidden vector size $\dHidden$ from 384 to either 192 or 768. This causes a substantial change to the number of learnable model parameters: The model with $\dHidden=192$ has about 2.7M parameters, the baseline model with $\dHidden=384$ about 11M parameters, and the model with $\dHidden=768$ about 43M parameters. Thus doubling $\dHidden$ roughly quadruples the number of parameters (due to matrices for transformations on vectors twice the size having 4 times as many parameters).
-	\item Change the number of GPT-2 blocks $\nBlocks$ from 6 to either 3 or 12. This also changes the number of parameters, but in a linear fashion: The model with 3 blocks has 5.4M parameters, and the model with 12 blocks has 21M parameters. 
+	\item Change the hidden vector size $\dHidden$ from 384 to either 192 or 768. This causes a substantial change to the number of learnable model parameters: The model with $\dHidden=192$ has about 2.7 million parameters, the baseline model with $\dHidden=384$ about 11M parameters, and the model with $\dHidden=768$ about 43 million parameters. Thus doubling $\dHidden$ roughly quadruples the number of parameters (due to matrices for transformations on vectors twice the size having 4 times as many parameters).
+	\item Change the number of GPT-2 blocks $\nBlocks$ from 6 to either 3 or 12. This also changes the number of parameters, but in a linear fashion: The model with 3 blocks has 5.4 million parameters, and the model with 12 blocks has 21 million parameters. 
 	\item Change the number of attention heads $\nHeads$ from 6 to either 3 or 12. This has no effect on the number of model parameters, it only affects the "partitioning" of the parameters inside the model.
 \end{itemize}
 
@@ -133,8 +133,8 @@ Due to time/hardware constraints, we limited experiments to the following tasks:
 	\item \textbf{Multiplication:} 5 operand digits, 100k training dataset.
 \end{itemize}
 
-We picked these two tasks from the baseline experiments because addition with 10 digits could be learned well with the 100k dataset, while still being harder than 3 or 5 digit addition, allowing more chances to see a difference in model performance in terms of how many optimization steps it takes to converge.
-Similarly, multiplication with 5 digits and 100k training dataset was chosen because the baseline model could not learn it and achieved zero accuracy. At the same time, learning 5 digit multiplication seemed somewhat realistic with a more capable model architecture, considering that 3 digit multiplication could be learned at a low but not zero (22\%) accuracy.
+We picked these two tasks from the baseline experiments because addition with 10 digits could be learned well with the 100k dataset, while still being harder than 3- or 5-digit addition, allowing more chances to see a difference in model performance in terms of how many optimization steps it takes to converge.
+Similarly, multiplication with 5 digits and 100k training dataset was chosen because the baseline model could not learn it and achieved zero accuracy. At the same time, learning 5-digit multiplication seemed somewhat realistic with a more capable model architecture, considering that 3-digit multiplication could be learned at a low but not zero (22\%) accuracy.
 
 In summary, we run these 12 experiments with 6 different model changes attempted on two operations and fixed operand digits and dataset size per operation:
 
