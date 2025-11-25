@@ -1,9 +1,9 @@
 \section{Summary}
 
-As a baseline, we trained a small transformer network on addition, multiplication and integer square root tasks, with different numbers of operand digits and training dataset sizes (\cref{results:baseline}).
+In this work, we investigated the performance of small transformer models on the arithmetic operations of addition, multiplication and integer square root.
+To establish a baseline, we trained transformer networks with GPT-2 architecture and about 10 million parameters on each combination of these three operations and various operand lengths and training dataset sizes per operation.
 
-We wanted to improve performance, in particular for the multiplication and integer square root tasks and thus attempted a number of changes to the model and dataset.
-
+We then wanted to improve performance, in particular for the multiplication and integer square root tasks and thus attempted a number of changes to the model and dataset.
 First, we explored whether changing the model size (number of layers, hidden vector sizes etc.) improved model performance (\cref{results:modelsize}).
 After that, we tried changing the sampling function for the training dataset to see whether prioritizing certain training samples improved performance (\cref{results:sampling}).
 Then, we went on to change the actual training samples themselves. For this, we tried two different strategies:
@@ -12,30 +12,14 @@ The second strategy was augmenting each training sample with a scratchpad of int
 Finally, we created heatmaps of model attention to get some insight into how the model processes input strings (\cref{results:heatmap}).
 
 \subsection{Results}
-When doing the baseline experiments (\cref{results:baseline}), we found out that addition was generally easily learned as long as the training dataset size was at least 10k (\cref{fig:baseline_add}), with accuracy of at least 99\% for 3, 5 and 10 digit addition when using a 100k training dataset. These results are in line with \cite{teaching}.
-Multiplication proved much tougher, with only about 20\% accuracy achieved for 3-digit multiplication and zero accuracy for 5 and 10 digits (\cref{fig:baseline_mul}).
-Integer square root, for a comparable operand size (single operand with twice as many digits as the two operands of addition or multiplication) proved to be somewhat in the middle in terms of difficulty. A 100k training dataset achieved 98\% accuracy for 6 digit integer square root and 64\% accuracy for 10 digit integer square root, with zero accuracy for 20 digit integer square root (\cref{fig:baseline_sqrt}).
 
-Errors for addition and multiplication were generally single/multiple digits being off in the middle of the sum/product (\cref{error_analysis}). This matches the error patterns observed in \citepage{7}{lengthgen}, which shows digits in the middle of the result taking longer to converge and finishing at lower accuracy.
-For square root, the errors were the result being off by one for numbers close to a square number.
+The best results we could achieve for the arithmetic functions we studied were 100\% accuracy for 3-, 5- and 10-digit addition, 94\% for 3-digit multiplication, 63\% for 5-digit multiplication, 22\% for 10-digit multiplication, 98\% for 6-digit integer square root, 64\% for 10-digit integer square root and 0\% for 20-digit integer square root.
+For addition and multiplication, these results were obtained when using scratchpads, for integer square root, they are from the baseline model. The largest training dataset size (100k training samples) was used.
 
-Changing the model size did result in a model with bigger vectors or more layers needing fewer training steps to achieve the same addition accuracy (\cref{fig:model_size_add}) but did not make a substantial difference in model capabilities (\cref{tbl:model_size}), meaning it still could not learn tasks such as 5-digit multiplication.
+On the one hand, these results could likely be made even better by longer training runs when using scratchpads (we constrained epochs to keep training time manageable with the long scratchpad strings).
+On the other hand, using scratchpads also requires knowledge of meaningful intermediate steps - how to compute the output from the input step by step. A key advantage of machine learning over traditional algorithms is that this knowledge of how to compute the result is generally not required: The model is provided only a sequence of input and output pairs with the optimizer handling how to make the model get from input to output. This advantage is lost when having to devise a step-by-step computation for the training samples.
 
-Changing the digit sampling from uniform across the whole sample space to bit-uniform or digit-uniform provided little improvement either. This stands in contrast to \cite{positionmatters} where both uniform-digit sampling and result reversal provided some improvement in model accuracy.
-
-Result reversal did improve accuracy for addition when using a 100k training dataset: from 98-99\% to 100\% (\cref{tbl:reverse_add}). While it did increase reliability for addition, it did not help with making large multiplication or integer square root learnable.
-
-Scratchpads led to big improvements for addition and multiplication: Addition could be learned perfectly with a 10k and 100k training dataset, and even for a 1k training dataset, accuracy numbers ranged between 85\% and 99\% (\cref{tbl:scratchpad_add}). For multiplication, accuracy numbers of 94\% for 3-digit multiplication, 63\% for 5-digit multiplication, and 22\% for 10-digit multiplication could be achieved. Interestingly, these numbers were obtained with a 10k training dataset, with slightly lower numbers achieved for the 100k training dataset. For integer square root, scratchpad performed worse than baseline (\cref{tbl:scratchpad_sqrt}) - this could be due to our square root scratchpad not containing each and every intermediate step due to size constraints.
-
-When looking at the heatmaps for model attention, we could see some meaningful relationships between input and output digits in the first layer, especially for addition, corresponding to how addition would be done by hand (\cref{fig:heatmap_add_full}, \cref{fig:heatmap_add_simple1}). What happened in later layers was not obvious in the visualization. When using result reversal and scratchpad, there was a clear connection between input digits and these same digits in the intermediate steps of the computation, but no clear pattern of the rest of the computation (\cref{fig:heatmap_add_rev}, \cref{fig:heatmap_add_scratch}).
-
-In summary, the best results we could achieve for the arithmetic functions we studied were 100\% accuracy for 3, 5 and 10 digit addition, 94\% for 3-digit multiplication, 63\% for 5-digit multiplication, 22\% for 10-digit multiplication, 98\% for 6-digit integer square root, 64\% for 10-digit integer square root and 0\% for 20-digit integer square root.
-For addition and multiplication, these results were obtained when using scratchpads, for integer square root, they are from the baseline model.
-
-On the one hand, these results could likely be made even better by longer training when using scratchpads (we constrained epochs to keep training time manageable with the long scratchpad strings).
-On the other hand, using scratchpads also requires knowledge of meaningful intermediate steps - how to compute the output from the input step by step. A key advantage of machine learning over traditional algorithms is that this knowledge of how to compute the result is generally not required: The model is provided only a sequence of input and output pairs with the optimizer handling how to make the model get from input to output. This advantage is lost when devising a detailed scratchpad for the training samples.
-
-
+Other strategies we tried for improving performance such as changing the dimensions of the model, dataset sampling strategy, or reversing the digits of the results generally brought only improvements to convergence speed (number of optimization steps until the model learned the task) or improved model accuracy from an already high 98-99\% to 100\% (no detectable errors). These strategies did not give the desired "quantum leap" of making multiplication or square root with large operands learnable.
 
 \subsection{Future work}
 
