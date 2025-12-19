@@ -1,11 +1,11 @@
-\section{Experimental results}
+\chapter{Experimental results}
 
 In this section we present the result of running each of the experiments outlined in \cref{setup:baseline} to \cref{setup:heatmap}. Results are presented in the form of colored accuracy tables outlining final model accuracy on the test dataset per experiment.
 For some experiments, we also plot curves illustrating the development of accuracy during model training.
 We also sample errors of the trained models for some experiments and compare them to expected results side by side.
 Finally, this section contains diagrams illustrating attention patterns in the trained models in \cref{results:heatmap}.
 
-\subsection{Baseline experiments}
+\section{Baseline experiments}
 \label{results:baseline}
 
 For the addition task we can see in \cref{tbl:baseline_add} that addition up to 10 digits can be learned, as long as the training dataset has at least 10k samples. Accuracy numbers are high, but short of 100\% for 5- and 10-digit addition, meaning there are quite a few errors left in the validation dataset. Only 3-digit addition achieved perfect accuracy.
@@ -48,7 +48,7 @@ When looking at the accuracy curves in \cref{fig:baseline_sqrt}, we can see curv
 
 
 
-\subsubsection{Error analysis}
+\subsection{Error analysis}
 \label{error_analysis}
 
 To get a better understanding of the presented accuracy numbers, we took a closer look at samples where the answer of the model differed from the correct one. This was done for tasks where the final model showed perfect or near-perfect accuracy:
@@ -260,7 +260,7 @@ To conclude, we can see that the errors our model makes follow clear patterns: I
 
 
 \newpage
-\subsection{Model size experiments}
+\section{Model size experiments}
 \label{results:modelsize}
 
 
@@ -298,7 +298,7 @@ Changing the number of attention heads, which does not impact the number of mode
 
 
 
-\subsection{Sampling strategy experiments}
+\section{Sampling strategy experiments}
 \label{results:sampling}
 
 
@@ -410,7 +410,7 @@ The integer square root task (\cref{tbl:sampling_strategies_sqrt_basic} to \cref
 
 
 
-\subsection{Result reversal experiments}
+\section{Result reversal experiments}
 \label{results:reversal}
 
 
@@ -473,12 +473,12 @@ For the integer square root task (\cref{tbl:reverse_sqrt}), the results were als
 \end{table}
 
 
-\subsubsection{Accuracy development}
+\subsection{Accuracy development}
 
 We also generated accuracy development plots for the result reversal experiments. These plots were combined for the result reversal and scratchpad experiments and are analyzed in \cref{results:rev_scratch_accuracy}.
 
 
-\subsubsection{Error analysis}
+\subsection{Error analysis}
 \label{results:reversal:error}
 
 We wanted to investigate whether there was any difference in the error patterns between the baseline models and the ones trained using result reversal. To do this, we used the same tasks as for the baseline error analysis (\cref{error_analysis}): addition with 5 and 10 digits (100k dataset), multiplication with 3 and 5 digits (100k dataset) and square root with 6 and 20 digits (100k dataset).
@@ -580,7 +580,7 @@ Also there is an interesting digit pattern not seen in the baseline errors. A lo
 
 
 
-\subsection{Scratchpad experiments}
+\section{Scratchpad experiments}
 \label{results:scratchpad}
 
 
@@ -650,7 +650,7 @@ Also, there is an important difference in the scratchpad structure between addit
 	\end{minipage}
 \end{table}
 
-\subsubsection{Accuracy development}
+\subsection{Accuracy development}
 \label{results:rev_scratch_accuracy}
 
 
@@ -676,7 +676,7 @@ For 10 operand digits, scratchpad actually failed to converge, as opposed to bas
 
 
 
-\subsubsection{Error analysis}
+\subsection{Error analysis}
 
 Similar to the baseline and result reversal experiments, we looked for errors in the model output for the addition task with 5 and 10 digits (100k dataset), multiplication task with 3 and 5 digits (100k dataset) and square root task with 6 digits (100k dataset).
 We did not analyze errors for the square root task with 20 operand digits, because the scratchpads are so long that presenting them here is impractical.
@@ -1152,7 +1152,7 @@ In summary, we can see that errors happen when computing larger square numbers a
 
 
 
-\subsection{Attention heatmaps}
+\section{Attention heatmaps}
 \label{results:heatmap}
 
 We generated attention heatmap diagrams for some example tasks processed by the corresponding models as outlined in \cref{methods:heatmap} and \cref{setup:heatmap}.
@@ -1167,7 +1167,7 @@ These diagrams are to be interpreted as follows:
 \end{itemize}
 
 
-\subsubsection{Addition task}
+\subsection{Addition task}
 
 Attention activation for the addition task "123+456=0579" is illustrated in \cref{fig:heatmap_add_full} for each of the six GPT-2 blocks and each of the six attention heads per block.
 When looking for patterns in these activation heatmaps, a clear relationship is visible in Block 1, where the position of the output digit "5" is mostly attending to the positions to the input digits "1" and "4", the position of the output digit "7" to the input digits "2" and "5" and the output digit "9" to the input digits "3" and "6". The first output digit "0" also attends mostly to the input digits "1" and "4". This is consistent with how data would flow from input to output in a standard addition algorithm. The stop token "." position does not attend to any input position in particular.
@@ -1203,7 +1203,7 @@ For the addition task using the scratchpad (\cref{fig:heatmap_add_scratch}), we 
 
 
 
-\subsubsection{Multiplication task}
+\subsection{Multiplication task}
 
 
 For the multiplication task with 3 digits (\cref{fig:heatmap_mul}) our model actually computes the wrong result 056188 instead of the correct result 056088 which is not unexpected considering its low accuracy at about 20\% (\cref{tbl:baseline_mul}).
@@ -1217,7 +1217,7 @@ This corresponds well to the fact that accuracy achieved for multiplication was 
 
 
 
-\subsubsection{Square root task}
+\subsection{Square root task}
 
 For the square root tasks with 6 digits (\cref{fig:heatmap_sqrt}) we can see the least significant digit of the output "1" attending to the 3 most significant digits of the input (and slightly to previous output digit "3") whereas the more significant output digit 5 attends mostly to the second most significant input digit "2" and the most significant output digit "3" attends mostly to the most significant input digit "1".
 

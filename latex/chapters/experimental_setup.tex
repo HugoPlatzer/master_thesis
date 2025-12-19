@@ -1,4 +1,4 @@
-\section{Experimental setup}
+\chapter{Experimental setup}
 \label{setup:main}
 
 Based on the methods outlined in \cref{methods}, we set up a training pipeline that first creates a dataset for the given arithmetic operation, operand digits and sampling method, then initializes a GPT-2-style model (\cref{methods:model}) with the given model configuration, and then trains the model on the dataset, monitoring loss and accuracy during training.
@@ -38,7 +38,7 @@ To generate answers to a prompt string like "1+2=", we use auto-regressive gener
 \end{itemize}
 
 
-\subsection{Datasets}
+\section{Datasets}
 
 Based on the sampling and formatting methods described above, for each experiment we create three separate dataset:
 
@@ -65,7 +65,7 @@ For the square root operation, we encode a sample like this:
 
 For even $n$, the integer square root of a $n$-digit decimal number always has $\frac{n}{2}$ decimal digits, thus no padding is needed.
 
-\subsection{Evaluation}
+\section{Evaluation}
 \label{setup:eval}
 
 During the training process, multiple metrics are tracked:
@@ -85,7 +85,7 @@ During the training process, multiple metrics are tracked:
 \end{itemize}
 
 
-\subsection{Error analysis}
+\section{Error analysis}
 \label{setup:error}
 
 We wanted to analyze not just the performance of the final models in terms of the percentage of correctly solved tasks, but also take a look at the types of errors the model makes.
@@ -94,7 +94,7 @@ For this, we picked the first few tasks from the test dataset that the model ans
 If there were errors, we then created a table with a few of the error samples for the experiment, with columns for the input (e.g., "123+456"), expected output (e.g., "0579"), model output (e.g., "0679") and additional remarks for some experiments. For longer output sequences (e.g., scratchpad experiments) the erroneous part of the model output was highlighted.
 We then tried to identify and discuss observable patterns in the small sample of errors.
 
-\subsection{Baseline experiments}
+\section{Baseline experiments}
 \label{setup:baseline}
 
 To test the ability of transformer networks to learn arithmetic operations, and to see whether we can replicate the results of \cite{teaching}, we first run some baseline experiments. The training pipeline is as described above and the training samples for the studied operations were created as described in \cref{methods:ops}.
@@ -114,7 +114,7 @@ Because integer square root is a unary operation, we double the number of operan
 
 
 
-\subsection{Model size experiments}
+\section{Model size experiments}
 \label{setup:modelsize}
 
 To see whether changing the number of parameters of the model improves accuracy, we tried each of the following changes to model dimensions:
@@ -144,7 +144,7 @@ In summary, we run these 12 experiments with 6 different model changes attempted
 \end{itemize}
 
 
-\subsection{Sampling strategy experiments}
+\section{Sampling strategy experiments}
 \label{setup:sampling}
 
 Changing the sampling method / distribution of training samples does not change the length of the training sequences. We can thus run the same 27 baseline experiments (\cref{setup:baseline}) with each of the four sampling methods outlined in \cref{setup:sampling} except "Basic sampling" which was used for the baseline experiments. Thus we run 27*3=81 additional experiments to evaluate sampling strategies:
@@ -157,7 +157,7 @@ Changing the sampling method / distribution of training samples does not change 
 
 
 
-\subsection{Result reversal experiments}
+\section{Result reversal experiments}
 \label{setup:reversal}
 
 We wanted to find out whether reversing the digits of the result of the arithmetic tasks in the training samples can improve model performance. For this we augmented the training samples with the reversed digits of the result, as described in \cref{methods:reversal}.
@@ -201,7 +201,7 @@ We can thus repeat the panel of 27 baseline experiments at the same settings (\c
 	\item \textbf{Integer square root:} 6, 10, or 20 operand digits, 1k, 10k, or 100k training dataset, using result reversal.
 \end{itemize}
 
-\subsection{Scratchpad experiments}
+\section{Scratchpad experiments}
 \label{setup:scratchpad}
 
 Since scratchpads (including intermediate steps of the computation in the training sample) did show promise in \cite{teaching} and \cite{goat}, we also wanted to test this for our panel of operations and operand sizes.
@@ -396,7 +396,7 @@ We thus run the following experiments to test model performance when using scrat
 
 
 \newpage
-\subsection{Attention heatmaps}
+\section{Attention heatmaps}
 \label{setup:heatmap}
 
 We generate diagrams illustrating attention activation between positions (attention heatmap diagrams) based on the methods outlined in \cref{methods:heatmap}. All diagrams consider only the first GPT-2 block and are averaged across all attention heads, except for the baseline "123+456" example, where a detailed diagram across all blocks and attention heads is also provided. Diagrams were generated for the following models handling the following example inputs:

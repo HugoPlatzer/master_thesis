@@ -1,4 +1,4 @@
-\section{Transformer models}
+\chapter{Transformer models}
 
 Machine translation, which is the automated translation from one natural language to another, was an important challenge since the beginning for the field of artificial intelligence and machine learning.
 The input and output texts are usually modeled as sequences of integers from a limited range, with each integer representing a phrase, word, or part of a word.
@@ -11,7 +11,7 @@ Transformer models were introduced in the influential paper "Attention as all yo
 
 Due to their parallelized architecture which will be explained in detail later, transformers allow for training on long sequences in a single optimization step, greatly increasing training throughput \citepage{1}{allyouneed}. They also have full connection between any two points in the sequence in each layer of the network, mitigating the problem of long-range dependencies being only considered across multiple model steps/layers in CNNs or RNNs which makes information loss more likely \citepage{6}{allyouneed}.
 
-\subsection{Types of transformer models}
+\section{Types of transformer models}
 
 There are a variety of different albeit similar structures that have been used to build effective transformer networks. In particular, decoder, encoder-decoder, and encoder models need to be differentiated.
 
@@ -21,7 +21,7 @@ Encoder-decoder models like the original transformer architecture as described i
 
 Decoder models like the GPT models \cite{improvinglu} generate new text to extend some given starting text. This can be used for example to write a story when given a first paragraph. But with the right training, they can be used for the same tasks as encoder and encoder-decoder models as can be seen in the next section.
 
-\subsection{Transformer decoder models}
+\section{Transformer decoder models}
 
 The purpose of a decoder transformer model is to have it complete a sequence of tokens. These tokens may represent a letter of some alphabet, fragments of words, entire words, keywords of a programming language, even decimal digits, byte values or the binary values 0 and 1.
 They could even represent color values or grid coordinates. Natural language modeling, however, is the most common scenario.
@@ -41,7 +41,7 @@ The training texts could also all be in a structured question-answer pair form, 
 
 When the models is well-trained on these question-answer pair texts, it can be asked a question by simply leaving out the answer part at the end of the text, like "21*3=", as demonstrated in \cite{alammar-transformer}. A good model would be able to generate the correct answer for similar questions by inference from the many examples it has seen, even when the exact question posed is not in its training data.
 
-\subsection{Beyond text}
+\section{Beyond text}
 
 Apart from text-based tasks, transformer models are also capable in domains like image classification.
 A 2D image can be flattened into a sequence of tokens / vectors which can then be processed in a normal transformer model. The resulting image classifier achieves similar results to state-of-the-art CNN-based classifiers \citepage{3,5}{worth16words}.
@@ -54,7 +54,7 @@ In \cite{grandmasterlevelchess} a transformer decoder model is trained to genera
 There have been minor modifications to the model architecture, data representation, and training regime among the diverse tasks outlined above. Also the performance of the resulting models is generally good but not quite state-of-the art. Nonetheless, having one model architecture that can achieve strong performance across a diverse set of domains seems promising as a step towards artificial general intelligence.
 
 
-\subsection{Tokenization}
+\section{Tokenization}
 \label{transformer:tokenization}
 
 Most transformer models preprocess input text using a so-called tokenizer, which is a model that was trained to group text into meaningful chunks out of a limited vocabulary called tokens to provide for an efficient representation of language \cite{subwordunits}. The tokenizer transforms the text into a sequence of integers, which is then processed by the transformer model which outputs token IDs which are then converted back into text.
@@ -74,7 +74,7 @@ To train a tokenizer, the byte-pair-encoding (BPE) algorithm \cite{subwordunits}
 Apart from the regular token vocabulary, most tokenizers also contain some special token values that will not be found in the input text. These are used for example to represent the start and end of each training sample, delimit individual pieces of text when they are fed to the model, or separate parts of a question/answer pair \cite{HuggingFaceTokenizers}.
 
 
-\subsection{Input and output}
+\section{Input and output}
 \label{transformer:input}
 
 Formally, the input to the model consists of a sequence of integers (token IDs) $\modIn_1 \ldots \modIn_n$, where $n$ is the length of the token sequence.
@@ -90,7 +90,7 @@ $\modOut_i$ should model which token most likely follows after all the tokens $\
 During training, all output positions are useful as they allow to optimize the model to correctly predict $\modIn_2$ based on $\modIn_1$,
 $\modIn_3$ based on $\modIn_1$ and $\modIn_2$, $\modIn_n$ based on $\modIn_1 \ldots \modIn_{n-1}$, all in a single training step. This greatly reduces training time for longer sequences \cite{alammar-gpt2}.
 
-\subsection{Text generation}
+\section{Text generation}
 \label{transformer:textgen}
 
 When using the trained model to generate text, only the last output distribution, $\modOut_n$, is of interest, because
@@ -100,7 +100,7 @@ This is used to generate one new token at a time (autoregressive decoding). The 
 
 The newly generated token $\modIn_{n+1}$ is appended to the input sequence and the whole process is repeated, with $n$ growing by one after each step, until a special end-of-sequence token is generated, the maximum length $\nPos$ is reached, or some other stop condition is triggered \cite[sect. "Generation"]{HuggingFaceGPT2}. If generation is not terminated, the model could in theory generate a text of infinite length, although transformer models generally only have a limited window of past tokens they can consider when generating the next token. In addition, generation time and memory requirements generally increase quadratically with sequence length for transformer models (\cref{gpt2:attn}).
 
-\subsection{User interaction}
+\section{User interaction}
 
 In 2023, OpenAI released their most successful product yet, ChatGPT \cite{openai_chatgpt_2022}. This online service allows users to chat with an artificial intelligence assistant which can help with reciting facts, writing texts and code, giving advice of all sorts and so on.
 
@@ -120,7 +120,7 @@ The model can then become the helpful assistant by filling in the assistant's me
 
 and the model would generate a response like "A banana is yellow" followed by an end-of-sequence token, similar to its training examples. For more details on how generic language models can be tuned to follow instructions or conversation, see \cite{yi2019coherent} and \cite{ouyang2022training}.
 
-\subsection{Generative pre-training}
+\section{Generative pre-training}
 
 The GPT-2/GPT-3/ChatGPT transformer models have demonstrated the effectiveness of a technique used to train language models called generative pre-training (GPT). This technique was first popularized in \cite{improvinglu} and consists of two phases.
 
@@ -131,7 +131,7 @@ After sufficient pre-training, the model is then fine-tuned on question-answer p
 Due to the well-known phenomenon of transfer learning \cite{transferlearning}, the pre-trained model will have already internalized the structure of natural language, source code and math. 
 This allows a relatively small amount of hand picked fine-tuning examples to make it significantly stronger compared to just training on the question-answer pairs on a freshly initialized model \citepage{8}{improvinglu}.
 
-\subsection{Attention mechanism}
+\section{Attention mechanism}
 \label{transformer:attn}
 
 Before transformers, model architectures such as recurrent neural networks (RNN) and long short-term memory (LSTM) were commonly used to handle textual or other sequential data. They ingest the tokenized text one token at a time, keeping one or multiple fixed vectors of model state. Transformers, in contrast, dropped recurrence and handle the entire sequence in parallel \citepage{1}{allyouneed}.

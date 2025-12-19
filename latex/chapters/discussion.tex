@@ -1,4 +1,4 @@
-\section{Summary}
+\chapter{Summary}
 
 In this work, we investigated the performance of small transformer models on the arithmetic operations of addition, multiplication and integer square root.
 To establish a baseline, we trained transformer networks with GPT-2 architecture and about 10 million parameters on each combination of these three operations and various operand lengths and training dataset sizes per operation.
@@ -11,7 +11,7 @@ The first strategy was reversing the digits of the result for each training samp
 The second strategy was augmenting each training sample with a scratchpad of intermediate steps of the arithmetic computation of that sample (\cref{results:scratchpad}).
 Finally, we created heatmaps of model attention to get some insight into how the model processes input strings (\cref{results:heatmap}).
 
-\subsection{Results}
+\section{Results}
 
 The best results we could achieve for the arithmetic functions we studied were 100\% accuracy for 3-, 5- and 10-digit addition, 94\% for 3-digit multiplication, 63\% for 5-digit multiplication, 22\% for 10-digit multiplication, 98\% for 6-digit integer square root, 64\% for 10-digit integer square root and 0\% for 20-digit integer square root.
 For addition and multiplication, these results were obtained when using scratchpads, for integer square root, they are from the baseline model. The largest training dataset size (100k training samples) was used.
@@ -21,7 +21,7 @@ On the other hand, using scratchpads also requires knowledge of meaningful inter
 
 Other strategies we tried for improving performance such as changing the dimensions of the model, dataset sampling strategy, or reversing the digits of the results generally brought only improvements to convergence speed (number of optimization steps until the model learned the task) or improved model accuracy from an already high 98-99\% to 100\% (no detectable errors). These strategies did not give the desired "quantum leap" of making multiplication or square root with large operands learnable.
 
-\subsection{Future work}
+\section{Future work}
 
 An obvious avenue for building on our results would be running training on the scratchpad experiments for longer, until an actual plateau is reached. Training using scratchpad was limited by the resources and budget. Training for more epochs would likely allow to see the actual limitations of scratchpad-aided multiplication on our model better, as we have reason to believe our models were undertrained (\cref{results:scratchpad}).
 It is also possible that the stopping condition we used contributes to premature termination of training; analyzing accuracy development curves suggests this might be a possibility. Focusing not only on loss but also accuracy might ensure training does not stop before the model reaches maximum accuracy.
