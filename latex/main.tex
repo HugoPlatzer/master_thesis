@@ -1,30 +1,35 @@
-\documentclass{article}
+\documentclass[
+	oneside,
+	paper=a4, 
+	ontsize=11pt,
+	headings=small]
+{scrbook}
 
 %%% packages
-\usepackage{lmodern}
-%\usepackage{indentfirst}
+\usepackage[american]{babel}
+\usepackage{csquotes}
+\usepackage{scrlayer-scrpage}
+\usepackage[
+	left=25mm,
+	right=25mm,
+	top=25mm, bottom=20mm,
+	footskip=10mm]
+{geometry}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{graphicx}
-\usepackage{svg}
-\usepackage{amsmath}
-\usepackage{amssymb}
 \usepackage[labelfont=bf]{caption}
 \usepackage{ifthen}
-\usepackage[a4paper]{geometry}
+%\usepackage{showframe}
 \usepackage{booktabs}
 \usepackage{pgfplotstable}
 \usepackage{colortbl}
 \usepackage{float}
-\usepackage{flafter}
-\usepackage{placeins}
 \usepackage{makecell}
-\usepackage{hyperref}
-\usepackage{xparse}
+\usepackage[pdfpagelabels]{hyperref}
 \usepackage{cleveref}
 \usepackage{tikz}
 \usepackage{listings}
-\usepackage{varwidth}
 \usepackage[
     style=numeric,
     backend=biber,
@@ -32,8 +37,7 @@
     defernumbers=true,
     sorting=none,
     urldate=long]
-    {biblatex}
-%\usepackage{letltxmacro}\LetLtxMacro{\cite}{\parencite}
+{biblatex}
 
 \usetikzlibrary{positioning}
 \usetikzlibrary{fit}
@@ -211,29 +215,59 @@
 	\end{figure}
 }
 
+%%% work title and related info
+
+\def\WorkTitle{An Experimental Investigation into Transformer Models Learning Integer Arithmetic}
+\def\WorkType{Master Thesis}
+\def\WorkAcademicDegree{Dipl.-Ing.}
+\def\WorkAuthor{Hugo Platzer}
+\def\WorkUniversity{Paris-Lodron-University of Salzburg}
+\def\WorkUniversityFaculty{Faculty of Digital and Analytical Sciences}
+\def\WorkSupervisor{Ao.Univ.-Prof. Dipl.-Ing. Dr. Helmut Mayer}
+\def\WorkSupervisorDepartment{Department of Artificial Intelligence \newline and Human Interfaces}
+\def\WorkSubmissionPlace{Salzburg}
+\def\WorkSubmissionDate{December 2025}
+
+%%% header/footer config
+
+\pagestyle{scrheadings}
+\clearpairofpagestyles
+\automark[chapter]{chapter}
+\chead{\headmark}
+\cfoot*{\pagemark}
+
 %%% document content
 \begin{document}
 
 \include{symbols}
 
+\frontmatter
+
 \include{chapters/titlepage}
+\include{chapters/abstract}
+\tableofcontents
+
+\mainmatter
 
 \include{chapters/introduction}
-
 \include{chapters/transformer_models}
-
 \include{chapters/gpt2_model}
-
 \include{chapters/methods}
-
 \include{chapters/experimental_setup}
-
 \include{chapters/experimental_results}
-
 \include{chapters/discussion}
 
 
+\backmatter
 
+% Define a custom bibliography heading based on \section*
+% It adds the title to the TOC but DOES NOT update the running header
+\defbibheading{subbibstatic}{%
+	\section*{#1}%
+	\addcontentsline{toc}{section}{#1}%
+}
+
+\printbibheading[heading=bibintoc, title={Bibliography}]
 
 \defbibfilter{references}{
 	type=article or
@@ -241,16 +275,12 @@
 	type=incollection
 }
 
-
-
 \emergencystretch=1em
 
-\printbibliography[filter=references, title={References}]
-
+\printbibliography[filter=references, heading=subbibstatic, title={References}]
 \clearpage
-\printbibliography[type=misc, title={Preprints}]
-
+\printbibliography[type=misc, heading=subbibstatic, title={Preprints}]
 \clearpage
-\printbibliography[type=online, title={Other Links}]
+\printbibliography[type=online, heading=subbibstatic, title={Other Links}]
 
 \end{document}

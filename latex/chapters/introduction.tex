@@ -1,20 +1,4 @@
-\thispagestyle{empty}
-
-\section*{Abstract}
-
-Transformer networks have proven to be successful in a number of domains such as natural language translation, coding, and general question answering. Arithmetic tasks, however, can be challenging for them.
-We study the performance of small (around $10^7$ parameters) transformer networks with a similar architecture to OpenAI GPT-2 on addition (3 to 10 decimal digits), multiplication (3 to 10 decimal digits), and integer square root (6 to 20 decimal digits). Training dataset sizes range from $10^3$ to $10^5$ samples, with character-level tokenization based on ASCII character values.
-We observe good performance on addition and poor performance on multiplication, with the latter not being learnable at all with five or more operand digits, with integer square root being somewhere in the middle.
-A number of strategies are attempted to address the issues with multiplication and integer square root performance: Adjusting the size of the model, different strategies for sampling the operands, reversing the digits of the result, and including a scratchpad with detailed intermediate steps in each training sample.
-While most strategies brought no dramatic improvement, scratchpads showed promise in making unlearnable tasks like multiplication learnable.
-
-
-\clearpage
-
-\tableofcontents
-\clearpage
-
-\section{Introduction}
+\chapter{Introduction}
 
 In 2017, the influential paper "Attention Is All You Need" \cite{allyouneed} was published. It showed that a new language model architecture, which they called the "Transformer", outperformed all previous models on English-French and English-German translation tasks, while also having lower training cost \citepage{8}{allyouneed}. Soon thereafter, variations of the transformer architecture described in this paper became the state of the art in most natural language processing tasks. They were also found to be competitive with established neural network architectures in other domains such as image classification \citepage{6}{worth16words}.
 
@@ -26,7 +10,7 @@ Even though transformer models are very strong at learning the patterns of human
 For example, GPT-3.5 and GPT-4 are unable to correctly multiply numbers with four or more decimal digits. It does however seem capable of adding numbers of arbitrary size \cite{openai2023gpt4} \citepage{9}{nocalculator}.  This work seeks to explore the limits on what transformer-style models are able to learn in terms of integer arithmetic.
 
 
-\subsection{Natural language versus arithmetic}
+\section{Natural language versus arithmetic}
 
 From a theoretical standpoint, one could argue both that natural language is harder to learn than arithmetic or vice versa:
 Natural language does not always follow strict logic but is more based on established conventions of its speakers, it covers a wide range of topics and can have multiple layers of meaning and nuance.
@@ -40,7 +24,7 @@ From a theoretical standpoint, Hahn \cite{theoreticallimits} showed that transfo
 
 In practice, OpenAI's technical report on GPT-4 \cite{openai2023gpt4} as well as Yang et al.  \citepage{9}{nocalculator} showed that GPT-3.5 and GPT-4, which were among the most advanced models for natural language understanding at the time of release, struggle with multiplication of integers with four or more decimal digits. They did, however, observe good performance on adding large integers, highlighting that multiplication is not only harder from a computational complexity standpoint but also a greater challenge for transformer models.
 
-\subsection{Related work}
+\section{Related work}
 
 Basic feed-forward networks can do addition of binary numbers (each input / output neuron representing one bit) with one hidden layer and binary multiplication with two hidden layers with perfect accuracy, as shown by Franco and Cannas \cite{solving}. The authors did not train a network, but instead proved its existence by constructing a feed-forward neural network including weight and bias matrices and proving its output always matches the sum or product of the input numbers.
 
