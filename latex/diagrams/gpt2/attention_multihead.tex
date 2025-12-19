@@ -35,9 +35,14 @@ font=\bfseries,
 %draw,
 ]
 
+\tikzstyle{medium gap}=[
+node distance=10mm and 0mm,
+]
+
 \tikzstyle{large gap}=[
 node distance=15mm and 0mm,
 ]
+
 
 \colorlet{h1color}{red!90!black}
 \colorlet{h2color}{green!80!black}
@@ -48,23 +53,18 @@ node distance=15mm and 0mm,
 \node[data node] (x1) at (cx1) {$\modHidden_1$};
 \node[data node] (x2) at (cx2) {$\modHidden_2$};
 
-
-\node[medium container node, above=of x1] (c2l1) {};
-\node[medium container node, left=of c2l1] (c1l1) {};
-\node[medium container node, right=of c2l1] (c3l1) {};
-
 \node[my block node, color 1, above=of cx1] (l1) {Linear};
 \node[my block node, color 1, above=of cx2] (l2) {Linear};
 
 \draw[my arrow style] (cx1) to (l1);
 \draw[my arrow style] (cx2) to (l2);
 
-\node[medium container node, above=of l1] (ck1) {};
-\node[medium container node, left=of ck1] (cq1) {};
-\node[medium container node, right=of ck1] (cv1) {};
-\node[medium container node, above=of l2] (ck2) {};
-\node[medium container node, left=of ck2] (cq2) {};
-\node[medium container node, right=of ck2] (cv2) {};
+\node[medium container node, medium gap, above=of l1] (ck1) {};
+\node[medium container node, medium gap, left=of ck1] (cq1) {};
+\node[medium container node, medium gap, right=of ck1] (cv1) {};
+\node[medium container node, medium gap, above=of l2] (ck2) {};
+\node[medium container node, medium gap, left=of ck2] (cq2) {};
+\node[medium container node, medium gap, right=of ck2] (cv2) {};
 
 \node[data node] at (cq1) (q1) {$\mathbf{q}_1$};
 \node[data node] at (ck1) (k1) {$\mathbf{k}_1$};
@@ -80,18 +80,18 @@ node distance=15mm and 0mm,
 \draw[arrow style] (l2.north-|ck2) to (ck2);
 \draw[arrow style] (l2.north-|cv2) to (cv2);
 
-\node[small container node, above=of cq1, anchor=east] (cq1h1) {};
-\node[small container node, above=of cq1, anchor=west] (cq1h2) {};
-\node[small container node, above=of ck1, anchor=east] (ck1h1) {};
-\node[small container node, above=of ck1, anchor=west] (ck1h2) {};
-\node[small container node, above=of cv1, anchor=east] (cv1h1) {};
-\node[small container node, above=of cv1, anchor=west] (cv1h2) {};
-\node[small container node, above=of cq2, anchor=east] (cq2h1) {};
-\node[small container node, above=of cq2, anchor=west] (cq2h2) {};
-\node[small container node, above=of ck2, anchor=east] (ck2h1) {};
-\node[small container node, above=of ck2, anchor=west] (ck2h2) {};
-\node[small container node, above=of cv2, anchor=east] (cv2h1) {};
-\node[small container node, above=of cv2, anchor=west] (cv2h2) {};
+\node[small container node, large gap, above=of cq1, anchor=east] (cq1h1) {};
+\node[small container node, large gap, above=of cq1, anchor=west] (cq1h2) {};
+\node[small container node, large gap, above=of ck1, anchor=east] (ck1h1) {};
+\node[small container node, large gap, above=of ck1, anchor=west] (ck1h2) {};
+\node[small container node, large gap, above=of cv1, anchor=east] (cv1h1) {};
+\node[small container node, large gap, above=of cv1, anchor=west] (cv1h2) {};
+\node[small container node, large gap, above=of cq2, anchor=east] (cq2h1) {};
+\node[small container node, large gap, above=of cq2, anchor=west] (cq2h2) {};
+\node[small container node, large gap, above=of ck2, anchor=east] (ck2h1) {};
+\node[small container node, large gap, above=of ck2, anchor=west] (ck2h2) {};
+\node[small container node, large gap, above=of cv2, anchor=east] (cv2h1) {};
+\node[small container node, large gap, above=of cv2, anchor=west] (cv2h2) {};
 
 \node[data node] (q1h1) at (cq1h1) {$\mathbf{q}_{1_{ \textcolor{h1color}{1} }}$};
 \node[data node] (q1h2) at (cq1h2) {$\mathbf{q}_{1_{ \textcolor{h2color}{2} }}$};
