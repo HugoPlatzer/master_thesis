@@ -20,7 +20,7 @@
 \usepackage{graphicx}
 \usepackage[labelfont=bf]{caption}
 \usepackage{ifthen}
-%\usepackage{showframe}
+\usepackage{showframe}
 \usepackage{booktabs}
 \usepackage{pgfplotstable}
 \usepackage{colortbl}
@@ -259,6 +259,9 @@
 
 
 \backmatter
+
+% Fix commit ID formatting, avoid long hash value sticking out
+\DeclareFieldFormat{note}{\newline \texttt{#1}}
 
 % Define a custom bibliography heading based on \section*
 % It adds the title to the TOC but DOES NOT update the running header
