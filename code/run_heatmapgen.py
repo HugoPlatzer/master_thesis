@@ -6,7 +6,9 @@ import matplotlib.pyplot as plt
 
 from model import load_model_from_path
 from tokenizer import ASCIITokenizer
+from plotgen.settings import apply_plot_settings
 
+apply_plot_settings()
 
 if len(sys.argv) != 2:
     print(f"usage: {sys.argv[0]} config.json")
@@ -17,8 +19,9 @@ config = json.loads(open(config_file).read())
 
 plot_type = config["plot_type"]
 
-matplotlib.rc("text", usetex=True)
-matplotlib.rc("font", family="serif", size=config["font_size"])
+tick_font_size = (config["tick_font_size"]
+        if "tick_font_size" in config
+        else plt.rcParams["font.size"])
 
 model = load_model_from_path(config["model_path"])
 
@@ -64,6 +67,9 @@ def plot_single():
     ax.set_yticks(range(len(row_labels)))
     ax.set_yticklabels(row_labels)
 
+    ax.tick_params(axis="both", which="major",
+            labelsize=tick_font_size)
+
 
 def plot_full():
     figure_gap = config["figure_gap"]
@@ -85,6 +91,8 @@ def plot_full():
             ax.set_xticklabels(col_labels)
             ax.set_yticks(range(len(row_labels)))
             ax.set_yticklabels(row_labels)
+            ax.tick_params(axis="both", which="major",
+                    labelsize=tick_font_size)
 
             if layer_idx != 0:
                 ax.tick_params(bottom=False)

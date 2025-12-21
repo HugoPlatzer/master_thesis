@@ -4,8 +4,8 @@
     "prompt_str": "123+456=",
     "response_str": "0579",
     "figure_width": 6.5,
-    "figure_height": 5.0,
+    "figure_height": 5.5,
     "figure_gap": 0.05,
-    "font_size": 7,
+    "tick_font_size": 8,
     "colormap": "viridis"
 }
