@@ -1,7 +1,7 @@
 \addchap{Abstract}
 
 Transformer networks have proven to be successful in a number of domains such as natural language translation, coding, and general question answering. Arithmetic tasks, however, can be challenging for them.
-We study the performance of small (around $10^7$ parameters) transformer networks with a similar architecture to OpenAI GPT-2 on addition (3 to 10 decimal digits), multiplication (3 to 10 decimal digits), and integer square root (6 to 20 decimal digits). Training dataset sizes range from $10^3$ to $10^5$ samples, with character-level tokenization based on ASCII character values.
-We observe good performance on addition and poor performance on multiplication, with the latter not being learnable at all with five or more operand digits, with integer square root being somewhere in the middle.
-A number of strategies are attempted to address the issues with multiplication and integer square root performance: Adjusting the size of the model, different strategies for sampling the operands, reversing the digits of the result, and including a scratchpad with detailed intermediate steps in each training sample.
-While most strategies brought no dramatic improvement, scratchpads showed promise in making unlearnable tasks like multiplication learnable.
+We study the performance of small (around $10^7$ parameters) transformer networks with a similar architecture to OpenAI GPT-2 on addition (3 to 10 decimal digits), multiplication (3 to 10 decimal digits), and integer square root (6 to 20 decimal digits). Training dataset sizes range from $10^3$ to $10^5$ samples, using character-level tokenization based on ASCII values.
+We observe good performance on addition but poor performance on multiplication, with the latter not being learnable at all with five or more operand digits, with integer square root being somewhere in the middle.
+Adjusting model dimensions, changing operand sampling, reversing the result and including a scratchpad are attempted to address the issues with multiplication and integer square root performance.
+While most strategies brought no dramatic improvement, scratchpads containing detailed intermediate computation steps showed promise in making unlearnable tasks like large multiplication learnable.
