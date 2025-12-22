@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 
 from model import load_model_from_path
 from tokenizer import ASCIITokenizer
-from plotgen.settings import apply_plot_settings
+from plotgen import settings
 
-apply_plot_settings()
+settings.apply_font_settings()
 
 if len(sys.argv) != 2:
     print(f"usage: {sys.argv[0]} config.json")
@@ -21,7 +21,7 @@ plot_type = config["plot_type"]
 
 tick_font_size = (config["tick_font_size"]
         if "tick_font_size" in config
-        else plt.rcParams["font.size"])
+        else settings.FONT_SIZE)
 
 model = load_model_from_path(config["model_path"])
 
@@ -46,12 +46,25 @@ figure_width = config["figure_width"]
 figure_height = config["figure_height"]
 colormap = config["colormap"]
 
+
+def format_label(x):
+    if len(x) != 1:
+        raise Exception(f"invalid input '{x}'")
+    if x == "{" or x == "}":
+        x = "\\" + x
+    return f"\\texttt{x}"
+
 row_labels = config["response_str"] + "."
 col_labels = config["prompt_str"] + config["response_str"]
+row_labels = [format_label(x) for x in row_labels]
+col_labels = [format_label(x) for x in col_labels]
+
 
 # only keep rows of attention matrices where tokens of
 # response_str are generated, plus EOS token
 attention_matrices = attention_matrices[:, :, -len(row_labels):, :]
+
+
 
 
 def plot_single():

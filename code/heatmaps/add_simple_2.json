@@ -6,6 +6,5 @@
     "response_str": "1000",
     "figure_width": 4.0,
     "figure_height": 2.0,
-    "tick_font_size": 8,
     "colormap": "viridis"
 }

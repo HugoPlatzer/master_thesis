@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 from matplotlib.legend_handler import HandlerLine2D
 import numpy as np
 
-from .settings import apply_plot_settings
+from . import settings
 
 def create_plot(config_file):
-    apply_plot_settings()
+    settings.apply_plot_settings()
     config = json.loads(open(config_file).read())
     
     curves = []
@@ -47,6 +47,5 @@ def create_plot(config_file):
     plt.grid(True)
     plt.legend(loc="lower right", bbox_to_anchor=(1,1),
         ncol=config["legend_columns"])
-    plt.tight_layout()
     output_file = config_file.rsplit(".", 1)[0] + ".pdf"
     plt.savefig(output_file)

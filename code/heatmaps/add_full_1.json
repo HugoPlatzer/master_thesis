@@ -3,9 +3,9 @@
     "model_path": "experiments/baseline/add/3digits/100k/checkpoint-4301/",
     "prompt_str": "123+456=",
     "response_str": "0579",
-    "figure_width": 6.5,
+    "figure_width": 7.5,
     "figure_height": 5.5,
     "figure_gap": 0.05,
-    "tick_font_size": 8,
+    "tick_font_size": 11,
     "colormap": "viridis"
 }
