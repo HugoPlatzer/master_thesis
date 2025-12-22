@@ -115,11 +115,11 @@ def plot_full():
     for layer_idx in range(num_layers):
         row_index = num_layers - 1 - layer_idx
         axes[row_index][0].set_ylabel(
-                f"\\textbf{{Block {layer_idx + 1}}}")
+                f"Block {layer_idx + 1}")
 
     for head_idx in range(num_heads):
         axes[num_layers - 1][head_idx].set_xlabel(
-                f"\\textbf{{Head {head_idx + 1}}}")
+                f"Head {head_idx + 1}")
 
 
 if plot_type == "single":
