@@ -5,6 +5,8 @@
 	headings=small]
 {scrbook}
 
+%\usepackage{showframe}
+
 %%% packages
 \usepackage[american]{babel}
 \usepackage{csquotes}
@@ -20,7 +22,6 @@
 \usepackage{graphicx}
 \usepackage[labelfont=bf]{caption}
 \usepackage{ifthen}
-\usepackage{showframe}
 \usepackage{booktabs}
 \usepackage{pgfplotstable}
 \usepackage{colortbl}
@@ -209,7 +210,7 @@
 \newcommand{\includePDFPlot}[3]{
 	\begin{figure}[H]
 		\centering
-		\includegraphics[scale=0.9]{#1}%
+		\includegraphics[scale=1]{#1}%
 		\caption{#3}
 		\label{#2}
 	\end{figure}

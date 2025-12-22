@@ -21,6 +21,7 @@ On the other hand, using scratchpads also requires knowledge of meaningful inter
 
 Other strategies we tried for improving performance such as changing the dimensions of the model, dataset sampling strategy, or reversing the digits of the results generally brought only improvements to convergence speed (number of optimization steps until the model learned the task) or improved model accuracy from an already high 98-99\% to 100\% (no detectable errors). These strategies did not give the desired "quantum leap" of making multiplication or square root with large operands learnable.
 
+\newpage
 \section{Future work}
 
 An obvious avenue for building on our results would be running training on the scratchpad experiments for longer, until an actual plateau is reached. Training using scratchpad was limited by the resources and budget. Training for more epochs would likely allow to see the actual limitations of scratchpad-aided multiplication on our model better, as we have reason to believe our models were undertrained (\cref{results:scratchpad}).

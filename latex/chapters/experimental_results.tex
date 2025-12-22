@@ -42,7 +42,7 @@ For 10-digit integer square root, accuracy was 63\% for the 100k dataset but rem
 
 \includeAccuracyTable{experiment_results/baseline_final_accuracy/sqrt.csv}{tbl:baseline_sqrt}{Final model accuracy on the test dataset for the square root operation for the given training dataset sizes and operand digits.}{}
 
-When looking at the accuracy curves in \cref{fig:baseline_sqrt}, we can see curves that are more similar to those of the multiplication experiment than the addition experiments, with accuracy slowly climbing from zero. Once again, it looks like early stopping might prevent the model from achieving their full accuracy potential.
+When looking at the accuracy curves in \cref{fig:baseline_sqrt}, we can see curves that are more similar to those of the multiplication experiment than the addition experiments, with accuracy slowly climbing from zero. Once again, it looks like early stopping might prevent the models from achieving their full accuracy potential.
 
 \includePDFPlot{experiment_results/baseline_accuracy/sqrt.pdf}{fig:baseline_sqrt}{Development of accuracy on the validation dataset when training for the square root task for different operand digits and dataset sizes. Square markers represent the point training was terminated by early stopping.}
 
@@ -170,7 +170,7 @@ For 3-digit multiplication, the model achieved an accuracy of about 20\% (\cref{
 
 
 
-For 5-digit multiplication, for which the model did not achieve above-zero accuracy (\cref{tbl:baseline_mul}), the first and last digits were still correct for failed tasks, but multiple digits in the middle of the product were off (\cref{tbl:errors_mul_5digits}).
+For 5-digit multiplication, for which the model did not achieve above-zero accuracy (\cref{tbl:baseline_mul}), the first and last digits were still correct for failed tasks, but multiple digits in the middle of the product were wrong (\cref{tbl:errors_mul_5digits}).
 
 \includeTable
 {
@@ -1207,7 +1207,7 @@ For the addition task using the scratchpad (\cref{fig:heatmap_add_scratch}), we 
 
 
 
-
+\newpage
 \subsection{Multiplication task}
 
 
@@ -1222,6 +1222,7 @@ This corresponds well to the fact that accuracy achieved for multiplication was 
 
 
 
+\newpage
 \subsection{Square root task}
 
 For the square root tasks with 6 digits (\cref{fig:heatmap_sqrt}) we can see the least significant digit of the output "1" attending to the 3 most significant digits of the input (and slightly to previous output digit "3") whereas the more significant output digit 5 attends mostly to the second most significant input digit "2" and the most significant output digit "3" attends mostly to the most significant input digit "1".
