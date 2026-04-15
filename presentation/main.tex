@@ -37,19 +37,32 @@
 \begin{frame}
 \frametitle{Why even do this?}
 \begin{itemize}
-\item No need to use transformers or even any machine learning model for simple aritmetics
-\item Nonetheless, it is interesting to see capabilities of models to learn based on examples alone
-\item Only one correct result, no ambiguity, easy verification
-\item Multiplication in particular is hard for even (in 2023) state-of-the-art general-purpose transformer models (GPT-3.5, GPT-4)
-\item To be fair, current models can often solve such tasks by calling an external tool or step-by-step reasoning
-\item Differing theoretical complexities per operation: $O(n)$ for addition, $O(n^2)$ for naive multiplication
+    \item No need to use transformers or even any machine learning model for simple aritmetics
+    \item Nonetheless, it is interesting to see capabilities of models to learn based on examples alone
+    \item Only one correct result, no ambiguity, easy verification
+    \item Multiplication in particular is hard for even (in 2023) state-of-the-art general-purpose transformer models (GPT-3.5, GPT-4)
+    \item To be fair, current models can often solve such tasks by calling an external tool or step-by-step reasoning
+    \item Differing theoretical complexities per operation: $\operatorname{O}(n)$ for addition, $\operatorname{O}(n^2)$ for naive multiplication
 \end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Existing work}
 \begin{itemize}
-\item \textit{Teaching arithmetic to }
+    \item \textit{Teaching Arithmetic to Small Transformers [Lee et al., 2024]}
+    \begin{itemize}
+        \item train small transformer networks on 3-digit up to 10-digit addition
+        \item plotted final accuracy in response to training dataset size
+        \item tested the influence of various strategies like result reversal and step-by-step training data
+        \item also tried multiplication, but only 2-digit operands
+    \end{itemize}
+    \item \textit{Goat: Fine-tuned LLaMA Outperforms GPT-4 [Liu and Low, 2024]}
+    \begin{itemize}
+        \item larger transformer network (7 billion parameters)
+        \item not training from scratch, use existing open-weight language model base
+        \item up to 16 digit operands, addition and multiplication, step-by-step training data
+        \item model learned addition perfectly, but failed at multiplication
+    \end{itemize}
 \end{itemize}
 \end{frame}
 
@@ -83,23 +96,70 @@
 \begin{frame}
 \frametitle{Initial results}
 \begin{itemize}
-\item add, mul, sqrt results (baseline)
+    \item add, mul, sqrt results (baseline)
 \end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Further experiments}
 \begin{itemize}
-    \item Reversing result
-    \item changing sample distribution
-    \item Scratchpads:
+    \item Changing model size
+    \item Reversing the result
     \begin{itemize}
-        \item Addition: ADDSCRATCHPAD
-        \item Multiplication: MULSCRATCHPAD
-        \item Square root: SQRTSCRATCHPAD
+        \item \texttt{123+456=579} becomes \texttt{123+456=975}
+        \item Order of digits then matches order of computation
+    \end{itemize}
+    \item Changing sample distribution
+    \begin{itemize}
+        \item Uniform digits, uniform bits...
+        \item Shifts balance between "easy" and "hard" samples
+    \end{itemize}
+    \item Step-by-step computation examples ("scratchpads")
+    \begin{itemize}
+        \item Encode intermediate steps into training samples, not just the result
+        \item For example, for addition include steps for each digit, carry propagation...
     \end{itemize}
 \end{itemize}
 \end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Further experiments: Scratchpads}
+\begin{itemize}
+    \item Addition example:
+    \begin{verbatim}
+        456+789=[69051|58141|47121]1245
+    \end{verbatim}
+    \item Multiplication example:
+    \begin{verbatim}
+        67*89=[
+            *80{78065,68535}5360,
+            *9{79036,69606}603
+        |
+            {03,0,3,0;60,0,6,0;36,0,9,0;5,0,5,0}
+        ]5963
+    \end{verbatim}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Further experiments: Scratchpads}
+\begin{itemize}
+    \item Integer square root example:
+    \begin{verbatim}
+        123:[
+            {0,123} 61*61=3721|
+            {0,61} 30*30=900|
+            {0,30} 15*15=225|
+            {0,15} 7*7=49|
+            {7,15} 11*11=121|
+            {11,15} 13*13=169|
+            {11,13} 12*12=144|
+            {11,12}
+        ]11
+    \end{verbatim}
+\end{itemize}
+\end{frame}
+
 
 \begin{frame}
 \frametitle{Results using scratchpad}
@@ -115,7 +175,7 @@
 \item Going from 99\% to 100\% accuracy can still be an issue (seen when learning addition without scratchpad)
 \item Transformer networks can learn addition (directly) and also multiplication (with help from scratchpad)
 \item Small transformers can learn the structure of long scratchpads
-\item But the scratchpad needs to be in small steps (issue seen with square root)
+\item But the scratchpad needs to be in small steps (speculated cause for issues seen with integer square root)
 \item How to compute the result must be known to generate a scratchpad
 \item Scratchpads have downsides of longer training sequences (slower training, higher memory demand)
 \end{itemize}
