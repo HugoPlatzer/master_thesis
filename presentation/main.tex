@@ -1,8 +1,60 @@
 \documentclass{beamer}
+\usepackage{pgfplotstable}
+\usepackage{colortbl}
+\usepackage{booktabs}
+
 \title{An Experimental Investigation into Transformer Models Learning Integer Arithmetic}
 \subtitle{Presentation of thesis}
 \author{Hugo Platzer}
 \date{April 16, 2026}
+
+
+
+
+%%% code for colored accuracy tables BEGIN
+
+\newcommand\AccuracyTableFontSize{\footnotesize}
+
+\pgfplotsset{compat=1.18}
+
+\definecolor{mutedred}{rgb}{1.0, 0.3, 0.3}
+\definecolor{mutedgreen}{rgb}{0.3, 1.0, 0.3}
+
+\newcommand{\mapvaluetocolor}[1]{%
+	\pgfmathsetmacro{\colorvalue}{(1-(#1))*100}%
+	\edef\temp{\noexpand\cellcolor{mutedred!\colorvalue!mutedgreen}}%
+	\temp
+}
+
+% arguments: csv file, additional styling options
+\newcommand{\includeAccuracyTableCore}[2]{
+    \pgfplotstabletypeset[
+        string type,
+        col sep=comma,
+        assign column name/.style={/pgfplots/table/column name={\textbf{##1}}},
+        every head row/.style={
+            before row=\toprule,
+            after row=\midrule,
+        },
+        every last row/.style={
+            after row=\bottomrule
+        },
+        every column/.style={
+            column type={r},
+            postproc cell content/.code={%
+                \pgfkeyssetvalue{/pgfplots/table/@cell content}{\mapvaluetocolor{####1} ####1}%
+            },
+        },
+        columns/name/.style={
+            column name={},
+            postproc cell content/.code={}
+        },
+        font=\AccuracyTableFontSize,
+        #2
+    ]{#1}
+}
+
+%%% code for colored accuracy tables END
 
 \setbeamertemplate{navigation symbols}{}
 \begin{document}
@@ -96,7 +148,12 @@
 \begin{frame}
 \frametitle{Initial results}
 \begin{itemize}
-    \item add, mul, sqrt results (baseline)
+    \item Additon: \\ \medskip
+    \includeAccuracyTableCore{../latex/experiment_results/baseline_final_accuracy/add.csv}{}
+    \item Multiplication: \\ \medskip
+    \includeAccuracyTableCore{../latex/experiment_results/baseline_final_accuracy/mul.csv}{}
+    \item Integer square root: \\ \medskip
+    \includeAccuracyTableCore{../latex/experiment_results/baseline_final_accuracy/sqrt.csv}{}
 \end{itemize}
 \end{frame}
 
@@ -161,11 +218,26 @@
 \end{frame}
 
 
-\begin{frame}
+\begin{frame}[fragile]
 \frametitle{Results using scratchpad}
-\begin{itemize}
-\item side by side: add, mul, sqrt (using scratchpad)
-\end{itemize}
+\begin{columns}
+    \column{0.5\textwidth}
+        \textbf{Baseline} \\
+            Additon: \\
+            \includeAccuracyTableCore{../latex/experiment_results/baseline_final_accuracy/add.csv}{}
+            \\ \medskip Multiplication: \\
+            \includeAccuracyTableCore{../latex/experiment_results/baseline_final_accuracy/mul.csv}{}
+            \\ \medskip Integer square root: \\
+            \includeAccuracyTableCore{../latex/experiment_results/baseline_final_accuracy/sqrt.csv}{}
+    \column{0.5\textwidth}
+        \textbf{Scratchpad} \\
+            Additon: \\
+            \includeAccuracyTableCore{../latex/experiment_results/intermediate_steps_final_accuracy/scratchpad/add.csv}{}
+            \\ \medskip Multiplication: \\
+            \includeAccuracyTableCore{../latex/experiment_results/intermediate_steps_final_accuracy/scratchpad/mul.csv}{}
+            \\ \medskip Integer square root: \\
+            \includeAccuracyTableCore{../latex/experiment_results/intermediate_steps_final_accuracy/scratchpad/sqrt.csv}{}
+\end{columns}
 \end{frame}
 
 \begin{frame}
