@@ -2,6 +2,7 @@
 \title{An Experimental Investigation into Transformer Models Learning Integer Arithmetic}
 \subtitle{Presentation of thesis}
 \author{Hugo Platzer}
+\date{April 16, 2026}
 
 \setbeamertemplate{navigation symbols}{}
 \begin{document}
@@ -10,30 +11,114 @@
 
 \begin{frame}
 \frametitle{Overview}
+
+\begin{itemize}
+    \item Transformer networks
+    \begin{itemize}
+        \item Type of neural network architecture that is trained to continue a sequence of integers
+        \item These can represent characters (ASCII), words, tokens (parts of words)
+        \item Introduced in \textit{Attention Is All You Need [Vaswani et al., 2017]}
+        \item Initially introduced for natural language translation tasks
+        \item Later employed successfully for all sorts of tasks, including as a general-purpose AI agent
+        \item Transformer networks power state of the art AI systems (e.g., ChatGPT, various coding agents)
+    \end{itemize}
+    \item Integer arithmetic
+    \begin{itemize}
+        \item Addition \texttt{123+456=579.}
+        \item Multiplication \texttt{456*789=359784.}
+        \item Integer square root \texttt{123:11.}
+    \end{itemize}
+    \item Goal is to have the model complete the answer (arithmetic result)
+    based on the operands: Model gets \texttt{123+456=} and should continue with the result
+    \texttt{579}
+\end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{Transformer networks}
-\end{frame}
-
-\begin{frame}
-\frametitle{Integer Arithmetic}
-\end{frame}
-
-\begin{frame}
-\frametitle{Experiments}
+\frametitle{Why even do this?}
+\begin{itemize}
+\item No need to use transformers or even any machine learning model for simple aritmetics
+\item Nonetheless, it is interesting to see capabilities of models to learn based on examples alone
+\item Only one correct result, no ambiguity, easy verification
+\item Multiplication in particular is hard for even (in 2023) state-of-the-art general-purpose transformer models (GPT-3.5, GPT-4)
+\item To be fair, current models can often solve such tasks by calling an external tool or step-by-step reasoning
+\item Differing theoretical complexities per operation: $O(n)$ for addition, $O(n^2)$ for naive multiplication
+\end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Existing work}
+\begin{itemize}
+\item \textit{Teaching arithmetic to }
+\end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{Results}
+\frametitle{Initial experiments}
+\begin{itemize}
+    \item Three integer arithmetic operations:
+    \begin{itemize}
+        \item addition, multiplication, integer square root
+    \end{itemize}
+    \item Three operand sizes:
+    \begin{itemize}
+        \item 3, 5, 10 digits for addition and multiplication
+        \item 6, 10, 20 digits for integer square root
+    \end{itemize}
+    \item Three dataset sizes:
+    \begin{itemize}
+        \item 1k, 10k, 100k elements
+    \end{itemize}
+    \item 27 experiments in total
+    \item Small transformer network:
+    \begin{itemize}
+        \item OpenAI GPT2 variant (released in 2019)
+        \item trained from scratch on a single task only
+        \item about 10M parameters
+        \item ASCII tokenization (one token per character)
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Initial results}
+\begin{itemize}
+\item add, mul, sqrt results (baseline)
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Further experiments}
+\begin{itemize}
+    \item Reversing result
+    \item changing sample distribution
+    \item Scratchpads:
+    \begin{itemize}
+        \item Addition: ADDSCRATCHPAD
+        \item Multiplication: MULSCRATCHPAD
+        \item Square root: SQRTSCRATCHPAD
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Results using scratchpad}
+\begin{itemize}
+\item side by side: add, mul, sqrt (using scratchpad)
+\end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Conclusion}
+
+\begin{itemize}
+\item Going from 99\% to 100\% accuracy can still be an issue (seen when learning addition without scratchpad)
+\item Transformer networks can learn addition (directly) and also multiplication (with help from scratchpad)
+\item Small transformers can learn the structure of long scratchpads
+\item But the scratchpad needs to be in small steps (issue seen with square root)
+\item How to compute the result must be known to generate a scratchpad
+\item Scratchpads have downsides of longer training sequences (slower training, higher memory demand)
+\end{itemize}
 \end{frame}
 
 \end{document}
